@@ -1,5 +1,5 @@
 # audio-graph
 
 
-<img width="1327" alt="Screen Shot 2022-07-16 at 21 13 45" src="https://user-images.githubusercontent.com/1325721/179369046-d413bd6f-3c84-4c81-89ff-0f9468b754a9.png">
+<img width="1610" alt="Screen Shot 2022-07-17 at 01 16 00" src="https://user-images.githubusercontent.com/1325721/179374755-0a3a0acb-2ffc-480b-b4bc-66210385db26.png">
 
