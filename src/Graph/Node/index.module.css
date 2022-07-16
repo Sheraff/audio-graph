@@ -1,0 +1,67 @@
+.main {
+	--bg: #514c57;
+	--highlight: #604b79;
+	--radius: 4px;
+
+	position: absolute;
+	z-index: 0;
+	top: var(--y);
+	left: var(--x);
+
+	display: grid;
+	grid-template-areas:
+		"header header"
+		"input output"
+		"settings settings";
+	grid-template-columns: 1fr 1fr;
+
+	user-select: none;
+}
+
+.main.hover {
+	--bg: var(--highlight);
+}
+
+.main::before,
+.main::after {
+	content: "";
+	background-color: var(--bg);
+	z-index: -1;
+	align-self: end;
+}
+.main::before {
+	grid-area: input;
+	height: calc(100% - 100% * var(--left) / max(var(--left), var(--right)));
+}
+.main::after {
+	grid-area: output;
+	height: calc(100% - 100% * var(--right) / max(var(--left), var(--right)));
+}
+
+.header {
+	grid-area: header;
+	padding: .5em;
+	text-align: center;
+	background: var(--bg);
+	border-top-left-radius: var(--radius);
+	border-top-right-radius: var(--radius);
+
+	user-select: none;
+	cursor: grab;
+}
+
+.input {
+	grid-area: input;
+}
+
+.output {
+	grid-area: output;
+}
+
+.settings {
+	grid-area: settings;
+	padding: .5em;
+	background: var(--bg);
+	border-bottom-left-radius: var(--radius);
+	border-bottom-right-radius: var(--radius);
+}
