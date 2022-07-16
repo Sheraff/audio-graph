@@ -255,7 +255,22 @@ const TYPES = {
 				name: 'out',
 			},
 		],
-	}
+	},
+	'add-inputs': {
+		inputs: [
+			{
+				name: 'in1',
+			},
+			{
+				name: 'in2',
+			},
+		],
+		outputs: [
+			{
+				name: 'out',
+			},
+		],
+	},
 }
 
 export default TYPES

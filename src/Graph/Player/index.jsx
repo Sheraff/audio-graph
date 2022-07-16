@@ -95,6 +95,9 @@ function Player({nodes, connections}, ref) {
 			} else if (node.type === 'white-noise') {
 				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'white-noise-processor', {numberOfInputs: 0})
 				audioNodes.current[node.id] = whiteNoiseNode
+			} else if (node.type === 'add-inputs') {
+				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'add-inputs', {numberOfInputs: 2})
+				audioNodes.current[node.id] = whiteNoiseNode
 			} else if (node.type === 'output') {
 				audioNodes.current[node.id] = ctx.current.destination
 			}
@@ -111,7 +114,10 @@ function Player({nodes, connections}, ref) {
 	}, [nodes, updateSettings, updateConnections])
 
 	const loadModules = useCallback(async () => {
-		await ctx.current.audioWorklet.addModule('WhiteNoiseSource.js')
+		await Promise.all([
+			ctx.current.audioWorklet.addModule('AudioWorklets/WhiteNoiseSource.js'),
+			ctx.current.audioWorklet.addModule('AudioWorklets/InputAdd.js'),
+		])
 	}, [])
 
 	useEffect(() => {
