@@ -86,8 +86,8 @@ export default function Graph() {
 			...prev,
 			{
 				id: `${++id}`,
-				x: 100,
-				y: 300,
+				x: document.scrollingElement.scrollLeft + innerWidth * 0.25,
+				y: document.scrollingElement.scrollTop + innerHeight * 0.25,
 				type: select.current.value,
 			}
 		]))
@@ -114,20 +114,22 @@ export default function Graph() {
 				))}
 			</div>
 			<Connections ref={connectionRefs} nodeContainer={nodeContainer} nodeRefs={nodeRefs} onConnect={onConnect}/>
-			<select id="new-node-type" ref={select} onChange={onSelect} onFocus={onFocus}>
-				{Object.keys(TYPES).map(type => (
-					<option value={type} key={type}>{type}</option>
-				))}
-			</select>
-			{!play && (
-				<button
-					type='button'
-					onClick={() => setPlay(a => !a)}
-					aria-label='Play'
-				>
-					▶
-				</button>
-			)}
+			<div className={styles.hud}>
+				<select id="new-node-type" ref={select} onChange={onSelect} onFocus={onFocus}>
+					{Object.keys(TYPES).map(type => (
+						<option value={type} key={type}>{type}</option>
+					))}
+				</select>
+				{!play && (
+					<button
+						type='button'
+						onClick={() => setPlay(a => !a)}
+						aria-label='Play'
+					>
+						▶
+					</button>
+				)}
+			</div>
 			{play && (
 				<Player ref={playerRef} nodes={nodeRefs} connections={connectionRefs}/>
 			)}
