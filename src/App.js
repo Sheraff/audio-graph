@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import styles from './app.module.css'
 import Graph from './Graph'
 import Waveform from './Waveform'
