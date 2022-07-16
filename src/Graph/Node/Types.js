@@ -311,6 +311,14 @@ const TYPES = {
 			{name: 'multiplier', type: 'range', props: {min: -1000, max: 1000, step: 0.1}, defaultValue: -1, readFrom: 'value'},
 		],
 	},
+	'to-mono': {
+		inputs: [
+			{name: 'in'},
+		],
+		outputs: [
+			{name: 'out'},
+		]
+	},
 }
 
 export default TYPES

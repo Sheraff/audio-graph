@@ -69,7 +69,6 @@ function Player({nodes, connections}, ref) {
 				audioNode.release.value = node.settings.release
 			} else if (node.type === 'multiplier') {
 				audioNode.parameters.get('multiplier').value = parseFloat(node.settings.multiplier)
-			} else if (node.type === 'output') {
 			}
 		})
 	}, [nodes])
@@ -111,14 +110,17 @@ function Player({nodes, connections}, ref) {
 				const compressorNode = ctx.current.createDynamicsCompressor()
 				audioNodes.current[node.id] = compressorNode
 			} else if (node.type === 'white-noise') {
-				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'white-noise-processor', {numberOfInputs: 0})
-				audioNodes.current[node.id] = whiteNoiseNode
+				const customNode = new AudioWorkletNode(ctx.current, 'white-noise-processor', {numberOfInputs: 0})
+				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'add-inputs') {
-				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'add-inputs', {numberOfInputs: 2})
-				audioNodes.current[node.id] = whiteNoiseNode
+				const customNode = new AudioWorkletNode(ctx.current, 'add-inputs', {numberOfInputs: 2})
+				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'multiplier') {
-				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'multiplier')
-				audioNodes.current[node.id] = whiteNoiseNode
+				const customNode = new AudioWorkletNode(ctx.current, 'multiplier')
+				audioNodes.current[node.id] = customNode
+			} else if (node.type === 'to-mono') {
+				const customNode = new AudioWorkletNode(ctx.current, 'to-mono')
+				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'output') {
 				audioNodes.current[node.id] = ctx.current.destination
 			}
@@ -139,6 +141,7 @@ function Player({nodes, connections}, ref) {
 			ctx.current.audioWorklet.addModule('AudioWorklets/WhiteNoiseSource.js'),
 			ctx.current.audioWorklet.addModule('AudioWorklets/InputAdd.js'),
 			ctx.current.audioWorklet.addModule('AudioWorklets/Multiply.js'),
+			ctx.current.audioWorklet.addModule('AudioWorklets/ToMono.js'),
 		])
 	}, [])
 
