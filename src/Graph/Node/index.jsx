@@ -12,6 +12,7 @@ function Node({
 	y,
 	type,
 	setSelf,
+	deleteSelf,
 	onSettings,
 }, ref) {
 	const { inputs = [], outputs = [], settings = [] } = TYPES[type]
@@ -98,7 +99,7 @@ function Node({
 		return () => {
 			cancelIdleCallback(ricID)
 		}
-	}, [params])
+	}, [params, id, type])
 
 	const [hover, setHover] = useState(false)
 	return (
@@ -114,13 +115,16 @@ function Node({
 				'--right': outputs.length,
 			}}
 		>
-			<div
-				className={styles.header}
-				ref={header}
-				onMouseEnter={() => setHover(true)}
-				onMouseLeave={() => setHover(false)}
-			>
-				{type}
+			<div className={styles.header}>
+				<div
+					className={styles.title}
+					ref={header}
+					onMouseEnter={() => setHover(true)}
+					onMouseLeave={() => setHover(false)}
+				>
+					{type}
+				</div>
+				<button type="button" className={styles.delete} onClick={deleteSelf} aria-label="delete">✖</button>
 			</div>
 			<div className={styles.input}>
 				{inputs.map((slot, i) => {

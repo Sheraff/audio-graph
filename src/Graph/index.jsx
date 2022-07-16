@@ -26,7 +26,7 @@ let id = 1
 
 export default function Graph() {
 	const nodeRefs = useRef([])
-	const connectionRefs = useRef([])
+	const connectionRefs = useRef({})
 	const playerRef = useRef(null)
 	const [nodes, setNodes] = useState(() => {
 		const storedNodes = localStorage.getItem('nodes')
@@ -49,6 +49,15 @@ export default function Graph() {
 		return newNodes
 	})), [nodes.length])
 
+	const deleteSelves = useMemo(() => nodes.map((_,i) => () => {
+		connectionRefs.current.deleteNodeConnections(nodes[i].id)
+		setNodes((prev) => {
+			const newNodes = [...prev]
+			newNodes.splice(i, 1)
+			return newNodes
+		})
+	}), [nodes.length])
+
 	const [play, setPlay] = useState(false)
 
 	const onNode = useCallback(async () => {
@@ -68,6 +77,7 @@ export default function Graph() {
 		}
 	}, [nodes])
 
+	nodeRefs.current = []
 	return (
 		<div className={styles.main}>
 			<div ref={nodeContainer}>
@@ -77,6 +87,7 @@ export default function Graph() {
 						ref={e => nodeRefs.current[i] = e}
 						{...node}
 						setSelf={setSelves[i]}
+						deleteSelf={deleteSelves[i]}
 						onSettings={onSettings}
 					/>
 				))}

@@ -65,6 +65,40 @@ const TYPES = {
 			}
 		]
 	},
+	lfo: {
+		outputs: [
+			{
+				name: 'out',
+			}
+		],
+		settings: [
+			{
+				name: 'frequency',
+				type: 'range',
+				props: {
+					min: 0.1,
+					max: 200,
+					step: 0.01,
+				},
+				defaultValue: 60,
+				readFrom: 'value',
+			},
+			{
+				name: 'type',
+				type: 'select',
+				props: {
+				},
+				options: [
+					"sine",
+					"square",
+					"sawtooth",
+					"triangle",
+				],
+				defaultValue: "sine",
+				readFrom: 'value',
+			}
+		]
+	},
 	pan: {
 		inputs: [
 			{

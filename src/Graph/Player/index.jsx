@@ -11,7 +11,7 @@ function Player({nodes, connections}, ref) {
 		Object.keys(audioNodes.current).forEach(id => {
 			audioNodes.current[id].disconnect()
 		})
-		connections.current.forEach(connection => {
+		connections.current.list.forEach(connection => {
 			const {from, to} = connection
 			if(!from || !to) return
 			const [fromNodeId, fromSlotType, fromSlotIndex] = from.split('.')
@@ -36,7 +36,10 @@ function Player({nodes, connections}, ref) {
 			}
 			if (node.type === 'oscillator') {
 				audioNode.type = node.settings.type
-				audioNode.frequency.setValueAtTime(node.settings.frequency, ctx.current.currentTime)
+				audioNode.frequency.value = node.settings.frequency
+			} else if (node.type === 'lfo') {
+				audioNode.type = node.settings.type
+				audioNode.frequency.value = node.settings.frequency
 			} else if (node.type === 'gain') {
 				audioNode.gain.value = node.settings.gain
 			} else if (node.type === 'pan') {
@@ -65,6 +68,10 @@ function Player({nodes, connections}, ref) {
 			if(node.id in audioNodes.current)
 				return
 			if (node.type === 'oscillator') {
+				const oscNode = ctx.current.createOscillator()
+				oscNode.start()
+				audioNodes.current[node.id] = oscNode
+			} else if (node.type === 'lfo') {
 				const oscNode = ctx.current.createOscillator()
 				oscNode.start()
 				audioNodes.current[node.id] = oscNode

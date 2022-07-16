@@ -10,10 +10,10 @@ class InputAdd extends AudioWorkletProcessor {
 					continue
 				}
 				channel[i] = 0
-				if (aChannel[i] !== undefined) {
+				if (!!aChannel) {
 					channel[i] += aChannel[i]
 				}
-				if (bChannel[i] !== undefined) {
+				if (!!bChannel) {
 					channel[i] += bChannel[i]
 				}
 				channel[i] /= channelCount

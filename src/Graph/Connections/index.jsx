@@ -140,7 +140,16 @@ function Connections({nodeContainer, nodeRefs, onConnect}, ref) {
 		}
 	}, [connections])
 
-	useImperativeHandle(ref, () => connections)
+	useImperativeHandle(ref, () => ({
+		list: connections,
+		deleteNodeConnections: (id) => {
+			setConnections((connections) => connections.filter(({from, to}) => {
+				const [fromNodeId] = from.split('.')
+				const [toNodeId] = to.split('.')
+				return fromNodeId !== id && toNodeId !== id
+			}))
+		}
+	}))
 
 	useEffect(() => {
 		onConnect()

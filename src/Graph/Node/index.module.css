@@ -40,14 +40,22 @@
 
 .header {
 	grid-area: header;
-	padding: .5em;
 	text-align: center;
 	background: var(--bg);
 	border-top-left-radius: var(--radius);
 	border-top-right-radius: var(--radius);
+	display: flex;
+}
 
+.title {
+	padding: .5em;
 	user-select: none;
 	cursor: grab;
+	flex: 1;
+}
+
+.delete {
+	cursor: pointer;
 }
 
 .input {
