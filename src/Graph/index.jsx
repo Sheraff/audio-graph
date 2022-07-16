@@ -119,22 +119,13 @@ export default function Graph() {
 					<option value={type} key={type}>{type}</option>
 				))}
 			</select>
-			<button type='button' onClick={() => {
-				setNodes((prev) => ([
-					...prev,
-					{
-						id: `${++id}`,
-						x: 100,
-						y: 300,
-						type: document.getElementById('new-node-type').value,
-					}
-				]))
-			}}>
-				Add Node
-			</button>
 			{!play && (
-				<button type='button' onClick={() => setPlay(true)}>
-					start
+				<button
+					type='button'
+					onClick={() => setPlay(true)}
+					aria-label='Play'
+				>
+					▶
 				</button>
 			)}
 			{play && (
