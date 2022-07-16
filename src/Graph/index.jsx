@@ -77,6 +77,22 @@ export default function Graph() {
 		}
 	}, [nodes])
 
+	const select = useRef(/** @type {HTMLSelectElement} */(null))
+	const onFocus = () => {
+		select.current.value = -1
+	}
+	const onSelect = () => {
+		setNodes((prev) => ([
+			...prev,
+			{
+				id: `${++id}`,
+				x: 100,
+				y: 300,
+				type: select.current.value,
+			}
+		]))
+	}
+
 	const maxX = Math.max(...nodes.map((node) => node.x))
 	const maxY = Math.max(...nodes.map((node) => node.y))
 	nodeRefs.current = []
@@ -98,7 +114,7 @@ export default function Graph() {
 				))}
 			</div>
 			<Connections ref={connectionRefs} nodeContainer={nodeContainer} nodeRefs={nodeRefs} onConnect={onConnect}/>
-			<select id="new-node-type">
+			<select id="new-node-type" ref={select} onChange={onSelect} onFocus={onFocus}>
 				{Object.keys(TYPES).map(type => (
 					<option value={type} key={type}>{type}</option>
 				))}

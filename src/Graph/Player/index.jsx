@@ -38,7 +38,7 @@ function Player({nodes, connections}, ref) {
 
 	const updateSettings = useCallback(() => {
 		nodes.current.forEach(node => {
-			const audioNode = audioNodes.current[node.id]
+			const audioNode = audioNodes.current[node?.id]
 			if(!audioNode) {
 				console.log('node not found', node, audioNodes.current)
 				return
@@ -76,7 +76,7 @@ function Player({nodes, connections}, ref) {
 
 	const updateNodes = useCallback(() => {
 		nodes.current.forEach(node => {
-			if(node.id in audioNodes.current)
+			if(!node || (node.id in audioNodes.current))
 				return
 			if (node.type === 'oscillator') {
 				const oscNode = ctx.current.createOscillator()
@@ -124,7 +124,7 @@ function Player({nodes, connections}, ref) {
 			}
 		})
 		Object.keys(audioNodes.current).forEach(id => {
-			const found = nodes.current.find(node => node.id === id)
+			const found = nodes.current.find(node => node?.id === id)
 			if (!found) {
 				audioNodes.current[id].disconnect()
 				delete audioNodes.current[id]
