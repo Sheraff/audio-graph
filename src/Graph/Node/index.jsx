@@ -101,6 +101,11 @@ function Node({
 		}
 	}, [params, id, type])
 
+	const onDelete = () => {
+		deleteSelf()
+		localStorage.removeItem(`node-${id}-${type}`)
+	}
+
 	const [hover, setHover] = useState(false)
 	return (
 		<div
@@ -124,7 +129,14 @@ function Node({
 				>
 					{type}
 				</div>
-				<button type="button" className={styles.delete} onClick={deleteSelf} aria-label="delete">✖</button>
+				<button
+					type="button"
+					className={styles.delete}
+					onClick={onDelete}
+					aria-label="delete"
+				>
+					✖
+				</button>
 			</div>
 			<div className={styles.input}>
 				{inputs.map((slot, i) => {
