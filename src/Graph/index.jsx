@@ -122,7 +122,7 @@ export default function Graph() {
 			{!play && (
 				<button
 					type='button'
-					onClick={() => setPlay(true)}
+					onClick={() => setPlay(a => !a)}
 					aria-label='Play'
 				>
 					▶

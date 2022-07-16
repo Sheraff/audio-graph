@@ -142,10 +142,10 @@ const TYPES = {
 				type: 'range',
 				props: {
 					min: 0,
-					max: 179,
-					step: 0.01,
+					max: 1,
+					step: 0.001,
 				},
-				defaultValue: 1,
+				defaultValue: 0,
 				readFrom: 'value',
 			},
 		]
@@ -317,6 +317,19 @@ const TYPES = {
 		],
 		outputs: [
 			{name: 'out'},
+		]
+	},
+	'duplicate': {
+		inputs: [
+			{name: 'in'},
+		],
+		outputs: [
+			{name: 'out1'},
+			{name: 'out2'},
+			{name: 'out3'},
+			{name: 'out4'},
+			{name: 'out5'},
+			{name: 'out6'},
 		]
 	},
 }

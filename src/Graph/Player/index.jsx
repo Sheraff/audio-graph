@@ -121,6 +121,9 @@ function Player({nodes, connections}, ref) {
 			} else if (node.type === 'to-mono') {
 				const customNode = new AudioWorkletNode(ctx.current, 'to-mono')
 				audioNodes.current[node.id] = customNode
+			} else if (node.type === 'duplicate') {
+				const customNode = new AudioWorkletNode(ctx.current, 'duplicate', {numberOfOutputs: 6})
+				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'output') {
 				audioNodes.current[node.id] = ctx.current.destination
 			}
@@ -142,6 +145,7 @@ function Player({nodes, connections}, ref) {
 			ctx.current.audioWorklet.addModule('AudioWorklets/InputAdd.js'),
 			ctx.current.audioWorklet.addModule('AudioWorklets/Multiply.js'),
 			ctx.current.audioWorklet.addModule('AudioWorklets/ToMono.js'),
+			ctx.current.audioWorklet.addModule('AudioWorklets/Duplicate.js'),
 		])
 	}, [])
 
