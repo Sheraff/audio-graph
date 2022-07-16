@@ -1,0 +1,11 @@
+.main {
+
+}
+
+.main > * {
+	padding: .25em;
+}
+
+.output {
+	font-variant: tabular-nums;
+}

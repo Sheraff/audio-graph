@@ -20,3 +20,22 @@ body {
 	height: 100%;
 }
 
+button {
+	cursor: pointer;
+	color: inherit;
+	background: transparent;
+	appearance: none;
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+input {
+	vertical-align: middle;
+}
+
+input[type=range],
+select {
+	cursor: pointer;
+}
+

@@ -127,6 +127,7 @@ function Node({
 					onMouseEnter={() => setHover(true)}
 					onMouseLeave={() => setHover(false)}
 				>
+					<img src={`/icons/${type}.svg`} width="1" height="1"/>
 					{type}
 				</div>
 				<button
