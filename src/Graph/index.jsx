@@ -77,9 +77,14 @@ export default function Graph() {
 		}
 	}, [nodes])
 
+	const maxX = Math.max(...nodes.map((node) => node.x))
+	const maxY = Math.max(...nodes.map((node) => node.y))
 	nodeRefs.current = []
 	return (
-		<div className={styles.main}>
+		<div className={styles.main} style={{
+			minWidth: `${maxX + 300}px`,
+			minHeight: `${maxY + 300}px`,
+		}}>
 			<div ref={nodeContainer}>
 				{nodes.map((node, i) => (
 					<Node

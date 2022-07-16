@@ -20,6 +20,7 @@
 
 .main.hover {
 	--bg: var(--highlight);
+	z-index: 1;
 }
 
 .main::before,

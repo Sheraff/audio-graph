@@ -114,7 +114,13 @@ function Connections({nodeContainer, nodeRefs, onConnect}, ref) {
 				ctx.fillStyle = "#fff"
 				ctx.lineWidth = 4
 				ctx.clearRect(0, 0, canvas.current.width, canvas.current.height)
+				const x = document.scrollingElement.scrollLeft
+				const y = document.scrollingElement.scrollTop
+				ctx.save()
+				ctx.translate(x, y)
 				connections.forEach(({from, to}) => {
+					const x = 0
+					const y = 0
 					const {x: fromX, y: fromY} = getXY(from)
 					const {x: toX, y: toY} = getXY(to)
 					ctx.beginPath()
@@ -132,6 +138,7 @@ function Connections({nodeContainer, nodeRefs, onConnect}, ref) {
 					ctx.arc(toX, toY, 8, 0, Math.PI * 2)
 					ctx.fill()
 				})
+				ctx.restore()
 				loop()
 			})
 		}()
