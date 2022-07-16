@@ -11,19 +11,28 @@ function Player({nodes, connections}, ref) {
 		Object.keys(audioNodes.current).forEach(id => {
 			audioNodes.current[id].disconnect()
 		})
+		function getNodeParams(id, defaultName) {
+			const [nodeId, slotType, slotIndex] = id.split('.')
+			const node = nodes.current.find(node => node.id === nodeId)
+			const slot = node.slots[id]
+			const audioNode = audioNodes.current[nodeId]
+			if (slot.name in node.settings) {
+				return {node: audioNode[slot.name], channel: 0}
+			}
+			const channel = slot.name === defaultName ? 0 : Number(slotIndex)
+			return {node: audioNode, channel}
+		}
 		connections.current.list.forEach(connection => {
 			const {from, to} = connection
-			if(!from || !to) return
-			const [fromNodeId, fromSlotType, fromSlotIndex] = from.split('.')
-			const fromSlot = nodes.current.find(node => node.id === fromNodeId).slots[from]
-			const [toNodeId, toSlotType, toSlotIndex] = to.split('.')
-			const toSlot = nodes.current.find(node => node.id === toNodeId).slots[to]
-			const fromNode = audioNodes.current[fromNodeId]
-			const toNode = audioNodes.current[toNodeId]
-			const outChannel = fromSlot.name === 'out' ? undefined : fromSlotIndex
-			const inChannel = toSlot.name === 'in' ? undefined : toSlotIndex
-			if(!fromNode || !toNode) return
-			fromNode.connect(toNode, outChannel, inChannel)
+			if (!from || !to) return
+			const fromParams = getNodeParams(from, 'out')
+			const toParams = getNodeParams(to, 'in')
+			if (!fromParams.node || !toParams.node) return
+			if (fromParams.channel === 0 && toParams.channel === 0) {
+				fromParams.node.connect(toParams.node)
+			} else {
+				fromParams.node.connect(toParams.node, fromParams.channel, toParams.channel)
+			}
 		})
 	}, [nodes, connections])
 
@@ -58,6 +67,8 @@ function Player({nodes, connections}, ref) {
 				audioNode.ratio.value = node.settings.ratio
 				audioNode.attack.value = node.settings.attack
 				audioNode.release.value = node.settings.release
+			} else if (node.type === 'multiplier') {
+				audioNode.parameters.get('multiplier').value = parseFloat(node.settings.multiplier)
 			} else if (node.type === 'output') {
 			}
 		})
@@ -105,6 +116,9 @@ function Player({nodes, connections}, ref) {
 			} else if (node.type === 'add-inputs') {
 				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'add-inputs', {numberOfInputs: 2})
 				audioNodes.current[node.id] = whiteNoiseNode
+			} else if (node.type === 'multiplier') {
+				const whiteNoiseNode = new AudioWorkletNode(ctx.current, 'multiplier')
+				audioNodes.current[node.id] = whiteNoiseNode
 			} else if (node.type === 'output') {
 				audioNodes.current[node.id] = ctx.current.destination
 			}
@@ -124,6 +138,7 @@ function Player({nodes, connections}, ref) {
 		await Promise.all([
 			ctx.current.audioWorklet.addModule('AudioWorklets/WhiteNoiseSource.js'),
 			ctx.current.audioWorklet.addModule('AudioWorklets/InputAdd.js'),
+			ctx.current.audioWorklet.addModule('AudioWorklets/Multiply.js'),
 		])
 	}, [])
 

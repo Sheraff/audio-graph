@@ -1,16 +1,13 @@
 const TYPES = {
 	output: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
 		],
 	},
 	gain: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
+			{name: 'gain'},
 		],
 		outputs: [
 			{
@@ -32,6 +29,9 @@ const TYPES = {
 		]
 	},
 	oscillator: {
+		inputs: [
+			{name: 'frequency'},
+		],
 		outputs: [
 			{
 				name: 'out',
@@ -66,6 +66,9 @@ const TYPES = {
 		]
 	},
 	lfo: {
+		inputs: [
+			{name: 'frequency'},
+		],
 		outputs: [
 			{
 				name: 'out',
@@ -76,11 +79,11 @@ const TYPES = {
 				name: 'frequency',
 				type: 'range',
 				props: {
-					min: 0.1,
-					max: 200,
+					min: 0.00001,
+					max: 10,
 					step: 0.01,
 				},
-				defaultValue: 60,
+				defaultValue: 0.00003,
 				readFrom: 'value',
 			},
 			{
@@ -101,9 +104,8 @@ const TYPES = {
 	},
 	pan: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
+			{name: 'pan'},
 		],
 		outputs: [
 			{
@@ -126,9 +128,8 @@ const TYPES = {
 	},
 	delay: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
+			{name: 'delayTime'},
 		],
 		outputs: [
 			{
@@ -151,9 +152,10 @@ const TYPES = {
 	},
 	biquadFilter: {
 		inputs: [
-			{
-				name: 'in',
-			}
+			{name: 'in'},
+			{name: 'frequency'},
+			{name: 'Q'},
+			{name: 'gain'},
 		],
 		outputs: [
 			{
@@ -216,12 +218,8 @@ const TYPES = {
 	},
 	merge: {
 		inputs: [
-			{
-				name: 'in1',
-			},
-			{
-				name: 'in2',
-			},
+			{name: 'in1'},
+			{name: 'in2'},
 		],
 		outputs: [
 			{
@@ -231,9 +229,7 @@ const TYPES = {
 	},
 	split: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
 		],
 		outputs: [
 			{
@@ -266,9 +262,12 @@ const TYPES = {
 	},
 	compressor: {
 		inputs: [
-			{
-				name: 'in',
-			},
+			{name: 'in'},
+			{name: 'threshold'},
+			{name: 'knee'},
+			{name: 'ratio'},
+			{name: 'attack'},
+			{name: 'release'},
 		],
 		outputs: [
 			{
@@ -292,17 +291,24 @@ const TYPES = {
 	},
 	'add-inputs': {
 		inputs: [
-			{
-				name: 'in1',
-			},
-			{
-				name: 'in2',
-			},
+			{name: 'in1'},
+			{name: 'in2'},
 		],
 		outputs: [
 			{
 				name: 'out',
 			},
+		],
+	},
+	'multiplier': {
+		inputs: [
+			{name: 'in'},
+		],
+		outputs: [
+			{name: 'out'},
+		],
+		settings: [
+			{name: 'multiplier', type: 'range', props: {min: -1000, max: 1000, step: 0.1}, defaultValue: -1, readFrom: 'value'},
 		],
 	},
 }

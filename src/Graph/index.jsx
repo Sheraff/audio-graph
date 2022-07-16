@@ -33,7 +33,7 @@ export default function Graph() {
 		if (storedNodes) {
 			const nodes = JSON.parse(storedNodes)
 			const maxIndex = Math.max(...nodes.map((node) => Number(node.id)))
-			id = maxIndex
+			id = maxIndex + 1
 			return nodes
 		}
 		return defaultInitialNodes
