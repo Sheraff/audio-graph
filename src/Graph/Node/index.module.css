@@ -34,10 +34,12 @@
 .main::before {
 	grid-area: input;
 	height: calc(100% - 100% * var(--left) / max(var(--left), var(--right)));
+	border-left: 1px solid currentColor;
 }
 .main::after {
 	grid-area: output;
 	height: calc(100% - 100% * var(--right) / max(var(--left), var(--right)));
+	border-right: 1px solid currentColor;
 }
 
 .header {
@@ -47,7 +49,7 @@
 	border-top-left-radius: var(--radius);
 	border-top-right-radius: var(--radius);
 	display: flex;
-	border-bottom: 1px solid currentColor;
+	border: 1px solid currentColor;
 }
 
 .title {
@@ -83,11 +85,13 @@
 .input {
 	grid-area: input;
 	--bg: #3b383f;
+	--highlight: #514c57;
 }
 
 .output {
 	grid-area: output;
 	--bg: #3b383f;
+	--highlight: #514c57;
 }
 
 .settings {
@@ -96,7 +100,8 @@
 	background: var(--bg);
 	border-bottom-left-radius: var(--radius);
 	border-bottom-right-radius: var(--radius);
-	border-top: 1px solid currentColor;
+	border: 1px solid currentColor;
+	box-shadow: 0 10px 15px -5px rgba(0,0,0,.3);
 
 	display: table;
 }
@@ -106,4 +111,8 @@
 }
 .settings > * > * {
 	display: table-cell;
+}
+
+.main.hover .settings{
+	box-shadow: 0 10px 15px -5px rgba(0,0,0,0.7);
 }
