@@ -1,6 +1,7 @@
 import { useId } from "react"
-import AutomationTrack from "../../../AutomationTrack"
+import AutomationTrack from "./AutomationTrack"
 import styles from "./index.module.css"
+import Range from "./Range"
 
 export default function Setting({name, type, defaultValue, value, options, props, params}) {
 	const id = useId()
@@ -9,6 +10,7 @@ export default function Setting({name, type, defaultValue, value, options, props
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
 				<AutomationTrack {...props} id={id} name={name} defaultValue={value ?? defaultValue} duration={params.duration}/>
+				<div />
 			</div>
 		)
 	if (type === 'select')
@@ -20,6 +22,13 @@ export default function Setting({name, type, defaultValue, value, options, props
 						<option key={option} value={option}>{option}</option>
 					))}
 				</select>
+			</div>
+		)
+	if (type === 'range')
+		return (
+			<div className={styles.main}>
+				<label htmlFor={id}>{name}</label>
+				<Range id={id} name={name} defaultValue={value ?? defaultValue} props={props} value={value}/>
 			</div>
 		)
 	

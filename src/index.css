@@ -37,7 +37,10 @@ input {
 input[type=range],
 select {
 	cursor: pointer;
-	width: 100%;
 	margin: 0;
+}
+
+select{
+	width: 100%;
 }
 
