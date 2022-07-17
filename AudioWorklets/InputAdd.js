@@ -1,5 +1,7 @@
 class InputAdd extends AudioWorkletProcessor {
 	process ([a, b], [output], parameters) {
+		if(!a?.length && !b?.length)
+			return true
 		output.forEach((channel, chIndex) => {
 			const aChannel = a[chIndex]
 			const bChannel = b[chIndex]
