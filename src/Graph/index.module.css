@@ -62,3 +62,9 @@
 .toggle {
 	font-size: 2em;
 }
+
+.github img {
+	width: 1.2em;
+	height: 100%;
+	object-fit: contain;
+}

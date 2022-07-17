@@ -154,6 +154,9 @@ export default function Graph() {
 							▶
 						</button>
 					)}
+					<a href="https://github.com/Sheraff/audio-graph" target="_blank" className={styles.github}>
+						<img src={`${process.env.PUBLIC_URL}/github.png`} width="1" height="1" alt=""/>
+					</a>
 				</div>
 			</div>
 			{play && (
