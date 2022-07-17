@@ -362,6 +362,12 @@ const TYPES = {
 		settings: [
 			{name: 'track', type: 'track', props: {}, defaultValue: [], readFrom: 'points'},
 			{name: 'duration', type: 'range', props: {min: 0.1, max: 10, step: 0.1}, defaultValue: 1, readFrom: 'value'},
+			{name: 'interpolation', type: 'select', props: {}, defaultValue: "linear", readFrom: 'value',
+				options: [
+					"linear",
+					"exponential",
+				],
+			},
 		],
 	},
 }

@@ -34,7 +34,11 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 
 	useEffect(() => {
 		if (!touched.current && Array.isArray(defaultValue))
-			setInitialValue(localizePoints(canvas.current, defaultValue))
+			setInitialValue((former) => {
+				if (former.length && !defaultValue.length)
+					return former
+				return localizePoints(canvas.current, defaultValue)
+			})
 	}, [defaultValue])
 
 	const [audioContext, setAudioContext] = useState(null)
@@ -64,16 +68,19 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 		const DISTANCE_TO_GRAB = 10
 		let path
 
+		Object.defineProperty(input.current, 'points', {
+			get() {
+				return normalizePoints(canvas.current, points)
+			},
+			configurable: true
+		})
+
 		function dispatch() {
 			touched.current = true
-			Object.defineProperty(input.current, 'points', {
-				get() {
-					return normalizePoints(canvas.current, points)
-				},
-				configurable: true
-			})
 			input.current.dispatchEvent(new Event("input", {bubbles: true}))
 		}
+		if(points?.length)
+			dispatch()
 
 		function draw() {
 			if(rafId) return

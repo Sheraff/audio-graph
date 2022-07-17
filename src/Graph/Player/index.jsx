@@ -21,6 +21,7 @@ function plugAutomationNode(ctx, node, destination) {
 		const lerpYValue = points.at(prevPoint).y + (points.at(nextPoint).y - points.at(prevPoint).y) * progressBetweenPrevAndNext
 		offsetNode.setValueAtTime(lerpYValue, startTime)
 	}
+	const interpolation = node.settings.interpolation === 'linear' ? 'linearRampToValueAtTime' : 'exponentialRampToValueAtTime'
 	for(let i = 0; i < 10_000; i++) {
 		points.forEach((point, p) => {
 			const time = startTime + (i * duration) + (point.x * duration)
@@ -28,7 +29,7 @@ function plugAutomationNode(ctx, node, destination) {
 				if(p === 0)
 					offsetNode.setValueAtTime(point.y, time)
 				else
-					offsetNode.linearRampToValueAtTime(point.y, time)
+					offsetNode[interpolation](point.y, time)
 			}
 		})
 	}
