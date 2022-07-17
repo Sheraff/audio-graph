@@ -1,4 +1,5 @@
 /* eslint-disable */
+import classNames from 'classnames'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Connections from './Connections'
 import styles from './index.module.css'
@@ -77,21 +78,36 @@ export default function Graph() {
 		}
 	}, [nodes])
 
-	const select = useRef(/** @type {HTMLSelectElement} */(null))
-	const onFocus = () => {
-		select.current.value = -1
-	}
-	const onSelect = () => {
+	const [showHud, setShowHud] = useState(false)
+	const onSelect = (type) => {
 		setNodes((prev) => ([
 			...prev,
 			{
-				id: `${++id}`,
+				id: `${Date.now()}`,
 				x: document.scrollingElement.scrollLeft + innerWidth * 0.25,
 				y: document.scrollingElement.scrollTop + innerHeight * 0.25,
-				type: select.current.value,
+				type,
 			}
 		]))
+		setShowHud(false)
 	}
+	const hud = useRef(/** @type {HTMLDivElement} */(null))
+	useEffect(() => {
+		if(!showHud)
+			return
+		const controller = new AbortController()
+		window.addEventListener('keydown', (e) => {
+			if(e.key === 'Escape')
+				setShowHud(false)
+		}, {signal: controller.signal})
+		window.addEventListener('click', (e) => {
+			if(!hud.current.contains(e.target))
+				setShowHud(false)
+		}, {signal: controller.signal})
+		return () => {
+			controller.abort()
+		}
+	}, [showHud])
 
 	const maxX = Math.max(...nodes.map((node) => node.x))
 	const maxY = Math.max(...nodes.map((node) => node.y))
@@ -114,21 +130,31 @@ export default function Graph() {
 				))}
 			</div>
 			<Connections ref={connectionRefs} nodeContainer={nodeContainer} nodeRefs={nodeRefs} onConnect={onConnect}/>
-			<div className={styles.hud}>
-				<select id="new-node-type" ref={select} onChange={onSelect} onFocus={onFocus}>
-					{Object.keys(TYPES).map(type => (
-						<option value={type} key={type}>{type}</option>
-					))}
-				</select>
-				{!play && (
-					<button
-						type='button'
-						onClick={() => setPlay(a => !a)}
-						aria-label='Play'
-					>
-						▶
+			<div ref={hud} className={classNames(styles.hud, {
+				[styles.showHud]: showHud,
+			})}>
+				{Object.keys(TYPES).map((type, i) => (
+					<div key={type} className={styles.hudItem}>
+						<button type="button" onClick={() => onSelect(type)}>
+							<img src={`${process.env.PUBLIC_URL}/icons/${type}.svg`} width="1" height="1" alt=""/>
+							{type}
+						</button>
+					</div>
+				))}
+				<div className={styles.hudBottom}>
+					<button className={styles.toggle} type="button" onClick={() => setShowHud(!showHud)} aria-label="toggle hud">
+						{showHud ? '×' : '+'}
 					</button>
-				)}
+					{!play && (
+						<button
+							type='button'
+							onClick={() => setPlay(a => !a)}
+							aria-label='Play'
+						>
+							▶
+						</button>
+					)}
+				</div>
 			</div>
 			{play && (
 				<Player ref={playerRef} nodes={nodeRefs} connections={connectionRefs}/>
