@@ -20,7 +20,7 @@ const TYPES = {
 				type: 'range',
 				props: {
 					min: 0,
-					max: 2,
+					max: 100,
 					step: 0.01,
 				},
 				defaultValue: 1,
