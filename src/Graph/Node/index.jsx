@@ -1,6 +1,7 @@
 import classNames from "classnames"
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { flushSync } from "react-dom"
+import Extra from "./Extra"
 import styles from './index.module.css'
 import Setting from "./Setting"
 import Slot from "./Slot"
@@ -15,7 +16,7 @@ function Node({
 	deleteSelf,
 	onSettings,
 }, ref) {
-	const { inputs = [], outputs = [], settings = [] } = TYPES[type]
+	const { inputs = [], outputs = [], settings = [], extras = [] } = TYPES[type]
 	const slotsRef = useRef({})
 
 	const main = useRef(/** @type {HTMLDivElement} */(null))
@@ -155,11 +156,20 @@ function Node({
 					)
 				})}
 			</div>
-			<form className={styles.settings} ref={form}>
-				{settings.map((setting, i) => (
-					<Setting key={i} value={params[setting.name]} {...setting} params={params}/>
-				))}
-			</form>
+			<div className={styles.bottom}>
+				<form className={styles.settings} ref={form}>
+					{settings.map((setting, i) => (
+						<Setting key={i} value={params[setting.name]} {...setting} params={params}/>
+					))}
+				</form>
+				{extras.length > 0 && (
+					<>
+						{extras.map((extra, i) => (
+							<Extra key={i} id={id} {...extra}/>
+						))}
+					</>
+				)}
+			</div>
 		</div>
 	)
 }

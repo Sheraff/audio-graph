@@ -196,6 +196,12 @@ function Player({nodes, connections}, ref) {
 			} else if (node.type === 'automation') {
 				const customNode = new AudioWorkletNode(ctx.current, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 1}})
 				audioNodes.current[node.id] = customNode
+			} else if (node.type === 'visualizer') {
+				const customNode = new AudioWorkletNode(ctx.current, 'visualizer', {numberOfOutputs: 0, parameterData: {id: node.id}})
+				audioNodes.current[node.id] = customNode
+				customNode.port.onmessage = e => {
+					window.dispatchEvent(new CustomEvent(node.id, {detail: {buffer: e.data.buffer}}))
+				}
 			} else if (node.type === 'output') {
 				audioNodes.current[node.id] = ctx.current.destination
 			}
@@ -219,6 +225,7 @@ function Player({nodes, connections}, ref) {
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/ToMono.js'),
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Duplicate.js'),
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/ConstantCustom.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Visualizer.js'),
 		])
 	}, [])
 

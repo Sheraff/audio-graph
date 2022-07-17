@@ -94,7 +94,7 @@
 	--highlight: #514c57;
 }
 
-.settings {
+.bottom {
 	grid-area: settings;
 	padding: .5em;
 	background: var(--bg);
@@ -102,7 +102,13 @@
 	border-bottom-right-radius: var(--radius);
 	border: 1px solid currentColor;
 	box-shadow: 0 10px 15px -5px rgba(0,0,0,.3);
+}
 
+.main.hover .bottom{
+	box-shadow: 0 10px 15px -5px rgba(0,0,0,0.7);
+}
+
+.settings {
 	display: table;
 }
 
@@ -111,8 +117,4 @@
 }
 .settings > * > * {
 	display: table-cell;
-}
-
-.main.hover .settings{
-	box-shadow: 0 10px 15px -5px rgba(0,0,0,0.7);
 }

@@ -370,6 +370,14 @@ const TYPES = {
 			},
 		],
 	},
+	'visualizer': {
+		inputs: [
+			{name: 'in'},
+		],
+		extras: [
+			{type: 'visualizer'}
+		]
+	}
 }
 
 export default TYPES
