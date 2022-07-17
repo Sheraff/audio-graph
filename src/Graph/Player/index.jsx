@@ -75,6 +75,9 @@ function Player({nodes, connections}, ref) {
 				audioNode.release.value = node.settings.release
 			} else if (node.type === 'multiplier') {
 				audioNode.parameters.get('multiplier').value = parseFloat(node.settings.multiplier)
+			} else if (node.type === 'white-noise') {
+				audioNode.parameters.get('min').value = parseFloat(node.settings.min)
+				audioNode.parameters.get('max').value = parseFloat(node.settings.max)
 			}
 		})
 	}, [nodes])

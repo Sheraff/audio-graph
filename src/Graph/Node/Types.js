@@ -296,11 +296,19 @@ const TYPES = {
 		]
 	},
 	'white-noise': {
+		inputs: [
+			{name: 'min'},
+			{name: 'max'},
+		],
 		outputs: [
 			{
 				name: 'out',
 			},
 		],
+		settings: [
+			{name: 'min', type: 'range', props: {min: 0, max: 1, step: 0.01}, defaultValue: 0, readFrom: 'value'},
+			{name: 'max', type: 'range', props: {min: 0, max: 1, step: 0.01}, defaultValue: 1, readFrom: 'value'},
+		]
 	},
 	'add-inputs': {
 		inputs: [
