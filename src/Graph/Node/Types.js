@@ -31,6 +31,7 @@ const TYPES = {
 	oscillator: {
 		inputs: [
 			{name: 'frequency'},
+			{name: 'detune'},
 		],
 		outputs: [
 			{
@@ -47,6 +48,17 @@ const TYPES = {
 					step: 1,
 				},
 				defaultValue: 440,
+				readFrom: 'value',
+			},
+			{
+				name: 'detune',
+				type: 'range',
+				props: {
+					min: -4800,
+					max: 4800,
+					step: 100,
+				},
+				defaultValue: 0,
 				readFrom: 'value',
 			},
 			{
@@ -251,8 +263,8 @@ const TYPES = {
 				name: 'offset',
 				type: 'range',
 				props: {
-					min: -1,
-					max: 1,
+					min: -10,
+					max: 10,
 					step: 0.001,
 				},
 				defaultValue: 1,

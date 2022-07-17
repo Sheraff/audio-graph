@@ -30,6 +30,8 @@ function Player({nodes, connections}, ref) {
 			if (!fromParams.node || !toParams.node) return
 			if (fromParams.channel === 0 && toParams.channel === 0) {
 				fromParams.node.connect(toParams.node)
+			} else if (toParams.channel === 0) {
+				fromParams.node.connect(toParams.node, fromParams.channel)
 			} else {
 				fromParams.node.connect(toParams.node, fromParams.channel, toParams.channel)
 			}
@@ -46,6 +48,7 @@ function Player({nodes, connections}, ref) {
 			if (node.type === 'oscillator') {
 				audioNode.type = node.settings.type
 				audioNode.frequency.value = node.settings.frequency
+				audioNode.detune.value = parseFloat(node.settings.detune)
 			} else if (node.type === 'lfo') {
 				audioNode.type = node.settings.type
 				audioNode.frequency.value = node.settings.frequency
