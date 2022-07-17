@@ -1,8 +1,16 @@
 import { useId } from "react"
+import AutomationTrack from "../../../AutomationTrack"
 import styles from "./index.module.css"
 
-export default function Setting({name, type, defaultValue, value, options, props}) {
+export default function Setting({name, type, defaultValue, value, options, props, params}) {
 	const id = useId()
+	if (type === 'track')
+		return (
+			<div className={styles.main}>
+				<label htmlFor={id}>{name}</label>
+				<AutomationTrack {...props} id={id} name={name} defaultValue={value ?? defaultValue} duration={params.duration}/>
+			</div>
+		)
 	if (type === 'select')
 		return (
 			<div className={styles.main}>

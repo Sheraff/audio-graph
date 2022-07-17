@@ -355,6 +355,15 @@ const TYPES = {
 			{name: 'out6'},
 		]
 	},
+	'automation': {
+		outputs: [
+			{name: 'out'},
+		],
+		settings: [
+			{name: 'track', type: 'track', props: {}, defaultValue: [], readFrom: 'points'},
+			{name: 'duration', type: 'range', props: {min: 0.1, max: 10, step: 0.1}, defaultValue: 1, readFrom: 'value'},
+		],
+	},
 }
 
 export default TYPES

@@ -157,7 +157,7 @@ function Node({
 			</div>
 			<form className={styles.settings} ref={form}>
 				{settings.map((setting, i) => (
-					<Setting key={i} value={params[setting.name]} {...setting}/>
+					<Setting key={i} value={params[setting.name]} {...setting} params={params}/>
 				))}
 			</form>
 		</div>
