@@ -43,7 +43,7 @@ const TYPES = {
 				type: 'range',
 				props: {
 					min: 20,
-					max: 20000,
+					max: 5000,
 					step: 1,
 				},
 				defaultValue: 440,
@@ -308,7 +308,7 @@ const TYPES = {
 			{name: 'out'},
 		],
 		settings: [
-			{name: 'multiplier', type: 'range', props: {min: -1000, max: 1000, step: 0.1}, defaultValue: -1, readFrom: 'value'},
+			{name: 'multiplier', type: 'range', props: {min: -1000, max: 1000, step: 0.1}, defaultValue: 1, readFrom: 'value'},
 		],
 	},
 	'to-mono': {

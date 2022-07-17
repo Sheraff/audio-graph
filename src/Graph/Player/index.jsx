@@ -141,11 +141,11 @@ function Player({nodes, connections}, ref) {
 
 	const loadModules = useCallback(async () => {
 		await Promise.all([
-			ctx.current.audioWorklet.addModule('AudioWorklets/WhiteNoiseSource.js'),
-			ctx.current.audioWorklet.addModule('AudioWorklets/InputAdd.js'),
-			ctx.current.audioWorklet.addModule('AudioWorklets/Multiply.js'),
-			ctx.current.audioWorklet.addModule('AudioWorklets/ToMono.js'),
-			ctx.current.audioWorklet.addModule('AudioWorklets/Duplicate.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/WhiteNoiseSource.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/InputAdd.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Multiply.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/ToMono.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Duplicate.js'),
 		])
 	}, [])
 

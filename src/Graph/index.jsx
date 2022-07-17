@@ -9,15 +9,15 @@ import Player from './Player'
 const defaultInitialNodes = [
 	{
 		id: '0',
-		x: 300,
-		y: 300,
+		x: 500,
+		y: 100,
 		type: 'output',
 	},
 	{
 		id: '1',
 		x: 100,
 		y: 100,
-		type: 'gain',
+		type: 'oscillator',
 	},
 ]
 
