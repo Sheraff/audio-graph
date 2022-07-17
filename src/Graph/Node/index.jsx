@@ -164,9 +164,12 @@ function Node({
 				</form>
 				{extras.length > 0 && (
 					<>
-						{extras.map((extra, i) => (
-							<Extra key={i} id={id} {...extra}/>
-						))}
+						{extras.map((extra, i) => {
+							const extraId = `${id}.extras.${i}`
+							return (
+								<Extra key={i} id={id} extraId={extraId} {...extra}/>
+							)
+						})}
 					</>
 				)}
 			</div>

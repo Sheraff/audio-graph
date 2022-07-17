@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import styles from "./index.module.css"
 
 const normalizeData = array => {
@@ -6,7 +6,9 @@ const normalizeData = array => {
 	return array.map(n => n * multiplier)
 }
 
-function Visualizer({id}) {
+const BUFFER_SIZE = 88220
+
+function Visualizer({id, extraId}) {
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const adjust = useRef(/** @type {HTMLInputElement} */(null))
 	const zoom = useRef(/** @type {HTMLInputElement} */(null))
@@ -17,14 +19,13 @@ function Visualizer({id}) {
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
 
-		const bufferSize = 88200
 		const controller = new AbortController()
-		const array = new Float32Array(bufferSize).fill(0)
+		const array = new Float32Array(BUFFER_SIZE).fill(0)
 		
 		window.addEventListener(id, e => {
 			const data = new Float32Array(e.detail.buffer)
-			array.copyWithin(0, data.length, bufferSize)
-			array.set(data, bufferSize - data.length)
+			array.copyWithin(0, data.length, BUFFER_SIZE)
+			array.set(data, BUFFER_SIZE - data.length)
 		}, {signal: controller.signal})
 
 		let rafId
@@ -33,7 +34,7 @@ function Visualizer({id}) {
 			rafId = requestAnimationFrame((time) => {
 				const sampleCount = Math.ceil(array.length / SAMPLES)
 				const [samples] = array
-					.slice(0, Number(zoom.current.value))
+					.slice(array.length - Number(zoom.current.value))
 					.reduce(([samples, sum, count], v, i) => {
 						sum += Math.abs(v)
 						count++
@@ -67,19 +68,43 @@ function Visualizer({id}) {
 
 	const adjustId = useId()
 	const zoomId = useId()
+	const [initialValues = {}] = useState(() => {
+		const data = localStorage.getItem(extraId)
+		if(data)
+			return JSON.parse(data)
+	})
+	useEffect(() => {
+		const controller = new AbortController()
+		let ricId
+		const onChange = () => {
+			cancelIdleCallback(ricId)
+			ricId = requestIdleCallback(() => {
+				localStorage.setItem(extraId, JSON.stringify({
+					adjust: adjust.current.value,
+					zoom: zoom.current.value,
+				}))
+			})
+		}
+		adjust.current.addEventListener("input", onChange, {signal: controller.signal, passive: true})
+		zoom.current.addEventListener("input", onChange, {signal: controller.signal, passive: true})
+		return () => {
+			controller.abort()
+			cancelIdleCallback(ricId)
+		}
+	}, [extraId])
 	return (
 		<div className={styles.visualizer}>
 			<canvas ref={canvas} width="400" height="100" className={styles.main} />
-			<input ref={adjust} id={adjustId} type="range" min="1" max="100" defaultValue="1" className={styles.input} />
-			<input ref={zoom} id={zoomId} type="range" min="44" max="88200" defaultValue="22000" className={styles.input} />
+			<input ref={adjust} id={adjustId} type="range" min="1" max="120" step="0.5" defaultValue={initialValues.adjust ?? 1} className={styles.input} />
+			<input ref={zoom} id={zoomId} type="range" min="44" max={BUFFER_SIZE} step="44" defaultValue={initialValues.zoom ?? 1} className={styles.input} />
 			<label htmlFor={adjustId}>time window</label>
 			<label htmlFor={zoomId}>sample size</label>
 		</div>
 	)
 }
 
-export default function Extra({type, id}) {
+export default function Extra({type, id, extraId}) {
 	if (type === 'visualizer')
-		return <Visualizer id={id} />
+		return <Visualizer id={id} extraId={extraId}/>
 	return null
 }
