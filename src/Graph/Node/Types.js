@@ -91,11 +91,11 @@ const TYPES = {
 				name: 'frequency',
 				type: 'range',
 				props: {
-					min: 0.00001,
+					min: 0.01,
 					max: 10,
 					step: 0.01,
 				},
-				defaultValue: 0.00003,
+				defaultValue: 0.03,
 				readFrom: 'value',
 			},
 			{
@@ -253,10 +253,11 @@ const TYPES = {
 		],
 	},
 	constant: {
+		inputs: [
+			{name: 'offset'},
+		],
 		outputs: [
-			{
-				name: 'out',
-			},
+			{name: 'out'},
 		],
 		settings: [
 			{
@@ -314,7 +315,9 @@ const TYPES = {
 	},
 	'multiplier': {
 		inputs: [
-			{name: 'in'},
+			{name: 'in1'},
+			{name: 'in2'},
+			{name: 'multiplier'},
 		],
 		outputs: [
 			{name: 'out'},

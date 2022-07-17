@@ -17,7 +17,10 @@ function Player({nodes, connections}, ref) {
 			const slot = node.slots[id]
 			const audioNode = audioNodes.current[nodeId]
 			if (slot.name in node.settings) {
-				return {node: audioNode[slot.name], channel: 0}
+				if(slot.name in audioNode)
+					return {node: audioNode[slot.name], channel: 0}
+				if(audioNode.parameters?.has(slot.name))
+					return {node: audioNode.parameters.get(slot.name), channel: 0}
 			}
 			const channel = slot.name === defaultName ? 0 : Number(slotIndex)
 			return {node: audioNode, channel}
@@ -59,7 +62,7 @@ function Player({nodes, connections}, ref) {
 			} else if (node.type === 'delay') {
 				audioNode.delayTime.value = node.settings.delayTime
 			} else if (node.type === 'constant') {
-				audioNode.offset.value = node.settings.offset
+				audioNode.parameters.get('offset').value = parseFloat(node.settings.offset)
 			} else if (node.type === 'biquadFilter') {
 				audioNode.frequency.value = node.settings.frequency
 				audioNode.Q.value = node.settings.Q
@@ -84,6 +87,7 @@ function Player({nodes, connections}, ref) {
 				const oscNode = ctx.current.createOscillator()
 				oscNode.start()
 				audioNodes.current[node.id] = oscNode
+				console.log('oscNode', oscNode)
 			} else if (node.type === 'lfo') {
 				const oscNode = ctx.current.createOscillator()
 				oscNode.start()
@@ -107,8 +111,8 @@ function Player({nodes, connections}, ref) {
 				const splitNode = ctx.current.createChannelSplitter(2)
 				audioNodes.current[node.id] = splitNode
 			} else if (node.type === 'constant') {
-				const constantNode = ctx.current.createConstantSource()
-				audioNodes.current[node.id] = constantNode
+				const customNode = new AudioWorkletNode(ctx.current, 'constant-custom', {numberOfInputs: 0})
+				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'compressor') {
 				const compressorNode = ctx.current.createDynamicsCompressor()
 				audioNodes.current[node.id] = compressorNode
@@ -119,7 +123,7 @@ function Player({nodes, connections}, ref) {
 				const customNode = new AudioWorkletNode(ctx.current, 'add-inputs', {numberOfInputs: 2})
 				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'multiplier') {
-				const customNode = new AudioWorkletNode(ctx.current, 'multiplier')
+				const customNode = new AudioWorkletNode(ctx.current, 'multiplier', {numberOfInputs: 2})
 				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'to-mono') {
 				const customNode = new AudioWorkletNode(ctx.current, 'to-mono')
@@ -149,6 +153,7 @@ function Player({nodes, connections}, ref) {
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Multiply.js'),
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/ToMono.js'),
 			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/Duplicate.js'),
+			ctx.current.audioWorklet.addModule(process.env.PUBLIC_URL + '/AudioWorklets/ConstantCustom.js'),
 		])
 	}, [])
 
