@@ -17,7 +17,7 @@ function Visualizer({id}) {
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
 
-		const bufferSize = 44100
+		const bufferSize = 88200
 		const controller = new AbortController()
 		const array = new Float32Array(bufferSize).fill(0)
 		
@@ -47,7 +47,7 @@ function Visualizer({id}) {
 				const normalized = normalizeData(samples)
 				ctx.clearRect(0, 0, canvas.current.width, canvas.current.height)
 				ctx.fillStyle = "#fff"
-				const incrementWidth = canvas.current.width / normalized.length
+				const incrementWidth = canvas.current.width / (Number(zoom.current.value) / sampleCount)
 				const number = Number(adjust.current.value)
 				const adjustX = ((time/100) % number) / number
 				normalized.forEach((v, i) => {
@@ -71,7 +71,7 @@ function Visualizer({id}) {
 		<div className={styles.visualizer}>
 			<canvas ref={canvas} width="400" height="100" className={styles.main} />
 			<input ref={adjust} id={adjustId} type="range" min="1" max="100" defaultValue="1" className={styles.input} />
-			<input ref={zoom} id={zoomId} type="range" min="44" max="44100" defaultValue="22000" className={styles.input} />
+			<input ref={zoom} id={zoomId} type="range" min="44" max="88200" defaultValue="22000" className={styles.input} />
 			<label htmlFor={adjustId}>time window</label>
 			<label htmlFor={zoomId}>sample size</label>
 		</div>
