@@ -181,17 +181,13 @@ function Node({
 						))}
 					</form>
 				)}
-				{Class.structure.extras?.map((extra, i) => {
-					const extraId = `${id}.extras.${extra.name}`
-					return (
-						<Extra
-							{...extra}
-							key={extraId}
-							id={extraId}
-							instance={instance}
-						/>
-					)
-				})}
+				{Class.structure.extras?.map((extra) => (
+					<Extra
+						{...extra}
+						key={extra.name}
+						instance={instance}
+					/>
+				))}
 			</div>
 		</div>
 	)

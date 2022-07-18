@@ -8,7 +8,7 @@ const normalizeData = array => {
 
 const BUFFER_SIZE = 88220
 
-export default function Visualizer({id, instance}) {
+export default function Visualizer({instance}) {
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const adjust = useRef(/** @type {HTMLInputElement} */(null))
 	const zoom = useRef(/** @type {HTMLInputElement} */(null))
@@ -19,14 +19,20 @@ export default function Visualizer({id, instance}) {
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
 
-		const controller = new AbortController()
 		const array = new Float32Array(BUFFER_SIZE).fill(0)
-		
-		window.addEventListener(id, e => {
-			const data = new Float32Array(e.detail.buffer)
+
+		const onMessage = ({data: {buffer}}) => {
+			const data = new Float32Array(buffer)
 			array.copyWithin(0, data.length, BUFFER_SIZE)
 			array.set(data, BUFFER_SIZE - data.length)
-		}, {signal: controller.signal})
+		}
+		if (instance.current.audioNode) {
+			instance.current.audioNode.port.onmessage = onMessage
+		} else {
+			instance.current.onAudioNode = () => {
+				instance.current.audioNode.port.onmessage = onMessage
+			}
+		}
 
 		let rafId
 		const SAMPLES = 100
@@ -61,10 +67,9 @@ export default function Visualizer({id, instance}) {
 		}()
 		
 		return () => {
-			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [id])
+	}, [instance])
 
 	const adjustId = useId()
 	const zoomId = useId()

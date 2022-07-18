@@ -19,9 +19,9 @@ export default class Visualizer extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new AudioWorkletNode(audioContext, 'visualizer', {numberOfOutputs: 0})
-		const extraId = `${this.id}.extras.${Visualizer.structure.extras[0].name}`
-		this.audioNode.port.onmessage = e => {
-			window.dispatchEvent(new CustomEvent(extraId, {detail: {buffer: e.data.buffer}}))
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
 		}
 	}
 
