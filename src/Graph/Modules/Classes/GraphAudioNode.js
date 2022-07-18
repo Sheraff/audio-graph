@@ -167,7 +167,7 @@ export default class GraphAudioNode {
 	listenToConnections() {
 		/**
 		 * @typedef {Object} ConnectionRequest
-		 * @property {'connect' | 'disconnect'} request
+		 * @property {'connect' | 'disconnect' | 'ack-connect' | 'ack-disconnect'} request
 		 * @property {ConnectionReference<FromSlotDefinition>} from
 		 * @property {ConnectionReference<ToSlotDefinition>} to
 		 * @property {AudioNode | AudioParam?} audioNode
@@ -175,7 +175,11 @@ export default class GraphAudioNode {
 		 */
 		const onRequest = ({detail: {request, from, to, audioNode}}) => {
 			const connectionId = `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
-			if (request === 'connect') {
+			if (request === 'ack-connect') {
+				this.establishedConnections.add(connectionId)
+			} else if (request === 'ack-disconnect') {
+				this.establishedConnections.delete(connectionId)
+			} else if (request === 'connect') {
 				if (this.establishedConnections.has(connectionId)) {
 					console.warn('Connection already established')
 					return
@@ -185,7 +189,6 @@ export default class GraphAudioNode {
 						let responseAudioNode = this.getDestinationAudioNode(to)
 						if (responseAudioNode) {
 							window.dispatchEvent(new CustomEvent(from.nodeUuid, {detail: {request: 'connect', from, to, audioNode: responseAudioNode}}))
-							this.establishedConnections.add(connectionId)
 						} else {
 							console.warn('No audio node found for connection')
 						}
@@ -193,6 +196,7 @@ export default class GraphAudioNode {
 						if (audioNode) {
 							this.ownNodeConnection('connect', from, to, audioNode)
 							this.establishedConnections.add(connectionId)
+							window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'ack-connect', from, to}}))
 						} else {
 							window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'connect', from, to}}))
 							return
@@ -213,7 +217,6 @@ export default class GraphAudioNode {
 						let responseAudioNode = this.getDestinationAudioNode(to)
 						if (responseAudioNode) {
 							window.dispatchEvent(new CustomEvent(from.nodeUuid, {detail: {request: 'disconnect', from, to, audioNode: responseAudioNode}}))
-							this.establishedConnections.delete(connectionId)
 						} else {
 							console.warn('No audio node found for disconnection')
 						}
@@ -221,6 +224,7 @@ export default class GraphAudioNode {
 						if (audioNode) {
 							this.ownNodeConnection('disconnect', from, to, audioNode)
 							this.establishedConnections.delete(connectionId)
+							window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'ack-disconnect', from, to}}))
 						} else {
 							window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'disconnect', from, to}}))
 							return
