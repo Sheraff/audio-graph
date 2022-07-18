@@ -110,6 +110,8 @@ function Node({
 	}
 
 	const [hover, setHover] = useState(false)
+	const outputsCount = Class.structure.slots.filter(({type}) => type === 'output').length
+	const inputsCount = Class.structure.slots.length - outputsCount
 	return (
 		<div
 			className={classNames(styles.main, {
@@ -143,8 +145,8 @@ function Node({
 			<div
 				className={styles.slots}
 				style={{
-					'--count': Class.structure.slots.length,
-					'--outputs': Class.structure.slots.filter(({type}) => type === 'output').length,
+					'--inputs': inputsCount,
+					'--outputs': outputsCount,
 				}}
 			>
 				{Class.structure.slots.map((slot) => {
