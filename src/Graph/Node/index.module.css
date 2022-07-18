@@ -5,45 +5,19 @@
 
 	position: absolute;
 	z-index: 0;
-	top: var(--y);
-	left: var(--x);
-
-	display: grid;
-	grid-template-areas:
-		"header header"
-		"input output"
-		"settings settings";
-	grid-template-columns: 1fr 1fr;
+	top: calc(1px * var(--y));
+	left: calc(1px * var(--x));
+	width: fit-content;
 
 	user-select: none;
 }
 
-.main.hover {
+.hover {
 	--bg: var(--highlight);
 	z-index: 1;
 }
 
-.main::before,
-.main::after {
-	content: "";
-	background-color: var(--bg);
-	z-index: -1;
-	align-self: end;
-	--bg: #3b383f;
-}
-.main::before {
-	grid-area: input;
-	height: calc(100% - 100% * var(--left) / max(var(--left), var(--right)));
-	border-left: 1px solid currentColor;
-}
-.main::after {
-	grid-area: output;
-	height: calc(100% - 100% * var(--right) / max(var(--left), var(--right)));
-	border-right: 1px solid currentColor;
-}
-
 .header {
-	grid-area: header;
 	text-align: center;
 	background: var(--bg);
 	border-top-left-radius: var(--radius);
@@ -59,7 +33,6 @@
 	flex: 1;
 	font-size: .6em;
 }
-
 .title img {
 	width: 2rem;
 	height: 2rem;
@@ -77,25 +50,57 @@
 	border-radius: 4px;
 	background: #FFFFFF33;
 }
-
 .delete:hover {
 	background: #FFFFFF66;
 }
 
-.input {
-	grid-area: input;
+.slots {
+	position: relative;
+	z-index: 0;
+	display: grid;
+	grid-auto-flow: row dense;
+	grid-template-columns: 1fr 1fr;
+	grid-auto-rows: 1fr;
+	--inputs: calc(var(--count) - var(--outputs));
+	--max: max(var(--inputs), var(--outputs));
+	--min: min(var(--inputs), var(--outputs));
 	--bg: #3b383f;
 	--highlight: #514c57;
 }
-
-.output {
-	grid-area: output;
+.slots::before,
+.slots::after {
+	content: "";
+	position: absolute;
+	width: 50%;
+	bottom: 0;
+	background-color: var(--bg);
+	z-index: -1;
+	align-self: end;
 	--bg: #3b383f;
-	--highlight: #514c57;
 }
+.slots::before {
+	height: calc(100% - 100% * var(--inputs) / max(var(--inputs), var(--outputs)));
+	border-left: 1px solid currentColor;
+	left: 0;
+}
+.slots::after {
+	height: calc(100% - 100% * var(--outputs) / max(var(--inputs), var(--outputs)));
+	border-right: 1px solid currentColor;
+	right: 0;
+}
+/* .slots::after {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	background-color: var(--bg);
+	border-left: 1px solid currentColor;
+	border-right: 1px solid currentColor;
+	height: calc(100% - 100% * var(--min) / var(--max));
+	bottom: 0;
+	width: 100%;
+} */
 
 .bottom {
-	grid-area: settings;
 	padding: .5em;
 	background: var(--bg);
 	border-bottom-left-radius: var(--radius);
@@ -103,15 +108,13 @@
 	border: 1px solid currentColor;
 	box-shadow: 0 10px 15px -5px rgba(0,0,0,.3);
 }
-
-.main.hover .bottom{
+.hover .bottom{
 	box-shadow: 0 10px 15px -5px rgba(0,0,0,0.7);
 }
 
 .settings {
 	display: table;
 }
-
 .settings > * {
 	display: table-row;
 }

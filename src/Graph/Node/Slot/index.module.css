@@ -25,6 +25,7 @@
 }
 
 .left {
+	grid-column: 1 / 2;
 	text-align: left;
 	padding-left: 1.25em;
 	padding-right: 1.5em;
@@ -40,6 +41,7 @@
 }
 
 .right {
+	grid-column: 2 / 3;
 	text-align: right;
 	padding-right: 1.25em;
 	padding-left: 1.5em;

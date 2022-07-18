@@ -1,167 +1,152 @@
-/* eslint-disable */
-import classNames from 'classnames'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Connections from './Connections'
-import styles from './index.module.css'
+import Gain from './Modules/Gain'
+import { GraphAudioContextProvider } from './GraphAudioContext'
 import Node from './Node'
-import TYPES from './Node/Types'
-import Player from './Player'
+import UI from './UI'
+import styles from './index.module.css'
+import Oscillator from './Modules/Oscillator'
+import Output from './Modules/Output'
+import Connector from './Connector'
+import LFO from './Modules/LFO'
+import Pan from './Modules/Pan'
+import Delay from './Modules/Delay'
+import BiQuadFilter from './Modules/BiQuadFilter'
+import Merge from './Modules/Merge'
+import Split from './Modules/Split'
+import Constant from './Modules/Constant'
+import Compressor from './Modules/Compressor'
+import WhiteNoise from './Modules/WhiteNoise'
+import AddInputs from './Modules/AddInputs'
+import Automation from './Modules/Automation'
+import Visualizer from './Modules/Visualizer'
+import Multiplier from './Modules/Multiplier'
+import ToMono from './Modules/ToMono'
+import Duplicate from './Modules/Duplicate'
 
-const defaultInitialNodes = [
-	{
-		id: '0',
-		x: 500,
-		y: 100,
-		type: 'output',
-	},
-	{
-		id: '1',
-		x: 100,
-		y: 100,
-		type: 'oscillator',
-	},
+const modules = [
+	Output,
+	Gain,
+	Oscillator,
+	LFO,
+	Pan,
+	Delay,
+	BiQuadFilter,
+	Merge,
+	// Split,
+	Constant,
+	Compressor,
+	WhiteNoise,
+	AddInputs,
+	Multiplier,
+	Automation,
+	Visualizer,
+	ToMono,
+	Duplicate,
 ]
 
-let id = 1
-
-
 export default function Graph() {
-	const nodeRefs = useRef([])
-	const connectionRefs = useRef({})
-	const playerRef = useRef(null)
+	const ref = useRef(/** @type {HTMLDivElement} */(null))
+
 	const [nodes, setNodes] = useState(() => {
-		const storedNodes = localStorage.getItem('nodes')
-		if (storedNodes) {
-			const nodes = JSON.parse(storedNodes)
-			const maxIndex = Math.max(...nodes.map((node) => Number(node.id)))
-			id = maxIndex + 1
-			return nodes
+		const save = localStorage.getItem('nodes')
+		if (save) {
+			return JSON.parse(save)
+		} else {
+			console.log('No saved nodes, should create default')
+			return []
 		}
-		return defaultInitialNodes
 	})
 
-	const nodeContainer = useRef(/** @type {HTMLDivElement} */(null))
-
-	const setSelves = useMemo(() => nodes.map((_,i) => (callback) => setNodes((prev) => {
-		const newNodes = [...prev]
-		newNodes[i] = typeof callback === 'function'
-			? callback(prev[i])
-			: callback
-		return newNodes
-	})), [nodes.length])
-
-	const deleteSelves = useMemo(() => nodes.map((_,i) => () => {
-		connectionRefs.current.deleteNodeConnections(nodes[i].id)
-		setNodes((prev) => {
-			const newNodes = [...prev]
-			newNodes.splice(i, 1)
-			return newNodes
-		})
-	}), [nodes.length])
-
-	const [play, setPlay] = useState(false)
-
-	const onNode = useCallback(async () => {
-		await playerRef.current?.loadModules()
-		playerRef.current?.updateNodes()
-	}, [])
-	const onSettings = useCallback(() => playerRef.current?.updateSettings(), [])
-	const onConnect = useCallback(() => playerRef.current?.updateConnections(), [])
-
+	const ricId = useRef(/** @type {number?} */(null))
 	useEffect(() => {
-		onNode()
-		const ricID = requestIdleCallback(() => {
-			localStorage.setItem(`nodes`, JSON.stringify(nodes))
-		})
 		return () => {
-			cancelIdleCallback(ricID)
+			if(ricId.current)
+				cancelIdleCallback(ricId.current)
 		}
-	}, [nodes])
-
-	const [showHud, setShowHud] = useState(false)
-	const onSelect = (type) => {
-		setNodes((prev) => ([
-			...prev,
-			{
-				id: `${Date.now()}`,
-				x: document.scrollingElement.scrollLeft + innerWidth * 0.25,
-				y: document.scrollingElement.scrollTop + innerHeight * 0.25,
-				type,
-			}
-		]))
-		setShowHud(false)
-	}
-	const hud = useRef(/** @type {HTMLDivElement} */(null))
-	useEffect(() => {
-		if(!showHud)
+	}, [])
+	const nodesRef = useRef(nodes)
+	useEffect(() => { nodesRef.current = nodes }, [nodes])
+	const save = useCallback(() => {
+		if(ricId.current)
 			return
+		ricId.current = requestIdleCallback(() => {
+			ricId.current = null
+			const data = nodesRef.current.map(({id, type}) => ({id, type}))
+			localStorage.setItem('nodes', JSON.stringify(data))
+		})
+	}, [])
+
+	const canvasNodesHandle = useRef({})
+
+	const addNode = useCallback((type) => {
+		const node = {
+			type,
+			id: `${Date.now()}${Math.round(Math.random() * 1000)}`,
+			initialPosition: {
+				x: ref.current.offsetWidth * 0.33 + ref.current.scrollLeft,
+				y: ref.current.offsetHeight * 0.25 + ref.current.scrollTop,
+			}
+		}
+		setNodes(nodes => [...nodes, node])
+		save()
+	}, [save])
+	const removeNode = useCallback((id) => {
+		delete canvasNodesHandle.current[id]
+		setNodes(nodes => nodes.filter(node => node.id !== id))
+		save()
+	}, [save])
+
+	const [offset, setOffset] = useState({x: 0, y: 0})
+	useEffect(() => {
+		const onNodePlacement = () => {
+			const offset = Object.values(canvasNodesHandle.current).reduce(({x, y}, node) => {
+				if(!node?.position)
+					return {x, y}
+				return {
+					x: Math.max(x, node.position.x),
+					y: Math.max(y, node.position.y),
+				}
+			}, {x: 0, y: 0})
+			setOffset(offset)
+		}
+		onNodePlacement()
 		const controller = new AbortController()
-		window.addEventListener('keydown', (e) => {
-			if(e.key === 'Escape')
-				setShowHud(false)
-		}, {signal: controller.signal})
-		window.addEventListener('click', (e) => {
-			if(!hud.current.contains(e.target))
-				setShowHud(false)
-		}, {signal: controller.signal})
+		ref.current.addEventListener('node-moved', onNodePlacement, {signal: controller.signal})
 		return () => {
 			controller.abort()
 		}
-	}, [showHud])
+	}, [])
 
-	const maxX = Math.max(...nodes.map((node) => node.x))
-	const maxY = Math.max(...nodes.map((node) => node.y))
-	nodeRefs.current = []
+	const handles = useMemo(() => {
+		return nodes.map(({id}) => 
+			(handle) => canvasNodesHandle.current[id] = handle
+		)
+	}, [nodes])
+
 	return (
-		<div className={styles.main} style={{
-			minWidth: `${maxX + innerWidth}px`,
-			minHeight: `${maxY + innerHeight}px`,
-		}}>
-			<div ref={nodeContainer}>
-				{nodes.map((node, i) => (
-					<Node
-						key={node.id + node.type}
-						ref={e => nodeRefs.current[i] = e}
-						{...node}
-						setSelf={setSelves[i]}
-						deleteSelf={deleteSelves[i]}
-						onSettings={onSettings}
-					/>
-				))}
-			</div>
-			<Connections ref={connectionRefs} nodeContainer={nodeContainer} nodeRefs={nodeRefs} onConnect={onConnect}/>
-			<div ref={hud} className={classNames(styles.hud, {
-				[styles.showHud]: showHud,
-			})}>
-				{Object.keys(TYPES).map((type, i) => (
-					<div key={type} className={styles.hudItem}>
-						<button type="button" onClick={() => onSelect(type)}>
-							<img src={`${process.env.PUBLIC_URL}/icons/${type}.svg`} width="1" height="1" alt=""/>
-							{type}
-						</button>
-					</div>
-				))}
-				<div className={styles.hudBottom}>
-					<button className={styles.toggle} type="button" onClick={() => setShowHud(!showHud)} aria-label="toggle hud">
-						{showHud ? '×' : '+'}
-					</button>
-					{!play && (
-						<button
-							type='button'
-							onClick={() => setPlay(a => !a)}
-							aria-label='Play'
-						>
-							▶
-						</button>
+		<GraphAudioContextProvider modules={modules}>
+			<div
+				ref={ref}
+				className={styles.main}
+				style={{
+					'--x': offset.x,
+					'--y': offset.y,
+				}}
+			>
+				<Connector boundary={ref} handles={canvasNodesHandle}>
+					{nodes.map(({id, type, initialPosition}, i) => 
+						<Node
+							key={id}
+							id={id}
+							Class={modules.find(Class => Class.type === type)}
+							initialPosition={initialPosition}
+							removeNode={removeNode}
+							handle={handles[i]}
+						/>
 					)}
-					<a href="https://github.com/Sheraff/audio-graph" target="_blank" className={styles.github}>
-						<img src={`${process.env.PUBLIC_URL}/github.png`} width="1" height="1" alt=""/>
-					</a>
-				</div>
+					<UI addNode={addNode} modules={modules} />
+				</Connector>
 			</div>
-			{play && (
-				<Player ref={playerRef} nodes={nodeRefs} connections={connectionRefs}/>
-			)}
-		</div>
+		</GraphAudioContextProvider>
 	)
 }

@@ -3,13 +3,13 @@ import AutomationTrack from "./AutomationTrack"
 import styles from "./index.module.css"
 import Range from "./Range"
 
-export default function Setting({name, type, defaultValue, value, options, props, params}) {
+export default function Setting({name, type, defaultValue, options, props, settings}) {
 	const id = useId()
 	if (type === 'track')
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<AutomationTrack {...props} id={id} name={name} defaultValue={value ?? defaultValue} duration={params.duration}/>
+				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} settings={settings}/>
 				<div />
 			</div>
 		)
@@ -17,7 +17,7 @@ export default function Setting({name, type, defaultValue, value, options, props
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<select name={name} {...props} defaultValue={value ?? defaultValue} id={id}>
+				<select name={name} {...props} defaultValue={defaultValue} id={id}>
 					{options.map(option => (
 						<option key={option} value={option}>{option}</option>
 					))}
@@ -28,15 +28,15 @@ export default function Setting({name, type, defaultValue, value, options, props
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<Range id={id} name={name} defaultValue={value ?? defaultValue} props={props} value={value}/>
+				<Range id={id} name={name} defaultValue={defaultValue} props={props} />
 			</div>
 		)
 	
+	console.warn(`unknown Setting type ${type}`)
 	return (
 		<div className={styles.main}>
 			<label htmlFor={id}>{name}</label>
-			<input type={type} name={name} defaultValue={value ?? defaultValue} {...props} id={id}/>
-			<output className={styles.output} htmlFor={id}>{value}</output>
+			<input type={type} name={name} defaultValue={defaultValue} {...props} id={id}/>
 		</div>
 	)
 }

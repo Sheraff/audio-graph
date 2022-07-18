@@ -1,124 +1,126 @@
-import classNames from "classnames"
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
-import { flushSync } from "react-dom"
-import Extra from "./Extra"
+import classNames from 'classnames'
+import { memo, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { GraphAudioContext } from '../GraphAudioContext'
+import Slot from './Slot'
+import Setting from './Setting'
+import Extra from './Extra'
 import styles from './index.module.css'
-import Setting from "./Setting"
-import Slot from "./Slot"
-import TYPES from "./Types"
 
 function Node({
+	Class,
 	id,
-	x,
-	y,
-	type,
-	setSelf,
-	deleteSelf,
-	onSettings,
-}, ref) {
-	const { inputs = [], outputs = [], settings = [], extras = [] } = TYPES[type]
+	initialPosition,
+	removeNode,
+	handle,
+}) {
+	const audioContext = useContext(GraphAudioContext)
+	const instance = useRef(/** @type {typeof Class?} */(null))
+	const controls = useRef(/** @type {GainControls?} */({}))
+	if (!instance.current) {
+		instance.current = new Class(id, audioContext, controls, initialPosition)
+	}
+	useEffect(() => {
+		return () => {
+			instance.current.cleanup()
+		}
+	}, [])
+
+	const ref = useRef(/** @type {HTMLDivElement} */(null))
+	const header = useRef(/** @type {HTMLDivElement} */(null))
+
+	const position = useRef({...instance.current.data.dom})
 	const slotsRef = useRef({})
 
-	const main = useRef(/** @type {HTMLDivElement} */(null))
-	const header = useRef(/** @type {HTMLDivElement} */(null))
+	useImperativeHandle(handle, () => ({
+		slots: slotsRef.current,
+		connections: instance.current.data.connections,
+		position: position.current,
+	}))
 	useEffect(() => {
 		const controller = new AbortController()
-		let start, end, rafId
+		let dx = 0
+		let dy = 0
+		let initial
+		let start
+		let rafId
 		header.current.addEventListener('mousedown', e => {
-			start = { x: e.clientX, y: e.clientY }
+			if(e.button !== 0)
+				return
+			start = {x: e.clientX, y: e.clientY}
+			initial = {...position.current}
 			header.current.style.setProperty('cursor', 'grabbing')
 		}, {signal: controller.signal})
 		window.addEventListener('mousemove', e => {
-			if (!start) return
-			end = {
-				dx: e.clientX - start.x,
-				dy: e.clientY - start.y,
-			}
+			if(!start) return
+			dx = e.clientX - start.x
+			dy = e.clientY - start.y
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
-				main.current.style.setProperty('transform', `translate(${end.dx}px, ${end.dy}px)`)
+				ref.current.style.setProperty(
+					'transform',
+					`translate(${dx}px, ${dy}px)`
+				)
 			})
 		}, {signal: controller.signal})
-		window.addEventListener('mouseup', e => {
+		window.addEventListener('mouseup', (e) => {
 			if (!start) return
 			start = null
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
-				flushSync(() => {
-					setSelf((prev) => ({
-						...prev,
-						x: prev.x + end.dx,
-						y: prev.y + end.dy,
-					}))
-				})
-				main.current.style.removeProperty('transform')
+				position.current.x = initial.x + dx
+				position.current.y = initial.y + dy
+				ref.current.style.setProperty('--x', position.current.x)
+				ref.current.style.setProperty('--y', position.current.y)
+				ref.current.style.removeProperty('transform')
 				header.current.style.removeProperty('cursor')
+				ref.current.dispatchEvent(new CustomEvent('node-moved', {bubbles: true}))
+				instance.current.data.dom = {...position.current}
+				instance.current.saveToLocalStorage()
 			})
 		}, {signal: controller.signal})
 		return () => {
 			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [setSelf])
+	}, [])
 
-	const [params, setParams] = useState(() => {
-		const storedParams = localStorage.getItem(`node-${id}-${type}`)
-		if (storedParams) {
-			return JSON.parse(storedParams)
-		}
-		return Object.fromEntries(
-			settings.map(({ name, defaultValue }) => [name, defaultValue])
-		)
-	})
 	const form = useRef(/** @type {HTMLFormElement} */(null))
 	useEffect(() => {
+		if (!Class.structure.settings?.length)
+			return
 		const controller = new AbortController()
-		form.current.addEventListener('input', e => {
-			setParams(Object.fromEntries(
-				settings.map(
-					({name, readFrom}) => [name, form.current.elements[name][readFrom]]
-				)
-			))
+		form.current.addEventListener('input', ({target}) => {
+			const settingName = target.name
+			const structure = Class.structure.settings.find(({name}) => name === settingName)
+			if (!structure)
+				return
+			instance.current.data.settings[settingName] = target[structure.readFrom]
+			if(instance.current.audioNode)
+				instance.current.updateSetting(settingName)
+			instance.current.saveToLocalStorage()
 		}, {signal: controller.signal})
 		return () => {
 			controller.abort()
 		}
-	}, [settings])
-
-	useImperativeHandle(ref, () => ({
-		id,
-		type,
-		slots: slotsRef.current,
-		settings: params,
-	}))
-
-	useEffect(() => {
-		onSettings()
-		const ricID = requestIdleCallback(() => {
-			localStorage.setItem(`node-${id}-${type}`, JSON.stringify(params))
-		})
-		return () => {
-			cancelIdleCallback(ricID)
-		}
-	}, [params, id, type])
+	}, [Class])
 
 	const onDelete = () => {
-		deleteSelf()
-		localStorage.removeItem(`node-${id}-${type}`)
+		instance.current.destroy()
+		removeNode(id)
 	}
 
 	const [hover, setHover] = useState(false)
+	const outputsCount = Class.structure.slots.filter(({type}) => type === 'output').length
+	const inputsCount = Class.structure.slots.length - outputsCount
 	return (
 		<div
 			className={classNames(styles.main, {
 				[styles.hover]: hover
 			})}
-			ref={main}
+			ref={ref}
 			style={{
-				'--x': `${x}px`,
-				'--y': `${y}px`,
-				'--left': inputs.length,
-				'--right': outputs.length,
+				'--x': position.current.x,
+				'--y': position.current.y,
 			}}
 		>
 			<div className={styles.header}>
@@ -128,8 +130,8 @@ function Node({
 					onMouseEnter={() => setHover(true)}
 					onMouseLeave={() => setHover(false)}
 				>
-					<img src={`${process.env.PUBLIC_URL}/icons/${type}.svg`} width="1" height="1" alt=""/>
-					{type}
+					<img src={Class.image} width="1" height="1" alt=""/>
+					{Class.type}
 				</div>
 				<button
 					type="button"
@@ -140,41 +142,54 @@ function Node({
 					✖
 				</button>
 			</div>
-			<div className={styles.input}>
-				{inputs.map((slot, i) => {
-					const slotId = `${id}.inputs.${i}`
+			<div
+				className={styles.slots}
+				style={{
+					'--inputs': inputsCount,
+					'--outputs': outputsCount,
+				}}
+			>
+				{Class.structure.slots.map((slot) => {
+					const slotId = `${id}.${slot.type}.${slot.name}`
 					return (
-						<Slot key={i} {...slot} left id={slotId} ref={element => slotsRef.current[slotId] = element}/>
-					)
-				})}
-			</div>
-			<div className={styles.output}>
-				{outputs.map((slot, i) => {
-					const slotId = `${id}.outputs.${i}`
-					return (
-						<Slot key={i} {...slot} right id={slotId} ref={element => slotsRef.current[slotId] = element}/>
+						<Slot
+							{...slot}
+							key={slotId}
+							left={slot.type !== 'output'}
+							id={slotId}
+							nodeId={id}
+							// this method will leak memory if the # of slots in a Node can change
+							ref={(element) => slotsRef.current[slotId] = element}
+						/>
 					)
 				})}
 			</div>
 			<div className={styles.bottom}>
-				<form className={styles.settings} ref={form}>
-					{settings.map((setting, i) => (
-						<Setting key={i} value={params[setting.name]} {...setting} params={params}/>
-					))}
-				</form>
-				{extras.length > 0 && (
-					<>
-						{extras.map((extra, i) => {
-							const extraId = `${id}.extras.${i}`
-							return (
-								<Extra key={i} id={id} extraId={extraId} {...extra}/>
-							)
-						})}
-					</>
+				{Class.structure.settings?.length > 0 && (
+					<form
+						ref={form}
+						className={styles.settings}
+					>
+						{Class.structure.settings.map((setting, i) => (
+							<Setting
+								{...setting}
+								key={setting.name}
+								defaultValue={instance.current.data.settings[setting.name]}
+								settings={instance.current.data.settings}
+							/>
+						))}
+					</form>
 				)}
+				{Class.structure.extras?.map((extra) => (
+					<Extra
+						{...extra}
+						key={extra.name}
+						instance={instance}
+					/>
+				))}
 			</div>
 		</div>
 	)
 }
 
-export default forwardRef(Node)
+export default memo(Node)

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import styles from './index.module.css'
 
-export default function Range({id, name, defaultValue, props, value}){
+export default function Range({id, name, defaultValue, props}){
 	const range = useRef(null)
 	const text = useRef(null)
 	const touched = useRef(false)
