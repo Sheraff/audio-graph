@@ -28,9 +28,7 @@ function Node({
 	const ref = useRef(/** @type {HTMLDivElement} */(null))
 	const header = useRef(/** @type {HTMLDivElement} */(null))
 
-	// TODO: we don't need to have a "live" position since the canvas doesn't read it
 	const position = useRef({...instance.current.data.dom})
-	const staticPosition = useRef({...position.current})
 	const slotsRef = useRef({})
 
 	useImperativeHandle(handle, () => ({
@@ -56,8 +54,6 @@ function Node({
 			if(!start) return
 			dx = e.clientX - start.x
 			dy = e.clientY - start.y
-			position.current.x = initial.x + dx
-			position.current.y = initial.y + dy
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
 				ref.current.style.setProperty(
@@ -66,20 +62,21 @@ function Node({
 				)
 			})
 		}, {signal: controller.signal})
-		window.addEventListener('mouseup', () => {
+		window.addEventListener('mouseup', (e) => {
 			if (!start) return
 			start = null
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
+				position.current.x = initial.x + dx
+				position.current.y = initial.y + dy
 				ref.current.style.setProperty('--x', position.current.x)
 				ref.current.style.setProperty('--y', position.current.y)
 				ref.current.style.removeProperty('transform')
 				header.current.style.removeProperty('cursor')
-				staticPosition.current = {...position.current}
 				ref.current.dispatchEvent(new CustomEvent('node-moved', {bubbles: true}))
+				instance.current.data.dom = {...position.current}
+				instance.current.saveToLocalStorage()
 			})
-			instance.current.data.dom = {...position.current}
-			instance.current.saveToLocalStorage()
 		}, {signal: controller.signal})
 		return () => {
 			controller.abort()
@@ -120,8 +117,8 @@ function Node({
 			})}
 			ref={ref}
 			style={{
-				'--x': staticPosition.current.x,
-				'--y': staticPosition.current.y,
+				'--x': position.current.x,
+				'--y': position.current.y,
 			}}
 		>
 			<div className={styles.header}>
