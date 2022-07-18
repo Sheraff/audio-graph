@@ -82,6 +82,11 @@ import React from "react"
  */
 
 export default class Gain {
+	static type = 'gain'
+
+	/** @type {`${typeof process.env.PUBLIC_URL}/${string}.${'svg' | 'png'}`} */
+	static image = `${process.env.PUBLIC_URL}/icons/gain.svg`
+
 	static structure = {
 		/** @type {Array<FromSlotDefinition | ToSlotDefinition>} */
 		slots: [
@@ -114,8 +119,9 @@ export default class Gain {
 	 * @param {NodeUuid} id 
 	 * @param {AudioContext | string} audioContext 
 	 * @param {React.MutableRefObject<{}>} controls
+	 * @param {{x: number, y: number}?} initialPosition
 	 */
-	constructor(id, audioContext, controls) {
+	constructor(id, audioContext, controls, initialPosition) {
 		this.id = id
 		
 		/** @type {AudioNode | AudioWorkletNode?} */
@@ -135,6 +141,7 @@ export default class Gain {
 		
 		const save = localStorage.get(this.id)
 		this.data = save ? JSON.parse(save) : {
+			dom: initialPosition,
 			settings: Object.fromEntries(
 				Gain.structure.settings.map(({name, defaultValue}) => [name, defaultValue])
 			),
@@ -284,7 +291,7 @@ export default class Gain {
 			const [fromNodeUuid, fromSlotType, fromSlotKey, toNodeUuid, toSlotType, toSlotKey] = c.split('-')
 			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, key: fromSlotKey}}
 			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, key: toSlotKey}}
-			console.warn('audio node is not necessarily main audio node `this.audioNode`')
+			console.warn('audioNode is AudioNode|AudioParam, not necessarily main audio node `this.audioNode`')
 			window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'connect', from, to, audioNode: this.audioNode}}))
 			if (fromNodeUuid === this.id) {
 				this.establishedConnections.add(c)
