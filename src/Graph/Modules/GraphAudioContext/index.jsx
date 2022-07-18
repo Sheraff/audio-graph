@@ -9,11 +9,14 @@ export const GraphAudioContextProvider = ({ children, modules }) => {
 		const controller = new AbortController()
 		window.addEventListener('click', async () => {
 			const context = new AudioContext()
-			await Promise.all(modules.flatMap(
-				({requiredModules}) => requiredModules.map(
-					(path) => context.audioWorklet.addModule(path)
+			await Promise.all([
+				context.suspend(), 
+				...modules.flatMap(
+					({requiredModules}) => requiredModules.map(
+						(path) => context.audioWorklet.addModule(path)
+					)
 				)
-			))
+			])
 			window.dispatchEvent(new CustomEvent(id, {detail: context}))
 			setAudioContext(context)
 		}, {

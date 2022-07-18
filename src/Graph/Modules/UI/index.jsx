@@ -20,6 +20,8 @@ export default function UI({addNode, modules}) {
 		if(typeof audioContext !== 'string') {
 			if(!play)
 				audioContext.suspend()
+			else
+				audioContext.resume()
 		}
 	}, [audioContext])
 
