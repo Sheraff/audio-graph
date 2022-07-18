@@ -7,11 +7,41 @@ import styles from './index.module.css'
 import Oscillator from './Classes/Oscillator'
 import Output from './Classes/Output'
 import Connector from './Connector'
+import LFO from './Classes/LFO'
+import Pan from './Classes/Pan'
+import Delay from './Classes/Delay'
+import BiQuadFilter from './Classes/BiQuadFilter'
+import Merge from './Classes/Merge'
+import Split from './Classes/Split'
+import Constant from './Classes/Constant'
+import Compressor from './Classes/Compressor'
+import WhiteNoise from './Classes/WhiteNoise'
+import AddInputs from './Classes/AddInputs'
+import Automation from './Classes/Automation'
+import Visualizer from './Classes/Visualizer'
+import Multiplier from './Classes/Multiplier'
+import ToMono from './Classes/ToMono'
+import Duplicate from './Classes/Duplicate'
 
 const modules = [
 	Output,
 	Gain,
 	Oscillator,
+	LFO,
+	Pan,
+	Delay,
+	BiQuadFilter,
+	Merge,
+	// Split,
+	Constant,
+	Compressor,
+	WhiteNoise,
+	AddInputs,
+	Multiplier,
+	Automation,
+	Visualizer,
+	ToMono,
+	Duplicate,
 ]
 
 export default function Graph() {

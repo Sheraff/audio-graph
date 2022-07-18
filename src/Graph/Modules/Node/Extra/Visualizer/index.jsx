@@ -71,11 +71,11 @@ export default function Visualizer({id, instance}) {
 	useEffect(() => {
 		const controller = new AbortController()
 		const onChange = () => {
-			if (!instance.data.extra.visualizer)
-				instance.data.extra.visualizer = {}
-			instance.data.extra.visualizer.adjust = adjust.current.value
-			instance.data.extra.visualizer.zoom = zoom.current.value
-			instance.saveToLocalStorage()
+			if (!instance.current.data.extra.visualizer)
+				instance.current.data.extra.visualizer = {}
+			instance.current.data.extra.visualizer.adjust = adjust.current.value
+			instance.current.data.extra.visualizer.zoom = zoom.current.value
+			instance.current.saveToLocalStorage()
 		}
 		adjust.current.addEventListener("input", onChange, {signal: controller.signal, passive: true})
 		zoom.current.addEventListener("input", onChange, {signal: controller.signal, passive: true})
@@ -86,8 +86,8 @@ export default function Visualizer({id, instance}) {
 	return (
 		<div className={styles.visualizer}>
 			<canvas ref={canvas} width="400" height="100" className={styles.main} />
-			<input ref={adjust} id={adjustId} type="range" min="1" max="120" step="0.5" defaultValue={instance.data.extra?.visualizer?.adjust ?? 1} className={styles.input} />
-			<input ref={zoom} id={zoomId} type="range" min="44" max={BUFFER_SIZE} step="44" defaultValue={instance.data.extra?.visualizer?.zoom ?? 1} className={styles.input} />
+			<input ref={adjust} id={adjustId} type="range" min="1" max="120" step="0.5" defaultValue={instance.current.data.extra?.visualizer?.adjust ?? 1} className={styles.input} />
+			<input ref={zoom} id={zoomId} type="range" min="44" max={BUFFER_SIZE} step="44" defaultValue={instance.current.data.extra?.visualizer?.zoom ?? 1} className={styles.input} />
 			<label htmlFor={adjustId}>time window</label>
 			<label htmlFor={zoomId}>sample size</label>
 		</div>

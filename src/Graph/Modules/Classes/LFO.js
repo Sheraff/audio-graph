@@ -1,36 +1,24 @@
 import GraphAudioNode from "./GraphAudioNode"
 
-export default class Oscillator extends GraphAudioNode {
-	static type = 'oscillator'
-	static image = `${process.env.PUBLIC_URL}/icons/oscillator.svg`
+export default class LFO extends GraphAudioNode {
+	static type = 'lfo'
+	static image = `${process.env.PUBLIC_URL}/icons/lfo.svg`
 
 	static structure = {
 		slots: [
 			{type: 'setting', name: 'frequency'},
-			{type: 'setting', name: 'detune'},
 			{type: 'output', name: 0},
 		],
-		settings: [
+		settings:  [
 			{
 				name: 'frequency',
 				type: 'range',
 				props: {
-					min: 20,
-					max: 5000,
-					step: 1,
+					min: 0.01,
+					max: 10,
+					step: 0.01,
 				},
-				defaultValue: 440,
-				readFrom: 'value',
-			},
-			{
-				name: 'detune',
-				type: 'range',
-				props: {
-					min: -4800,
-					max: 4800,
-					step: 100,
-				},
-				defaultValue: 0,
+				defaultValue: 0.03,
 				readFrom: 'value',
 			},
 			{
@@ -58,12 +46,11 @@ export default class Oscillator extends GraphAudioNode {
 	}
 
 	updateSetting(name) {
+		console.log('update', this.audioNode)
 		if(name === 'type') {
 			this.audioNode.type = this.data.settings.type
 		} else if(name === 'frequency') {
 			this.audioNode.frequency.value = this.data.settings.frequency
-		} else if(name === 'detune') {
-			this.audioNode.detune.value = parseFloat(this.data.settings.detune)
 		}
 	}
 }

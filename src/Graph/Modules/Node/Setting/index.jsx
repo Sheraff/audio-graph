@@ -3,13 +3,13 @@ import AutomationTrack from "./AutomationTrack"
 import styles from "./index.module.css"
 import Range from "./Range"
 
-export default function Setting({name, type, defaultValue, options, props, params}) {
+export default function Setting({name, type, defaultValue, options, props, settings}) {
 	const id = useId()
 	if (type === 'track')
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} duration={params.duration}/>
+				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} settings={settings}/>
 				<div />
 			</div>
 		)

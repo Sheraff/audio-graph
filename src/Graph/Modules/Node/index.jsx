@@ -91,12 +91,13 @@ export default function Node({
 			return
 		const controller = new AbortController()
 		form.current.addEventListener('input', ({target}) => {
-			console.log('update setting', target.name)
 			const settingName = target.name
 			const structure = Class.structure.settings.find(({name}) => name === settingName)
+			if (!structure)
+				return
 			instance.current.data.settings[settingName] = target[structure.readFrom]
-			console.log(instance.current)
-			instance.current.updateSetting(settingName)
+			if(instance.current.audioNode)
+				instance.current.updateSetting(settingName)
 			instance.current.saveToLocalStorage()
 		}, {signal: controller.signal})
 		return () => {
@@ -173,6 +174,7 @@ export default function Node({
 								{...setting}
 								key={setting.name}
 								defaultValue={instance.current.data.settings[setting.name]}
+								settings={instance.current.data.settings}
 							/>
 						))}
 					</form>
@@ -180,7 +182,7 @@ export default function Node({
 				{Class.structure.extras?.length > 0 && (
 					<>
 						{Class.structure.extras.map((extra, i) => {
-							const extraId = `${id}.extras.${extra.key}`
+							const extraId = `${id}.extras.${extra.name}`
 							return (
 								<Extra
 									{...extra}

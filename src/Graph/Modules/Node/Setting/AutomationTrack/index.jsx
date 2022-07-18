@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
+import { GraphAudioContext } from "../../../GraphAudioContext"
 import styles from "./index.module.css"
 
 function normalizePoints(canvas, points) {
@@ -21,7 +22,7 @@ function localizePoints(canvas, points) {
 	return value
 }
 
-export default function AutomationTrack({id, name, defaultValue, duration}){
+export default function AutomationTrack({id, name, defaultValue, settings}){
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const input = useRef(/** @type {HTMLInputElement} */(null))
 	const [initialValue, setInitialValue] = useState([])
@@ -41,19 +42,7 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 			})
 	}, [defaultValue])
 
-	const [audioContext, setAudioContext] = useState(null)
-	useEffect(() => {
-		if(!duration || audioContext) return
-		const controller = new AbortController()
-		window.addEventListener('audio-context', ({detail: {ctx}}) => setAudioContext(ctx), {signal: controller.signal})
-		const interval = setInterval(() => {
-			window.dispatchEvent(new CustomEvent('audio-context-request'))
-		}, 1000)
-		return () => {
-			controller.abort()
-			clearInterval(interval)
-		}
-	}, [duration, audioContext])
+	const audioContext = useContext(GraphAudioContext)
 
 	useEffect(() => {
 		const ctx = canvas.current.getContext("2d")
@@ -107,8 +96,8 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 				ctx.strokeStyle = "#fff2"
 				ctx.stroke(path)
 
-				if (audioContext && duration) {
-					const factor = Number(duration)
+				if (typeof audioContext !== 'string' && settings.duration) {
+					const factor = Number(settings.duration)
 					ctx.strokeStyle = "#811ff9"
 					const progress = (audioContext.currentTime % factor) / factor
 					ctx.beginPath()
@@ -143,7 +132,7 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 					ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI)
 					ctx.fill()
 				})
-				if (audioContext && duration) {
+				if (typeof audioContext !== 'string') {
 					draw()
 				}
 			})
@@ -225,7 +214,7 @@ export default function AutomationTrack({id, name, defaultValue, duration}){
 			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [initialValue, audioContext, duration])
+	}, [initialValue, audioContext, settings])
 
 	return (
 		<>

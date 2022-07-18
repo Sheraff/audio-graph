@@ -297,7 +297,6 @@ export default class GraphAudioNode {
 			 * @param {CustomEvent<AudioContext>} event
 			 */
 			const onContext = ({detail}) => {
-				console.log('context reveived', detail, this)
 				this.audioContext = detail
 				this.createAudioNode()
 			}
