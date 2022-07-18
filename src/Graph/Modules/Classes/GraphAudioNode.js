@@ -174,7 +174,7 @@ export default class GraphAudioNode {
 		 * @param {CustomEvent<ConnectionRequest>} event
 		 */
 		const onRequest = ({detail: {request, from, to, audioNode}}) => {
-			console.log('request', {request, from, to, audioNode})
+			console.log('request', {request, from, to, audioNode}, this)
 			const connectionId = `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
 			if (request === 'connect') {
 				if (this.establishedConnections.has(connectionId)) {
@@ -259,9 +259,9 @@ export default class GraphAudioNode {
 		if (!this.audioNode)
 			return
 		if (typeof to.slot.name === 'string') {
-			this.audioNode[action](audioNode, from.slot.name)
+			this.audioNode[action](audioNode, Number(from.slot.name))
 		} else {
-			this.audioNode[action](audioNode, from.slot.name, to.slot.name)
+			this.audioNode[action](audioNode, Number(from.slot.name), Number(to.slot.name))
 		}
 	}
 
@@ -294,6 +294,7 @@ export default class GraphAudioNode {
 			 * @param {CustomEvent<AudioContext>} event
 			 */
 			const onContext = ({detail}) => {
+				console.log('context reveived', detail, this)
 				this.audioContext = detail
 				this.createAudioNode()
 			}
@@ -355,9 +356,9 @@ export default class GraphAudioNode {
 			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
 			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
 			if (from.nodeUuid === this.id) {
-				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to, audioNode: this.audioNode}}))
-			} else if (to.nodeUuid === this.id && from.slot.type === 'output') {
 				this.ownNodeConnection('disconnect', from, to, this.audioNode)
+			} else if (to.nodeUuid === this.id && from.slot.type === 'output') {
+				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to, audioNode: this.audioNode}}))
 			} else {
 				console.warn('Unknown connection when disconnecting', from, to)
 			}

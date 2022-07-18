@@ -60,6 +60,16 @@ export default function Connector({boundary, handles, children}) {
 		}
 		void function loop() {
 			rafId = requestAnimationFrame(() => {
+
+				connections.current.forEach(({from, to}) => {
+					if(!handles.current[from.nodeId] || !handles.current[to.nodeId]) {
+						const connectionId = connectedSlots.current.get(from.id) || connectedSlots.current.get(to.id)
+						connectedSlots.current.delete(from.id)
+						connectedSlots.current.delete(to.id)
+						connections.current.delete(connectionId)
+					}
+				})
+
 				ctx.strokeStyle = "#fff"
 				ctx.fillStyle = "#fff"
 				ctx.lineWidth = 4
@@ -78,7 +88,7 @@ export default function Connector({boundary, handles, children}) {
 		return () => {
 			cancelAnimationFrame(rafId)
 		}
-	}, [boundary])
+	}, [boundary, handles])
 
 	// resolution
 	useEffect(() => {

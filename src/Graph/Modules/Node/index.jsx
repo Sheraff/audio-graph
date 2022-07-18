@@ -36,12 +36,6 @@ export default function Node({
 	useImperativeHandle(handle, () => ({
 		slots: slotsRef.current,
 		connections: instance.current.data.connections,
-		addConnection: (from, to) => {
-			console.log('add connection', from , to)
-		},
-		removeConnection: (from, to) => {
-			console.log('remove connection', from , to)
-		},
 	}))
 	useEffect(() => {
 		const controller = new AbortController()
