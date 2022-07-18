@@ -55,7 +55,6 @@ export default class Oscillator extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new OscillatorNode(audioContext)
 		this.audioNode.start()
-		console.log('initialized', this.audioNode)
 	}
 
 	updateSetting(name) {

@@ -157,7 +157,7 @@ export default class GraphAudioNode {
 				connections: [],
 				extra: {}
 			}
-			this.saveToLocalStorage()
+			this.saveToLocalStorage(true)
 		}
 
 		this.listenToConnections()
@@ -174,7 +174,6 @@ export default class GraphAudioNode {
 		 * @param {CustomEvent<ConnectionRequest>} event
 		 */
 		const onRequest = ({detail: {request, from, to, audioNode}}) => {
-			console.log('request', {request, from, to, audioNode}, this)
 			const connectionId = `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
 			if (request === 'connect') {
 				if (this.establishedConnections.has(connectionId)) {
@@ -236,15 +235,15 @@ export default class GraphAudioNode {
 				console.warn('Unknown request', request)
 			}
 		}
-		console.log('listen on ', this.id)
 		window.addEventListener(this.id, /** @type {EventListener} */(onRequest), {signal: this.controller.signal})
 	}
 
-	saveToLocalStorage() {
+	saveToLocalStorage(force = false) {
 		if(!this.ricId) {
 			this.ricId = requestIdleCallback(() => {
 				this.ricId = null
-				localStorage.setItem(this.id, JSON.stringify(this.data))
+				if (force || localStorage.getItem(this.id))
+					localStorage.setItem(this.id, JSON.stringify(this.data))
 			})
 		}
 	}
@@ -258,10 +257,14 @@ export default class GraphAudioNode {
 	ownNodeConnection(action, from, to, audioNode) {
 		if (!this.audioNode)
 			return
-		if (typeof to.slot.name === 'string') {
-			this.audioNode[action](audioNode, Number(from.slot.name))
-		} else {
-			this.audioNode[action](audioNode, Number(from.slot.name), Number(to.slot.name))
+		try {
+			if (typeof to.slot.name === 'string') {
+				this.audioNode[action](audioNode, from.slot.name)
+			} else {
+				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
+			}
+		} catch (e) {
+			console.error('node not connected', e)
 		}
 	}
 
@@ -325,12 +328,7 @@ export default class GraphAudioNode {
 			const [toNodeUuid, toSlotType, toSlotName] = toId.split('.')
 			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
 			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
-			console.warn('audioNode is AudioNode|AudioParam, not necessarily main audio node `this.audioNode`')
 			window.dispatchEvent(new CustomEvent(toNodeUuid, {detail: {request: 'connect', from, to}}))
-			console.log('initial requests', toNodeUuid, {detail: {request: 'connect', from, to}})
-			// if (fromNodeUuid === this.id) {
-			// 	this.establishedConnections.add(c)
-			// }
 		})
 	}
 
@@ -356,14 +354,13 @@ export default class GraphAudioNode {
 			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
 			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
 			if (from.nodeUuid === this.id) {
-				this.ownNodeConnection('disconnect', from, to, this.audioNode)
+				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to}}))
 			} else if (to.nodeUuid === this.id && from.slot.type === 'output') {
 				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to, audioNode: this.audioNode}}))
 			} else {
 				console.warn('Unknown connection when disconnecting', from, to)
 			}
 		})
-		this.establishedConnections.clear()
 	}
 
 	cleanup() {
