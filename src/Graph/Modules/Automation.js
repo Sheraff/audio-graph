@@ -1,12 +1,27 @@
 import GraphAudioNode from "./GraphAudioNode"
 
+/**
+ * 
+ * @param {AudioContext} ctx 
+ * @param {*} settings 
+ * @param {AudioWorkletNode} destination 
+ * @returns 
+ */
 function plugAutomationNode(ctx, settings, destination) {
 	const offsetNode = destination.parameters.get('offset')
+	if (!offsetNode) {
+		console.warn('Automation node should use a "custom-constant" node')
+		return
+	}
 	const duration = Number(settings.duration)
 	const progress = ctx.currentTime % duration
 	const startTime = ctx.currentTime - progress
 	const percent = progress / duration
-	offsetNode.cancelScheduledValues(ctx.currentTime)
+	if (offsetNode.cancelAndHoldAtTime) {
+		offsetNode.cancelAndHoldAtTime(ctx.currentTime)
+	} else {
+		offsetNode.cancelScheduledValues(ctx.currentTime)
+	}
 	const points = settings.track
 	if(!points?.length) return
 	if(points[0].x !== 0)
