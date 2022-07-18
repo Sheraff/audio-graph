@@ -7,6 +7,7 @@
 	z-index: 0;
 	top: calc(1px * var(--y));
 	left: calc(1px * var(--x));
+	width: fit-content;
 
 	user-select: none;
 }

@@ -1,12 +1,12 @@
 import classNames from 'classnames'
-import { useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { memo, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { GraphAudioContext } from '../GraphAudioContext'
 import Slot from './Slot'
 import Setting from './Setting'
 import Extra from './Extra'
 import styles from './index.module.css'
 
-export default function Node({
+function Node({
 	Class,
 	id,
 	initialPosition,
@@ -36,6 +36,7 @@ export default function Node({
 	useImperativeHandle(handle, () => ({
 		slots: slotsRef.current,
 		connections: instance.current.data.connections,
+		position: position.current,
 	}))
 	useEffect(() => {
 		const controller = new AbortController()
@@ -75,6 +76,7 @@ export default function Node({
 				ref.current.style.removeProperty('transform')
 				header.current.style.removeProperty('cursor')
 				staticPosition.current = {...position.current}
+				ref.current.dispatchEvent(new CustomEvent('node-moved', {bubbles: true}))
 			})
 			instance.current.data.dom = {...position.current}
 			instance.current.saveToLocalStorage()
@@ -179,22 +181,20 @@ export default function Node({
 						))}
 					</form>
 				)}
-				{Class.structure.extras?.length > 0 && (
-					<>
-						{Class.structure.extras.map((extra, i) => {
-							const extraId = `${id}.extras.${extra.name}`
-							return (
-								<Extra
-									{...extra}
-									key={extraId}
-									id={extraId}
-									instance={instance}
-								/>
-							)
-						})}
-					</>
-				)}
+				{Class.structure.extras?.map((extra, i) => {
+					const extraId = `${id}.extras.${extra.name}`
+					return (
+						<Extra
+							{...extra}
+							key={extraId}
+							id={extraId}
+							instance={instance}
+						/>
+					)
+				})}
 			</div>
 		</div>
 	)
 }
+
+export default memo(Node)

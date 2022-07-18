@@ -74,14 +74,14 @@ export default function Connector({boundary, handles, children}) {
 				ctx.fillStyle = "#fff"
 				ctx.lineWidth = 4
 				ctx.clearRect(0, 0, canvas.current.width, canvas.current.height)
-				const x = boundary.current.scrollLeft
-				const y = boundary.current.scrollTop
-				ctx.save()
-				ctx.translate(x, y)
+				// const x = boundary.current.scrollLeft
+				// const y = boundary.current.scrollTop
+				// ctx.save()
+				// ctx.translate(x, y)
 				connections.current.forEach(connection => drawConnection(connection))
 				if (pendingConnection.current)
 					drawConnection(pendingConnection.current)
-				ctx.restore()
+				// ctx.restore()
 				loop()
 			})
 		}()
@@ -170,8 +170,6 @@ export default function Connector({boundary, handles, children}) {
 				const from = {nodeUuid: fromSlot.nodeId, slot: fromSlot}
 				const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
 				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'disconnect', from, to}}))
-				// handles.current[detail.nodeId].removeConnection('a', 'b')
-				// handles.current[otherSlot.nodeId].removeConnection('a', 'b')
 			}
 			
 			const fromSlot = thisKey === 'from' ? thisSlot : otherSlot
@@ -182,10 +180,7 @@ export default function Connector({boundary, handles, children}) {
 			connectedSlots.current.set(toSlot.id, connectionId)
 			const from = {nodeUuid: fromSlot.nodeId, slot: fromSlot}
 			const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
-			console.log('dispatch', to.nodeUuid, {request: 'connect', from, to})
 			window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'connect', from, to}}))
-			// handles.current[detail.nodeId].addConnection('a', 'b')
-			// handles.current[otherSlot.nodeId].addConnection('a', 'b')
 		}, {signal: controller.signal})
 
 		window.addEventListener('mouseup', () => {

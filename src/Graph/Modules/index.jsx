@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Gain from './Classes/Gain'
 import { GraphAudioContextProvider } from './GraphAudioContext'
 import Node from './Node'
@@ -48,7 +48,6 @@ export default function Graph() {
 	const ref = useRef(/** @type {HTMLDivElement} */(null))
 
 	const [nodes, setNodes] = useState(() => {
-		// return []
 		const save = localStorage.getItem('nodes')
 		if (save) {
 			return JSON.parse(save)
@@ -97,19 +96,50 @@ export default function Graph() {
 		save()
 	}, [save])
 
+	const [offset, setOffset] = useState({x: 0, y: 0})
+	useEffect(() => {
+		const onNodePlacement = () => {
+			const offset = Object.values(canvasNodesHandle.current).reduce(({x, y}, {position}) => {
+				return {
+					x: Math.max(x, position.x),
+					y: Math.max(y, position.y),
+				}
+			}, {x: 0, y: 0})
+			setOffset(offset)
+		}
+		onNodePlacement()
+		const controller = new AbortController()
+		ref.current.addEventListener('node-moved', onNodePlacement, {signal: controller.signal})
+		return () => {
+			controller.abort()
+		}
+	}, [])
+
+	const handles = useMemo(() => {
+		return nodes.map(({id}) => 
+			(handle) => canvasNodesHandle.current[id] = handle
+		)
+	}, [nodes])
+
 	return (
 		<GraphAudioContextProvider modules={modules}>
-			<div ref={ref} className={styles.main}>
+			<div
+				ref={ref}
+				className={styles.main}
+				style={{
+					'--x': offset.x,
+					'--y': offset.y,
+				}}
+			>
 				<Connector boundary={ref} handles={canvasNodesHandle}>
-					{/* <Canvas /> */}
-					{nodes.map(({id, type, initialPosition}) => 
+					{nodes.map(({id, type, initialPosition}, i) => 
 						<Node
 							key={id}
 							id={id}
 							Class={modules.find(Class => Class.type === type)}
 							initialPosition={initialPosition}
 							removeNode={removeNode}
-							handle={h => canvasNodesHandle.current[id] = h}
+							handle={handles[i]}
 						/>
 					)}
 					<UI addNode={addNode} modules={modules} />

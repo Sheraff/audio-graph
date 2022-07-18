@@ -273,7 +273,7 @@ export default class GraphAudioNode {
 	 * @returns {AudioNode | AudioParam?}
 	 */
 	getDestinationAudioNode(connection) {
-		if(!this.audioNode)
+		if (!this.audioNode)
 			return null
 		let responseAudioNode = null
 		if (connection.slot.type === 'input') {
@@ -281,8 +281,8 @@ export default class GraphAudioNode {
 		} else if (connection.slot.type === 'setting') {
 			if (connection.slot.name in this.audioNode) {
 				responseAudioNode = this.audioNode[connection.slot.name]
-			} else if('parameters' in this.audioNode && this.audioNode.parameters?.has(connection.slot.name)) {
-				responseAudioNode = this.audioNode.parameters[connection.slot.name]
+			} else if('parameters' in this.audioNode && this.audioNode.parameters.has(connection.slot.name)) {
+				responseAudioNode = this.audioNode.parameters.get(connection.slot.name)
 			}
 		}
 		return responseAudioNode
