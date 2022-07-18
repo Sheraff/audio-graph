@@ -1,8 +1,10 @@
+/** 
+ * @typedef {import('react')} React
+ */
+
 /**
  * @typedef {string} NodeUuid
  */
-
-import React from "react"
 
 /**
  * @typedef {Object} FromSlotDefinition

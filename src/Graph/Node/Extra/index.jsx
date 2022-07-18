@@ -48,7 +48,7 @@ function Visualizer({id, extraId}) {
 				const normalized = normalizeData(samples)
 				ctx.clearRect(0, 0, canvas.current.width, canvas.current.height)
 				ctx.fillStyle = "#fff"
-				const incrementWidth = canvas.current.width / (Number(zoom.current.value) / sampleCount)
+				const incrementWidth = canvas.current.width / (-1 + Number(zoom.current.value) / sampleCount)
 				const number = Number(adjust.current.value)
 				const adjustX = ((time/100) % number) / number
 				normalized.forEach((v, i) => {
