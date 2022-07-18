@@ -68,7 +68,7 @@ export default function AutomationTrack({id, name, defaultValue, settings}){
 			touched.current = true
 			input.current.dispatchEvent(new Event("input", {bubbles: true}))
 		}
-		if(points?.length)
+		if (points?.length)
 			dispatch()
 
 		function draw() {

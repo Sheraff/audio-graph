@@ -20,11 +20,14 @@ export default function Visualizer({instance}) {
 		canvas.current.height = canvas.current.offsetHeight
 
 		const array = new Float32Array(BUFFER_SIZE).fill(0)
-
+		let timeout
+		const resetOnTimeout = () => array.fill(0)
 		const onMessage = ({data: {buffer}}) => {
 			const data = new Float32Array(buffer)
 			array.copyWithin(0, data.length, BUFFER_SIZE)
 			array.set(data, BUFFER_SIZE - data.length)
+			clearTimeout(timeout)
+			timeout = setInterval(resetOnTimeout, 50)
 		}
 		if (instance.current.audioNode) {
 			instance.current.audioNode.port.onmessage = onMessage
@@ -68,6 +71,7 @@ export default function Visualizer({instance}) {
 		
 		return () => {
 			cancelAnimationFrame(rafId)
+			clearTimeout(timeout)
 		}
 	}, [instance])
 
