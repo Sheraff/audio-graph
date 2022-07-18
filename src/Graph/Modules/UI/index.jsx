@@ -77,7 +77,7 @@ export default function UI({addNode, modules}) {
 					{show ? '×' : '+'}
 				</button>
 				<button
-					className={styles.toggle}
+					className={styles.play}
 					type='button'
 					onClick={onTogglePlay}
 					aria-label={play ? 'pause' : 'play'}

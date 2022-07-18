@@ -48,15 +48,24 @@
 	transform: translateX(-50%);
 	background: #2b1b3e;
 	display: flex;
-	gap: 2em;
+	gap: .25em;
 	padding: 0.5em 2em;
 	border-bottom-right-radius: 1em;
 	border-bottom-left-radius: 1em;
 	box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3);
 }
 
+.bottom > * {
+	width: 3rem;
+	text-align: center;
+}
+
 .toggle {
 	font-size: 2em;
+}
+
+.play {
+	font-size: 1.5em;
 }
 
 .github img {
