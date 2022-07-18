@@ -197,7 +197,7 @@ function Player({nodes, connections}, ref) {
 				const customNode = new AudioWorkletNode(ctx.current, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 1}})
 				audioNodes.current[node.id] = customNode
 			} else if (node.type === 'visualizer') {
-				const customNode = new AudioWorkletNode(ctx.current, 'visualizer', {numberOfOutputs: 0, parameterData: {id: node.id}})
+				const customNode = new AudioWorkletNode(ctx.current, 'visualizer', {numberOfOutputs: 0, parameterData: {id: `${node.id}.extra.visualizer`}})
 				audioNodes.current[node.id] = customNode
 				customNode.port.onmessage = e => {
 					window.dispatchEvent(new CustomEvent(node.id, {detail: {buffer: e.data.buffer}}))

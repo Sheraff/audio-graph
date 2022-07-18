@@ -1,16 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import Gain from './Classes/gain'
+import Gain from './Classes/Gain'
 import { GraphAudioContextProvider } from './GraphAudioContext'
+import Node from './Node'
+import UI from './UI'
 import styles from './index.module.css'
+import Oscillator from './Classes/Oscillator'
+import Output from './Classes/Output'
+import Connector from './Connector'
 
 const modules = [
+	Output,
 	Gain,
+	Oscillator,
 ]
 
 export default function Graph() {
 	const ref = useRef(/** @type {HTMLDivElement} */(null))
 
 	const [nodes, setNodes] = useState(() => {
+		// return []
 		const save = localStorage.getItem('nodes')
 		if (save) {
 			return JSON.parse(save)
@@ -62,18 +70,20 @@ export default function Graph() {
 	return (
 		<GraphAudioContextProvider modules={modules}>
 			<div ref={ref} className={styles.main}>
-				<Canvas />
-				{nodes.map(({id, type, initialPosition}) => 
-					<Node
-						key={id}
-						id={id}
-						Class={modules.find(Class => Class.type === type)}
-						initialPosition={initialPosition}
-						removeNode={removeNode}
-						handle={h => canvasNodesHandle.current[id] = h}
-					/>
-				)}
-				<UI addNode={addNode} modules={modules} />
+				<Connector boundary={ref} handles={canvasNodesHandle}>
+					{/* <Canvas /> */}
+					{nodes.map(({id, type, initialPosition}) => 
+						<Node
+							key={id}
+							id={id}
+							Class={modules.find(Class => Class.type === type)}
+							initialPosition={initialPosition}
+							removeNode={removeNode}
+							handle={h => canvasNodesHandle.current[id] = h}
+						/>
+					)}
+					<UI addNode={addNode} modules={modules} />
+				</Connector>
 			</div>
 		</GraphAudioContextProvider>
 	)

@@ -1,13 +1,14 @@
 import styles from './app.module.css'
-import Graph from './Graph'
+// import Graph from './Graph'
+import Graph from './Graph/Modules'
 import Waveform from './Waveform'
 import example from './Graph/example'
 
-if(localStorage.length === 0) {
-	Object.entries(example).forEach(([key, value]) => {
-		localStorage.setItem(key, JSON.stringify(value))
-	})
-}
+// if(localStorage.length === 0) {
+// 	Object.entries(example).forEach(([key, value]) => {
+// 		localStorage.setItem(key, JSON.stringify(value))
+// 	})
+// }
 
 function App() {
 	return (
