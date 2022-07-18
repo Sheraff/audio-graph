@@ -46,7 +46,6 @@ export default class LFO extends GraphAudioNode {
 	}
 
 	updateSetting(name) {
-		console.log('update', this.audioNode)
 		if(name === 'type') {
 			this.audioNode.type = this.data.settings.type
 		} else if(name === 'frequency') {

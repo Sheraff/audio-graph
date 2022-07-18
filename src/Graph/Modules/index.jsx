@@ -99,10 +99,12 @@ export default function Graph() {
 	const [offset, setOffset] = useState({x: 0, y: 0})
 	useEffect(() => {
 		const onNodePlacement = () => {
-			const offset = Object.values(canvasNodesHandle.current).reduce(({x, y}, {position}) => {
+			const offset = Object.values(canvasNodesHandle.current).reduce(({x, y}, node) => {
+				if(!node?.position)
+					return {x, y}
 				return {
-					x: Math.max(x, position.x),
-					y: Math.max(y, position.y),
+					x: Math.max(x, node.position.x),
+					y: Math.max(y, node.position.y),
 				}
 			}, {x: 0, y: 0})
 			setOffset(offset)
