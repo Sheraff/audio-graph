@@ -89,16 +89,25 @@ function Node({
 		if (!Class.structure.settings?.length)
 			return
 		const controller = new AbortController()
-		form.current.addEventListener('input', ({target}) => {
-			const settingName = target.name
+		const onChange = (event) => {
+			const settingName = event.target.name
 			const structure = Class.structure.settings.find(({name}) => name === settingName)
 			if (!structure)
 				return
-			instance.current.data.settings[settingName] = target[structure.readFrom]
-			if(instance.current.audioNode)
-				instance.current.updateSetting(settingName, target)
-			instance.current.saveToLocalStorage()
-		}, {signal: controller.signal})
+			if (event.type === structure.event || (event.type === 'input' && !structure.event)) {
+				instance.current.data.settings[settingName] = event.target[structure.readFrom]
+				if(instance.current.audioNode)
+					instance.current.updateSetting(settingName, event.target)
+				instance.current.saveToLocalStorage()
+			}
+		}
+		const changeListenersCount = Class.structure.settings.filter(({event}) => event === 'change').length
+		const inputListenersCount = Class.structure.settings.length - changeListenersCount
+		
+		if (changeListenersCount)
+			form.current.addEventListener('change', onChange, {signal: controller.signal})
+		if (inputListenersCount)
+			form.current.addEventListener('input', onChange, {signal: controller.signal})
 		return () => {
 			controller.abort()
 		}

@@ -2,30 +2,10 @@ import { useContext, useEffect, useRef, useState } from "react"
 import { GraphAudioContext } from "../../../GraphAudioContext"
 import styles from "./index.module.css"
 
-function normalizePoints(canvas, points) {
-	const xRange = canvas.offsetWidth
-	const yRange = canvas.offsetHeight / 2
-	const value = points.map(point => ({
-		x: point.x / xRange,
-		y: (yRange - point.y) / yRange,
-	}))
-	return value
-}
-
-function localizePoints(canvas, points) {
-	const xRange = canvas.offsetWidth
-	const yRange = canvas.offsetHeight / 2
-	const value = points.map(point => ({
-		x: point.x * xRange,
-		y: yRange - point.y * yRange,
-	}))
-	return value
-}
-
 export default function Sequence({id, name, defaultValue, instance}){
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const input = useRef(/** @type {HTMLInputElement} */(null))
-	// const [initialValue, setInitialValue] = useState(defaultValue)
+	const [initialValue, setInitialValue] = useState(defaultValue)
 	const touched = useRef(false)
 
 	useEffect(() => {
@@ -33,14 +13,14 @@ export default function Sequence({id, name, defaultValue, instance}){
 		canvas.current.height = canvas.current.offsetHeight
 	}, [])
 
-	// useEffect(() => {
-	// 	if (!touched.current && Array.isArray(defaultValue))
-	// 		setInitialValue((former) => {
-	// 			if (former.length && !defaultValue.length)
-	// 				return former
-	// 			return localizePoints(canvas.current, defaultValue)
-	// 		})
-	// }, [defaultValue])
+	useEffect(() => {
+		if (!touched.current && Array.isArray(defaultValue))
+			setInitialValue((former) => {
+				if (former.length && !defaultValue.length)
+					return former
+				return defaultValue
+			})
+	}, [defaultValue])
 
 	const audioContext = useContext(GraphAudioContext)
 
@@ -48,7 +28,7 @@ export default function Sequence({id, name, defaultValue, instance}){
 		const ctx = canvas.current.getContext("2d")
 		if(!ctx) return
 
-		const bounds = Array.isArray(defaultValue) ? defaultValue : [0, 1]
+		const bounds = Array.isArray(initialValue) ? initialValue : [0, 1]
 		const controller = new AbortController()
 		let rafId
 
@@ -147,20 +127,19 @@ export default function Sequence({id, name, defaultValue, instance}){
 		window.addEventListener('mouseup', (e) => {
 			if(start === null) return
 			start = null
-			touched.current = true
-			input.current.dispatchEvent(new Event("input", {bubbles: true}))
+			dispatch()
 		}, {signal: controller.signal})
 
 		return () => {
 			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [defaultValue, audioContext, instance])
+	}, [initialValue, audioContext, instance])
 
 	return (
 		<>
 			<canvas ref={canvas} width="400" height="100" className={styles.main} />
-			<input ref={input} id={id} name={name} className={styles.input} />
+			<input ref={input} id={id} name={name} className={styles.input} defaultValue={''} />
 		</>
 	)
 }

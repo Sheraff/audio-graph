@@ -17,6 +17,7 @@ export default class FileSource extends GraphAudioNode {
 				},
 				defaultValue: '',
 				readFrom: 'files',
+				event: 'change',
 			},
 			{
 				name: 'select',
@@ -58,6 +59,12 @@ export default class FileSource extends GraphAudioNode {
 			this.connectBuffer()
 		} else if (name === 'playbackRate' && this.bufferNode) {
 			this.connectBuffer()
+		}
+	}
+
+	updateAudioNodeSettings() {
+		if (this.audioContext) {
+			this.updateSetting('source')
 		}
 	}
 
