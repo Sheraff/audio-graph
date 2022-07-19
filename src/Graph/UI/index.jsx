@@ -1,7 +1,44 @@
 import classNames from 'classnames'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { GraphAudioContext } from '../GraphAudioContext'
 import styles from './index.module.css'
+
+function downloadGraph() {
+	const data = {...localStorage}
+	console.log(data)
+	const blob = new Blob([JSON.stringify(data)], { type: "text/json" })
+	const link = document.createElement("a")
+
+	link.download = "graph.json"
+	link.href = window.URL.createObjectURL(blob)
+	link.dataset.downloadurl = ["text/json", link.download, link.href].join(":")
+
+	const evt = new MouseEvent("click", {
+		view: window,
+		bubbles: true,
+		cancelable: true,
+	})
+
+	link.dispatchEvent(evt)
+	link.remove()
+}
+
+function openGraph(e) {
+	const file = e.target.files[0]
+	if (!file) {
+		return
+	}
+	const reader = new FileReader()
+	reader.onload = function(e) {
+		localStorage.clear()
+		const contents = JSON.parse(e.target.result)
+		Object.entries(contents).forEach(([key, value]) => {
+			localStorage.setItem(key, value)
+		})
+		window.location.reload()
+	}
+	reader.readAsText(file)
+}
 
 export default function UI({addNode, modules}) {
 	const audioContext = useContext(GraphAudioContext)
@@ -71,6 +108,7 @@ export default function UI({addNode, modules}) {
 				<button
 					className={styles.toggle}
 					type="button"
+					title="add node"
 					onClick={() => setShow(a => !a)}
 					aria-label="toggle hud"
 				>
@@ -79,6 +117,7 @@ export default function UI({addNode, modules}) {
 				<button
 					className={styles.play}
 					type='button'
+					title={`${play ? 'pause' : 'play'} graph`}
 					onClick={onTogglePlay}
 					aria-label={play ? 'pause' : 'play'}
 				>
@@ -88,9 +127,15 @@ export default function UI({addNode, modules}) {
 					className={styles.github}
 					href="https://github.com/Sheraff/audio-graph"
 					target="_blank"
+					title="see source code on github"
 				>
 					<img src={`${process.env.PUBLIC_URL}/github.png`} width="1" height="1" alt=""/>
 				</a>
+				<button className={styles.file} title="download graph" type="button" onClick={downloadGraph}>DL</button>
+				<label className={styles.file} title="upload graph">
+					UP
+					<input type="file" onChange={openGraph} accept=".json,text/json,application/json" hidden/>
+				</label>
 			</div>
 		</div>
 	)

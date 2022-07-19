@@ -6,7 +6,7 @@ import example from './Graph/example'
 
 if (localStorage.length === 0) {
 	Object.entries(example).forEach(([key, value]) => {
-		localStorage.setItem(key, JSON.stringify(value))
+		localStorage.setItem(key, value)
 	})
 }
 

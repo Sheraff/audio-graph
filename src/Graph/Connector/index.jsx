@@ -15,6 +15,13 @@ export default function Connector({boundary, handles, children}) {
 				const [fromId, toId] = connectionId.split('-')
 				const [fromNodeId] = fromId.split('.')
 				const [toNodeId] = toId.split('.')
+				const from = handles.current[fromNodeId]?.slots[fromId]
+				const to = handles.current[toNodeId]?.slots[toId]
+				// TODO: this `return` only happens if we have bad data. find out why we sometimes have bad data.
+				if (!from || !to) {
+					console.warn('Bad initial connection data:', connectionId, fromId, toId, from, to)
+					return
+				}
 				connections.current.set(
 					connectionId,
 					{
