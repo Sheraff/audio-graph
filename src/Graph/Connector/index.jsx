@@ -144,12 +144,12 @@ export default function Connector({boundary, handles, children}) {
 				const from = {nodeUuid: fromSlot.nodeId, slot: fromSlot}
 				const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
 				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'disconnect', from, to}}))
-				// handles.current[detail.nodeId].removeConnection('a', 'b')
-				// handles.current[otherSlot.nodeId].removeConnection('a', 'b')
+				pendingConnection.current = { [otherKey]: otherSlot }
+			} else {
+				const thisKey = detail.left ? 'to' : 'from'
+				const thisSlot = handles.current[detail.nodeId].slots[detail.id]
+				pendingConnection.current = { [thisKey]: thisSlot }
 			}
-			const thisKey = detail.left ? 'to' : 'from'
-			const thisSlot = handles.current[detail.nodeId].slots[detail.id]
-			pendingConnection.current = { [thisKey]: thisSlot }
 		}, {signal: controller.signal})
 		
 		boundary.current.addEventListener('slot-up', ({detail}) => {
