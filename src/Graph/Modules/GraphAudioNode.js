@@ -60,6 +60,18 @@
  * @property {number} props.step
  * @property {number} defaultValue
  * @property {'value'} readFrom
+ * @property {'input' | 'change'?} event
+ */
+
+/**
+ * @typedef {Object} FileSettingDefinition
+ * @property {string} name
+ * @property {'file'} type
+ * @property {Object} props
+ * @property {string} props.accept
+ * @property {''} defaultValue
+ * @property {'files'} readFrom
+ * @property {'change'?} event
  */
 
 /**
@@ -69,6 +81,7 @@
  * @property {Array<string>} options
  * @property {string} defaultValue
  * @property {'value'} readFrom
+ * @property {'input' | 'change'?} event
  */
 
 /**
@@ -77,10 +90,20 @@
  * @property {'track'} type
  * @property {Array<{x: number, y: number}>} defaultValue
  * @property {'points'} readFrom
+ * @property {'input'?} event
  */
 
 /**
- * @typedef {RangeSettingDefinition | SelectSettingDefinition | TrackSettingDefinition} SettingDefinition
+ * @typedef {Object} SequenceSettingDefinition
+ * @property {string} name
+ * @property {'select'} type
+ * @property {[0, 1]} defaultValue
+ * @property {'bounds'} readFrom
+ * @property {'input'?} event
+ */
+
+/**
+ * @typedef {RangeSettingDefinition | SelectSettingDefinition | TrackSettingDefinition | SequenceSettingDefinition | FileSettingDefinition} SettingDefinition
  */
 
 export default class GraphAudioNode {
