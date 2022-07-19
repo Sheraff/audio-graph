@@ -96,7 +96,7 @@ function Node({
 				return
 			instance.current.data.settings[settingName] = target[structure.readFrom]
 			if(instance.current.audioNode)
-				instance.current.updateSetting(settingName)
+				instance.current.updateSetting(settingName, target)
 			instance.current.saveToLocalStorage()
 		}, {signal: controller.signal})
 		return () => {
@@ -176,6 +176,7 @@ function Node({
 								key={setting.name}
 								defaultValue={instance.current.data.settings[setting.name]}
 								settings={instance.current.data.settings}
+								instance={instance}
 							/>
 						))}
 					</form>

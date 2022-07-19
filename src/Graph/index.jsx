@@ -23,6 +23,7 @@ import Multiplier from './Modules/Multiplier'
 import ToMono from './Modules/ToMono'
 import Duplicate from './Modules/Duplicate'
 import Analyser from './Modules/Analyser'
+import FileSource from './Modules/FileSource'
 
 const modules = [
 	Output,
@@ -44,6 +45,7 @@ const modules = [
 	Analyser,
 	ToMono,
 	Duplicate,
+	FileSource,
 ]
 
 export default function Graph() {
