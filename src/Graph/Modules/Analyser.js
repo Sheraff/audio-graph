@@ -19,7 +19,7 @@ export default class Analyser extends GraphAudioNode {
 					max: 15,
 					step: 1,
 				},
-				defaultValue: 11,
+				defaultValue: 12,
 				readFrom: 'value',
 			},
 			{
@@ -30,7 +30,7 @@ export default class Analyser extends GraphAudioNode {
 					max: 0,
 					step: 1,
 				},
-				defaultValue: -30,
+				defaultValue: -5,
 				readFrom: 'value',
 			},
 			{
@@ -41,7 +41,7 @@ export default class Analyser extends GraphAudioNode {
 					max: 0,
 					step: 1,
 				},
-				defaultValue: -100,
+				defaultValue: -200,
 				readFrom: 'value',
 			},
 			{
@@ -52,7 +52,7 @@ export default class Analyser extends GraphAudioNode {
 					max: 1,
 					step: 0.01,
 				},
-				defaultValue: 0.8,
+				defaultValue: 0.5,
 				readFrom: 'value',
 			},
 			{
