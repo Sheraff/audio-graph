@@ -22,6 +22,7 @@ import Visualizer from './Modules/Visualizer'
 import Multiplier from './Modules/Multiplier'
 import ToMono from './Modules/ToMono'
 import Duplicate from './Modules/Duplicate'
+import Analyser from './Modules/Analyser'
 
 const modules = [
 	Output,
@@ -40,6 +41,7 @@ const modules = [
 	Multiplier,
 	Automation,
 	Visualizer,
+	Analyser,
 	ToMono,
 	Duplicate,
 ]

@@ -1,9 +1,3 @@
-.visualizer {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: .5em;
-}
-
 .main {
 	grid-column: 1 / 3;
 	min-width: 300px;

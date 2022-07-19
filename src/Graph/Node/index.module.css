@@ -88,17 +88,6 @@
 	border-right: 1px solid currentColor;
 	right: 0;
 }
-/* .slots::after {
-	content: "";
-	position: absolute;
-	z-index: -1;
-	background-color: var(--bg);
-	border-left: 1px solid currentColor;
-	border-right: 1px solid currentColor;
-	height: calc(100% - 100% * var(--min) / var(--max));
-	bottom: 0;
-	width: 100%;
-} */
 
 .bottom {
 	padding: .5em;
@@ -120,4 +109,7 @@
 }
 .settings > * > * {
 	display: table-cell;
+}
+.settings:not(:last-child) {
+	margin-bottom: 0.5em;
 }
