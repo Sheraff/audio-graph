@@ -52,20 +52,23 @@ export default function Sequence({id, name, defaultValue, instance}){
 			previousBuffer = instance.current.buffer
 			const a = instance.current.buffer.getChannelData(0)
 			const b = instance.current.buffer.getChannelData(1)
-			const SAMPLE_SIZE = 30
+			const SAMPLE_SIZE = Math.max(1, Math.floor(a.length / Math.max(1, ctx.canvas.width)))
+			let max = 0
 			const [result] = a
-				.map((value, i) => Math.abs(value) + Math.abs(b[i]))
-				.reduce(([samples, sum, count], value, i, array) => {
+				.reduce(([samples, sum, count], _value, i, array) => {
+					const value = Math.abs(_value) + Math.abs(b[i])
 					sum += Math.abs(value)
 					count++
 					if((i + 1) % SAMPLE_SIZE === 0 || i + 1 === array.length) {
-						samples.push(sum / count)
+						const sample = sum / count
+						samples.push(sample)
+						if (sample > max)
+							max = sample
 						sum = 0
 						count = 0
 					}
 					return [samples, sum, count]
 				}, [[], 0, 0])
-			const max = Math.max(...result)
 			const normalized = result.map((value) => value / max)
 			path = new Path2D()
 			const incrementSize = ctx.canvas.width / normalized.length
@@ -121,8 +124,8 @@ export default function Sequence({id, name, defaultValue, instance}){
 			const current = e.offsetX
 			const min = Math.min(start, current)
 			const max = Math.max(start, current)
-			bounds[0] = min / canvas.current.width
-			bounds[1] = max / canvas.current.width
+			bounds[0] = Math.max(0, min / canvas.current.width)
+			bounds[1] = Math.min(1, max / canvas.current.width)
 		}, {signal: controller.signal})
 		window.addEventListener('mouseup', (e) => {
 			if(start === null) return
