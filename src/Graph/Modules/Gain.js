@@ -16,8 +16,8 @@ export default class Gain extends GraphAudioNode {
 				type: 'range',
 				props: {
 					min: 0,
-					max: 100,
-					step: 0.01,
+					max: 10,
+					step: 0.1,
 				},
 				defaultValue: 1,
 				readFrom: 'value',

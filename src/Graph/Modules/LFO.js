@@ -15,10 +15,10 @@ export default class LFO extends GraphAudioNode {
 				type: 'range',
 				props: {
 					min: 0.01,
-					max: 10,
+					max: 5,
 					step: 0.01,
 				},
-				defaultValue: 0.03,
+				defaultValue: 0.5,
 				readFrom: 'value',
 			},
 			{
@@ -41,7 +41,7 @@ export default class LFO extends GraphAudioNode {
 				props: {
 					min: 0,
 					max: 100,
-					step: 0.01,
+					step: 0.1,
 				},
 				defaultValue: 1,
 				readFrom: 'value',

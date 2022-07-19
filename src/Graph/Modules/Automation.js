@@ -13,7 +13,7 @@ function plugAutomationNode(ctx, settings, destination) {
 		console.warn('Automation node should use a "custom-constant" node')
 		return
 	}
-	const duration = Number(settings.duration)
+	const duration = 60 / Number(settings.tempo) * 4
 	const progress = ctx.currentTime % duration
 	const startTime = ctx.currentTime - progress
 	const percent = progress / duration
@@ -60,7 +60,7 @@ export default class Automation extends GraphAudioNode {
 		],
 		settings: [
 			{name: 'track', type: 'track', props: {}, defaultValue: [], readFrom: 'points'},
-			{name: 'duration', type: 'range', props: {min: 0.1, max: 10, step: 0.1}, defaultValue: 1, readFrom: 'value'},
+			{name: 'tempo', type: 'range', props: {min: 1, max: 300, step: 1}, defaultValue: 120, readFrom: 'value'},
 			{name: 'interpolation', type: 'select', props: {}, defaultValue: "linear", readFrom: 'value',
 				options: [
 					"linear",

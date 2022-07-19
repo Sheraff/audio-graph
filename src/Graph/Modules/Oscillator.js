@@ -15,8 +15,8 @@ export default class Oscillator extends GraphAudioNode {
 				name: 'frequency',
 				type: 'range',
 				props: {
-					min: 20,
-					max: 5000,
+					min: 10,
+					max: 880,
 					step: 1,
 				},
 				defaultValue: 440,

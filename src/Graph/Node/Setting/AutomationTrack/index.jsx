@@ -96,8 +96,8 @@ export default function AutomationTrack({id, name, defaultValue, settings}){
 				ctx.strokeStyle = "#fff2"
 				ctx.stroke(path)
 
-				if (typeof audioContext !== 'string' && settings.duration) {
-					const factor = Number(settings.duration)
+				if (typeof audioContext !== 'string' && settings.tempo) {
+					const factor = 60 / Number(settings.tempo) * 4
 					ctx.strokeStyle = "#811ff9"
 					const progress = (audioContext.currentTime % factor) / factor
 					ctx.beginPath()
