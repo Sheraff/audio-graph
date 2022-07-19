@@ -34,6 +34,17 @@ export default class LFO extends GraphAudioNode {
 				],
 				defaultValue: "sine",
 				readFrom: 'value',
+			},
+			{
+				name: 'gain',
+				type: 'range',
+				props: {
+					min: 0,
+					max: 100,
+					step: 0.01,
+				},
+				defaultValue: 1,
+				readFrom: 'value',
 			}
 		]
 	}
@@ -41,15 +52,25 @@ export default class LFO extends GraphAudioNode {
 	static requiredModules = []
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new OscillatorNode(audioContext)
-		this.audioNode.start()
+		this.audioNode = new GainNode(audioContext)
+		this.oscillator = new OscillatorNode(audioContext)
+		this.oscillator.connect(this.audioNode)
+		this.oscillator.start()
 	}
 
 	updateSetting(name) {
 		if(name === 'type') {
-			this.audioNode.type = this.data.settings.type
+			this.oscillator.type = this.data.settings.type
 		} else if(name === 'frequency') {
-			this.audioNode.frequency.value = this.data.settings.frequency
+			this.oscillator.frequency.value = this.data.settings.frequency
+		} else if(name === 'gain') {
+			this.audioNode.gain.value = this.data.settings.gain
 		}
+	}
+
+	cleanup() {
+		this.oscillator.stop()
+		this.oscillator.disconnect()
+		super.cleanup()
 	}
 }
