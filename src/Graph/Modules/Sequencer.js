@@ -76,62 +76,43 @@ export default class Sequencer extends GraphAudioNode {
 		this.schedule()
 	}
 
-	lastBeatStartTime
-	previousTempo
 	schedule() {
 		const {currentTime} = this.audioContext
 		const order = ['a', 'b', 'c', 'd']
 		order.forEach((key) => {
-			this.customNodes[key].gain.cancelScheduledValues(currentTime)
+			this.customNodes[key].gain.cancelAndHoldAtTime(currentTime)
 		})
 		const beatCount = this.data.settings.sequence[0].length
 		const beatLength = 60 / this.data.settings.tempo
 		const barLength = beatLength * beatCount
-
-		////////////////////////////////////////
-		// TODO: FIX THIS AWFUL MESS OF MATHS //
-		////////////////////////////////////////
-
-		let beatCountOffset = 0
-		let timeOffset = 0
-		if(this.lastBeatStartTime) {
-			const previousBeatLength = this.previousTempo
-				? 60 / this.previousTempo
-				: beatLength
-			const previousBarLength = this.previousTempo
-				? previousBeatLength * beatCount
-				: barLength
-			const remainderInBar = (currentTime - this.lastBeatStartTime) % previousBarLength
-			const remainderInBeat = remainderInBar % previousBeatLength
-			beatCountOffset = Math.round((remainderInBar - remainderInBeat) / previousBeatLength)
-			// const percentAlongCurrentBeat = remainderInBeat / previousBeatLength
-			timeOffset = remainderInBeat
-		}
+		const rootOffset = currentTime % barLength
+		const rootTime = currentTime - rootOffset
 
 		this.data.settings.sequence.forEach((sequence, i) => {
 			const node = this.customNodes[order[i]]
-			for (let repeats = 0; repeats < 1000; repeats++) {
+			for (let repeats = -1; repeats < 100; repeats++) {
 				const bars = repeats * barLength
 				sequence.forEach((value, multiplier) => {
-					const offset = ((multiplier + beatCountOffset) % beatCount) * beatLength
-					node.gain.setValueAtTime(value, currentTime + offset + bars + timeOffset)
+					const offset = multiplier * beatLength
+					const time = rootTime + offset + bars
+					if(time > currentTime)
+						node.gain.setValueAtTime(value, time)
 				})
 			}
 		})
 
 		const node = this.customNodes.timer.parameters.get('offset')
-		node.cancelScheduledValues(currentTime + timeOffset)
+		node.cancelAndHoldAtTime(currentTime)
 		const sequence = this.data.settings.sequence[0]
-		for (let repeats = 0; repeats < 1000; repeats++) {
+		for (let repeats = -1; repeats < 100; repeats++) {
 			const bars = repeats * barLength
 			sequence.forEach((_, multiplier) => {
-				const offset = ((multiplier + beatCountOffset) % beatCount) * beatLength
+				const offset = multiplier * beatLength
 				const value = multiplier / beatCount
-				node.setValueAtTime(value, currentTime + offset + bars + timeOffset)
+				const time = rootTime + offset + bars
+				if(time > currentTime)
+					node.setValueAtTime(value, time)
 			})
 		}
-
-		this.lastBeatStartTime = currentTime
-		this.previousTempo = this.data.settings.tempo
 	}
 }
