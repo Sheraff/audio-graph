@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { useContext, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { GraphAudioContext } from '../GraphAudioContext'
 import styles from './index.module.css'
 
@@ -50,15 +50,17 @@ export default function UI({addNode, modules}) {
 	const audioContext = useContext(GraphAudioContext)
 
 	const [play, setPlay] = useState(false)
-	const onTogglePlay = () => {
-		if(typeof audioContext !== 'string') {
-			if (play)
-				audioContext.suspend()
-			else
-				audioContext.resume()
-		}
-		setPlay(!play)
-	}
+	const onTogglePlay = useCallback(() => {
+		setPlay(play => {
+			if(typeof audioContext !== 'string') {
+				if (play)
+					audioContext.suspend()
+				else
+					audioContext.resume()
+			}
+			return !play
+		})
+	}, [audioContext])
 	useEffect(() => {
 		if(typeof audioContext !== 'string') {
 			if(!play)
@@ -67,6 +69,16 @@ export default function UI({addNode, modules}) {
 				audioContext.resume()
 		}
 	}, [audioContext])
+	useEffect(() => {
+		const controller = new AbortController()
+		window.addEventListener('keydown', (e) => {
+			if (e.key === ' ') {
+				e.preventDefault()
+				onTogglePlay()
+			}
+		}, {signal: controller.signal})
+		return () => controller.abort()
+	}, [onTogglePlay])
 
 	const [show, setShow] = useState(false)
 	const onAddNode = (type) => {

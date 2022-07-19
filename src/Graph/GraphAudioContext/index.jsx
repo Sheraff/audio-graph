@@ -7,7 +7,8 @@ export const GraphAudioContextProvider = ({ children, modules }) => {
 	const [audioContext, setAudioContext] = useState(/** @type {AudioContext?} */(null))
 	useEffect(() => {
 		const controller = new AbortController()
-		window.addEventListener('click', async () => {
+		const onAnyUserEvent = async () => {
+			controller.abort()
 			const context = new AudioContext()
 			await Promise.all([
 				context.suspend(), 
@@ -19,7 +20,14 @@ export const GraphAudioContextProvider = ({ children, modules }) => {
 			])
 			window.dispatchEvent(new CustomEvent(id, {detail: context}))
 			setAudioContext(context)
-		}, {
+		}
+		window.addEventListener('click', onAnyUserEvent, {
+			once: true,
+			passive: true,
+			signal: controller.signal,
+			capture: true,
+		})
+		window.addEventListener('keydown', onAnyUserEvent, {
 			once: true,
 			passive: true,
 			signal: controller.signal,
