@@ -31,6 +31,8 @@ export default class Visualizer extends GraphAudioNode {
 
 	cleanup() {
 		super.cleanup()
-		this.audioNode.port.postMessage({type: 'stop'})
+		if (this.audioNode) {
+			this.audioNode.port.postMessage({type: 'stop'})
+		}
 	}
 }

@@ -12,18 +12,19 @@ import Pan from './Modules/Pan'
 import Delay from './Modules/Delay'
 import BiQuadFilter from './Modules/BiQuadFilter'
 import Merge from './Modules/Merge'
-import Split from './Modules/Split'
+// import Split from './Modules/Split'
 import Constant from './Modules/Constant'
 import Compressor from './Modules/Compressor'
 import WhiteNoise from './Modules/WhiteNoise'
 import AddInputs from './Modules/AddInputs'
 import Automation from './Modules/Automation'
-import Visualizer from './Modules/Visualizer'
+// import Visualizer from './Modules/Visualizer'
 import Multiplier from './Modules/Multiplier'
 import ToMono from './Modules/ToMono'
 import Duplicate from './Modules/Duplicate'
 import Analyser from './Modules/Analyser'
 import FileSource from './Modules/FileSource'
+import Waveform from './Modules/Waveform'
 
 const modules = [
 	Output,
@@ -41,11 +42,12 @@ const modules = [
 	AddInputs,
 	Multiplier,
 	Automation,
-	Visualizer,
+	// Visualizer,
 	Analyser,
 	ToMono,
 	Duplicate,
 	FileSource,
+	Waveform,
 ]
 
 export default function Graph() {

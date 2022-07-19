@@ -16,13 +16,15 @@ export default class Merge extends GraphAudioNode {
 		],
 	}
 
-	static requiredModules = []
+	static requiredModules = [
+		`${process.env.PUBLIC_URL}/AudioWorklets/Merge.js`
+	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new ChannelMergerNode(audioContext)
+		this.audioNode = new AudioWorkletNode(audioContext, 'merge', {numberOfInputs: 6})
 	}
 
 	updateSetting(name) {
-
+		
 	}
 }
