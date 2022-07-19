@@ -140,6 +140,9 @@ export default class GraphAudioNode {
 		/** @type {AudioNode | AudioWorkletNode?} */
 		this.audioNode = null
 		
+		/** @type {Object<string, AudioNode | AudioWorkletNode?>} */
+		this.customNodes = {}
+		
 		/** @type {AudioContext?} */
 		this.audioContext = null
 
@@ -285,12 +288,16 @@ export default class GraphAudioNode {
 		if (!this.audioNode)
 			return
 		try {
+			// TODO: handle custom nodes
+			// TODO: handle channel assignment better
 			if (typeof to.slot.name === 'string') {
 				this.audioNode[action](audioNode, from.slot.name)
 			} else {
 				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
 			}
 		} catch (e) {
+			console.log(from, this.audioNode)
+			console.log(to, audioNode)
 			console.error(`couldn't perform '${action}' on node`, e)
 		}
 	}
@@ -300,19 +307,28 @@ export default class GraphAudioNode {
 	 * @returns {AudioNode | AudioParam?}
 	 */
 	getDestinationAudioNode(connection) {
+		if (connection.slot.type === 'custom') {
+			if (this.customNodes && (connection.slot.name in this.customNodes)) {
+				return this.customNodes[connection.slot.name]
+			}
+			return null
+		}
 		if (!this.audioNode)
 			return null
-		let responseAudioNode = null
 		if (connection.slot.type === 'input') {
-			responseAudioNode = this.audioNode
-		} else if (connection.slot.type === 'setting') {
-			if (connection.slot.name in this.audioNode) {
-				responseAudioNode = this.audioNode[connection.slot.name]
-			} else if('parameters' in this.audioNode && this.audioNode.parameters.has(connection.slot.name)) {
-				responseAudioNode = this.audioNode.parameters.get(connection.slot.name)
-			}
+			return this.audioNode
 		}
-		return responseAudioNode
+		if (connection.slot.type === 'setting') {
+			if (connection.slot.name in this.audioNode) {
+				return this.audioNode[connection.slot.name]
+			}
+			if ('parameters' in this.audioNode && this.audioNode.parameters.has(connection.slot.name)) {
+				return this.audioNode.parameters.get(connection.slot.name)
+			}
+			return null
+		}
+
+		return null
 	}
 
 	/**

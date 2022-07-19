@@ -25,6 +25,7 @@ import Duplicate from './Modules/Duplicate'
 import Analyser from './Modules/Analyser'
 import FileSource from './Modules/FileSource'
 import Waveform from './Modules/Waveform'
+import Sequencer from './Modules/Sequencer'
 
 const modules = [
 	Output,
@@ -48,6 +49,7 @@ const modules = [
 	Duplicate,
 	FileSource,
 	Waveform,
+	Sequencer,
 ]
 
 export default function Graph() {
