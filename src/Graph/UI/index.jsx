@@ -40,6 +40,12 @@ function openGraph(e) {
 	reader.readAsText(file)
 }
 
+function clear() {
+	localStorage.clear()
+	localStorage.setItem('nodes', '[]')
+	window.location.reload()
+}
+
 export default function UI({addNode, modules}) {
 	const audioContext = useContext(GraphAudioContext)
 
@@ -136,6 +142,7 @@ export default function UI({addNode, modules}) {
 					UP
 					<input type="file" onChange={openGraph} accept=".json,text/json,application/json" hidden/>
 				</label>
+				<button className={styles.file} title="clear graph" type="button" onClick={clear}>🚫</button>
 			</div>
 		</div>
 	)
