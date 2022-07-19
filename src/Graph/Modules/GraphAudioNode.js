@@ -85,12 +85,12 @@
 
 export default class GraphAudioNode {
 	/** @type {string} */
-	// static get type() { throw new Error(`undefined type for ${this.constructor.name}`) }
-	// static set type(value) {this.type = value}
+	static get type() { throw new Error(`undefined type for ${this.constructor.name}`) }
+	static set type(value) { Object.defineProperty(this, 'type', {value, writable: false, configurable: false}) }
 
 	/** @type {`${typeof process.env.PUBLIC_URL}/${string}.${'svg' | 'png'}`} */
-	// static get image() { throw new Error(`undefined image for ${this.constructor.name}`) }
-	// static set image(value) {this.image = value}
+	static get image() { throw new Error(`undefined image for ${this.constructor.name}`) }
+	static set image(value) { Object.defineProperty(this, 'image', {value, writable: false, configurable: false}) }
 
 	/**
 	 * @type {{
@@ -98,12 +98,12 @@ export default class GraphAudioNode {
 	 * 	settings: SettingDefinition[],
 	 * }}
 	 */
-	// static get structure() { throw new Error(`undefined structure for ${this.constructor.name}`) }
-	// static set structure(value) {this.structure = value}
+	static get structure() { throw new Error(`undefined structure for ${this.constructor.name}`) }
+	static set structure(value) { Object.defineProperty(this, 'structure', {value, writable: false, configurable: false}) }
 
 	/** @type {Array<`${typeof process.env.PUBLIC_URL}/${string}.js`>} */
-	// static get requiredModules() { throw new Error(`undefined requiredModules for ${this.constructor.name}`) }
-	// static set requiredModules(value) {this.requiredModules = value}
+	static get requiredModules() { throw new Error(`undefined requiredModules for ${this.constructor.name}`) }
+	static set requiredModules(value) { Object.defineProperty(this, 'requiredModules', {value, writable: false, configurable: false}) }
 
 	/**
 	 * @param {NodeUuid} id 
@@ -268,7 +268,7 @@ export default class GraphAudioNode {
 				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
 			}
 		} catch (e) {
-			console.error('node not connected', e)
+			console.error(`couldn't perform '${action}' on node`, e)
 		}
 	}
 
