@@ -14,8 +14,8 @@ class Multiplier extends AudioWorkletProcessor {
 			return true
 		const isAutomatedParam = parameters.multiplier.length > 1
 		output.forEach((channel, chIndex) => {
-			const aChannel = a[chIndex]
-			const bChannel = b[chIndex]
+			const aChannel = a[chIndex] || a[chIndex - 1]
+			const bChannel = b[chIndex] || b[chIndex - 1]
 			const channelCount = !!aChannel + !!bChannel
 			if (channelCount === 0)
 				return
