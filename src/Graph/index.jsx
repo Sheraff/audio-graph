@@ -26,6 +26,7 @@ import Analyser from './Modules/Analyser'
 import FileSource from './Modules/FileSource'
 import Waveform from './Modules/Waveform'
 import Sequencer from './Modules/Sequencer'
+import NoteOscillator from './Modules/NoteOscillator'
 
 const modules = [
 	Output,
@@ -50,6 +51,7 @@ const modules = [
 	FileSource,
 	Waveform,
 	Sequencer,
+	NoteOscillator,
 ]
 
 export default function Graph() {
