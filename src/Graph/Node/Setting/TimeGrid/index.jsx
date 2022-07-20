@@ -119,7 +119,7 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 					))
 				))}
 			</div>
-			<input ref={input} id={id} name={name} className={styles.input} defaultValue={''} />
+			<input ref={input} id={id} name={name} className={styles.input} />
 		</div>
 	)
 }

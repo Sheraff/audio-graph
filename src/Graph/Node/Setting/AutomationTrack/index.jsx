@@ -219,7 +219,7 @@ export default function AutomationTrack({id, name, defaultValue, settings}){
 	return (
 		<>
 			<canvas ref={canvas} width="400" height="100" className={styles.main} />
-			<input ref={input} id={id} name={name} defaultValue={defaultValue} className={styles.input} />
+			<input ref={input} id={id} name={name} className={styles.input} />
 		</>
 	)
 }

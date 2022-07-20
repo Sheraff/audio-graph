@@ -16,7 +16,7 @@ function plugAutomationNode(ctx, settings, destination) {
 	const duration = 60 / Number(settings.tempo) * 4
 	const progress = ctx.currentTime % duration
 	const startTime = ctx.currentTime - progress
-	const percent = progress / duration
+	// const percent = progress / duration
 	if (offsetNode.cancelAndHoldAtTime) {
 		offsetNode.cancelAndHoldAtTime(ctx.currentTime)
 	} else {
@@ -28,14 +28,16 @@ function plugAutomationNode(ctx, settings, destination) {
 		points.unshift({x: 0, y: 0})
 	if(points.at(-1).x !== 1)
 		points.push({x: 0.9999, y: points.at(-1).y})
-	{
-		let nextPoint = points.findIndex(point => point.x > percent)
-		if (nextPoint === -1) nextPoint = 0
-		const prevPoint = nextPoint - 1
-		const progressBetweenPrevAndNext = (percent - points.at(prevPoint).x) / (points.at(nextPoint).x - points.at(prevPoint).x)
-		const lerpYValue = points.at(prevPoint).y + (points.at(nextPoint).y - points.at(prevPoint).y) * progressBetweenPrevAndNext
-		offsetNode.setValueAtTime(lerpYValue, startTime)
-	}
+	// {
+	// 	let nextPoint = points.findIndex(point => point.x > percent)
+	// 	if (nextPoint === -1) nextPoint = 0
+	// 	const prevPoint = nextPoint - 1
+	// 	const progressBetweenPrevAndNext = (percent - points.at(prevPoint).x) / (points.at(nextPoint).x - points.at(prevPoint).x)
+	// 	const lerpYValue = points.at(prevPoint).y + (points.at(nextPoint).y - points.at(prevPoint).y) * progressBetweenPrevAndNext
+	// 	if (startTime > ctx.currentTime) {
+	// 		offsetNode.setValueAtTime(lerpYValue, startTime)
+	// 	}
+	// }
 	const interpolation = settings.interpolation === 'linear' ? 'linearRampToValueAtTime' : 'exponentialRampToValueAtTime'
 	for(let i = 0; i < 60; i++) {
 		points.forEach((point, p) => {

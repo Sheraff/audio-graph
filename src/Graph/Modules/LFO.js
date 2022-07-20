@@ -56,6 +56,13 @@ export default class LFO extends GraphAudioNode {
 		this.oscillator = new OscillatorNode(audioContext)
 		this.oscillator.connect(this.audioNode)
 		this.oscillator.start()
+
+		Object.defineProperty(this.audioNode, 'frequency', {
+			value: this.oscillator.frequency,
+			enumerable: true,
+			configurable: false,
+			writable: false,
+		})
 	}
 
 	updateSetting(name) {
