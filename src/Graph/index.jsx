@@ -28,6 +28,7 @@ import Waveform from './Modules/Waveform'
 import Sequencer from './Modules/Sequencer'
 import NoteOscillator from './Modules/NoteOscillator'
 import BalanceDisplay from './Modules/BalanceDisplay'
+import Reverb from './Modules/Reverb'
 
 const modules = [
 	Output,
@@ -54,6 +55,7 @@ const modules = [
 	Sequencer,
 	NoteOscillator,
 	BalanceDisplay,
+	Reverb,
 ]
 
 export default function Graph() {
