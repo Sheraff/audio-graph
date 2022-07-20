@@ -90,7 +90,7 @@ export default class Sequencer extends GraphAudioNode {
 
 		this.data.settings.sequence.forEach((sequence, i) => {
 			const node = this.customNodes[order[i]]
-			for (let repeats = -1; repeats < 100; repeats++) {
+			for (let repeats = -1; repeats < 300; repeats++) {
 				const bars = repeats * barLength
 				sequence.forEach((value, multiplier) => {
 					const offset = multiplier * beatLength
@@ -104,7 +104,7 @@ export default class Sequencer extends GraphAudioNode {
 		const node = this.customNodes.timer.parameters.get('offset')
 		node.cancelAndHoldAtTime(currentTime)
 		const sequence = this.data.settings.sequence[0]
-		for (let repeats = -1; repeats < 100; repeats++) {
+		for (let repeats = -1; repeats < 300; repeats++) {
 			const bars = repeats * barLength
 			sequence.forEach((_, multiplier) => {
 				const offset = multiplier * beatLength
