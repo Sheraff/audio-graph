@@ -1,0 +1,41 @@
+.main {
+	height: 100px;
+	position: relative;
+	z-index: 0;
+	display: flex;
+	--key-width: 30px;
+}
+
+.button {
+	appearance: none;
+	height: 100%;
+	width: var(--key-width);
+	background: #fff;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	box-shadow: inset 0 0 2px #000;
+}
+
+.button.black {
+	position: relative;
+	z-index: 1;
+	background-color: #000;
+	height: 50%;
+	width: calc(0.5 * var(--key-width));
+	margin-right: calc(-0.5 * var(--key-width));
+	left: calc(-0.25 * var(--key-width));
+}
+
+.active {
+	box-shadow: inset 0 0 6px #000;
+	background: #ecdefc;
+}
+
+.black.active {
+	box-shadow: 0 0 6px #000;
+	background: #2e005c;
+}
+
+.input {
+	display: none !important;
+}

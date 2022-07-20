@@ -4,6 +4,7 @@ import styles from "./index.module.css"
 import Range from "./Range"
 import Sequence from "./Sequence"
 import TimeGrid from "./TimeGrid"
+import Piano from "./Piano"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -28,6 +29,14 @@ export default function Setting({name, type, defaultValue, options, props, setti
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
 				<TimeGrid {...props} id={id} name={name} defaultValue={defaultValue} instance={instance}/>
+				<div />
+			</div>
+		)
+	if (type === 'piano')
+		return (
+			<div className={styles.main}>
+				<label htmlFor={id}>{name}</label>
+				<Piano {...props} id={id} name={name} defaultValue={defaultValue} />
 				<div />
 			</div>
 		)

@@ -3,8 +3,8 @@ class ConstantCustom extends AudioWorkletProcessor {
 		return [{
 			name: 'offset',
 			defaultValue: 1,
-			minValue: -10,
-			maxValue: 10,
+			minValue: -10000,
+			maxValue: 10000,
 			automationRate: 'a-rate'
 		}]
 	}
