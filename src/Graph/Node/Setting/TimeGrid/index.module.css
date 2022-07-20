@@ -15,19 +15,20 @@
 
 .time {
 	font: inherit;
-	box-shadow: inset 0 0 .5em #811ff9;
+	background: radial-gradient(#eeebf2de, #ac91cc);
 }
 
 .active {
-	background: #2f1054;
+	background: radial-gradient(#4c1e83, #2b0c50);
+	box-shadow: inset 0 0 0.3em 1px #0b0017e3;
 }
 
 .active.time {
 	border-color: #bca7d6;
 	box-shadow:
-		inset 0 0 .5em #811ff9,
-		0 0 0.6em -0.2em #e2cefa;
-	background: #572891;
+		inset 0 0 0.5em 1px #14062591,
+		0 0 0.5em -0.1em #e2cefac2;
+	background: radial-gradient(#926ac4, #2f1054);
 }
 
 .input {
