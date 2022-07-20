@@ -290,6 +290,7 @@ export default class GraphAudioNode {
 		try {
 			// TODO: handle custom nodes
 			// TODO: handle channel assignment better
+			// though it seems to work pretty well...
 			if (typeof to.slot.name === 'string') {
 				this.audioNode[action](audioNode, from.slot.name)
 			} else {

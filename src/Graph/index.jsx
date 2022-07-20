@@ -29,6 +29,7 @@ import Sequencer from './Modules/Sequencer'
 import NoteOscillator from './Modules/NoteOscillator'
 import BalanceDisplay from './Modules/BalanceDisplay'
 import Reverb from './Modules/Reverb'
+import Echo from './Modules/Echo'
 
 const modules = [
 	Output,
@@ -56,6 +57,7 @@ const modules = [
 	NoteOscillator,
 	BalanceDisplay,
 	Reverb,
+	Echo,
 ]
 
 export default function Graph() {
