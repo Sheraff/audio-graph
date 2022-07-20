@@ -52,8 +52,7 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 	}, [size, initialValue])
 
 	useEffect(() => {
-		
-		let rafId
+		if(typeof audioContext === 'string') return
 
 		let array
 		let bufferLength
@@ -70,6 +69,8 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 			}
 		}
 
+		let rafId
+		let lastValue = -1
 		function loop() {
 			rafId = requestAnimationFrame(() => {
 				loop()
@@ -80,20 +81,33 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 
 				instance.current.customNodes.timeAnalyser.getFloatTimeDomainData(array)
 
-				const sum = array.reduce((sum, value) => sum + value, 0)
-				const step = Math.round(sum / (array.length / size[1]))
-				
-				buttons.current.forEach((array, y) => {
-					array.forEach((button, x) => {
-						button.classList.toggle(styles.time, x === step)
+				const newValue = array.find((value) => value !== lastValue)
+				if (typeof newValue !== 'undefined') {
+					lastValue = newValue
+					const step = Math.round(newValue * size[1])
+					
+					buttons.current.forEach((array, y) => {
+						array.forEach((button, x) => {
+							button.classList.toggle(styles.time, x === step)
+						})
 					})
-				})
+				}
 			})
 		}
-		loop()
+
+		const controller = new AbortController()
+		audioContext.addEventListener('statechange', (event) => {
+			if(audioContext.state === 'running')
+				loop()
+			else 
+				cancelAnimationFrame(rafId)
+		}, {signal: controller.signal})
+		if(audioContext.state === 'running')
+			loop()
 
 		return () => {
 			cancelAnimationFrame(rafId)
+			controller.abort()
 		}
 	}, [initialValue, audioContext, instance, size])
 

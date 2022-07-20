@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
+import { GraphAudioContext } from '../../../GraphAudioContext'
 import styles from "./index.module.css"
 
 export default function BalanceDisplay({instance}) {
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
+	const audioContext = useContext(GraphAudioContext)
 
 	useEffect(() => {
+		if(typeof audioContext === 'string') return
 		const ctx = canvas.current.getContext("2d")
 		if(!ctx) return
 		canvas.current.width = canvas.current.offsetWidth
@@ -49,7 +52,7 @@ export default function BalanceDisplay({instance}) {
 		path.lineTo(canvas.current.width, canvas.current.height * 0.75)
 
 		let rafId
-		void function loop() {
+		function loop() {
 			rafId = requestAnimationFrame(() => {
 				loop()
 				if(!array.left || !array.right)
@@ -90,12 +93,23 @@ export default function BalanceDisplay({instance}) {
 					}
 				}
 			})
-		}()
+		}
+
+		const controller = new AbortController()
+		audioContext.addEventListener('statechange', (event) => {
+			if(audioContext.state === 'running')
+				loop()
+			else 
+				cancelAnimationFrame(rafId)
+		}, {signal: controller.signal})
+		if(audioContext.state === 'running')
+			loop()
 		
 		return () => {
 			cancelAnimationFrame(rafId)
+			controller.abort()
 		}
-	}, [instance])
+	}, [instance, audioContext])
 
 	return (
 		<canvas ref={canvas} width="400" height="100" className={styles.main} />

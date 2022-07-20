@@ -1,14 +1,19 @@
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
+import { GraphAudioContext } from '../../../GraphAudioContext'
 import styles from "./index.module.css"
 
 export default function Analyser({instance}) {
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
+	const audioContext = useContext(GraphAudioContext)
 
 	useEffect(() => {
+		if(typeof audioContext === 'string') return
 		const ctx = canvas.current.getContext("2d")
 		if(!ctx) return
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
+
+		const controller = new AbortController()
 
 		let array
 		let bufferLength
@@ -26,7 +31,7 @@ export default function Analyser({instance}) {
 		}
 
 		let rafId
-		void function loop() {
+		function loop() {
 			rafId = requestAnimationFrame(() => {
 				loop()
 				if(!array)
@@ -59,12 +64,22 @@ export default function Analyser({instance}) {
 				ctx.lineTo(ctx.canvas.width, ctx.canvas.height / 2)
   				ctx.stroke()
 			})
-		}()
+		}
+
+		audioContext.addEventListener('statechange', (event) => {
+			if(audioContext.state === 'running')
+				loop()
+			else 
+				cancelAnimationFrame(rafId)
+		}, {signal: controller.signal})
+		if(audioContext.state === 'running')
+			loop()
 		
 		return () => {
 			cancelAnimationFrame(rafId)
+			controller.abort()
 		}
-	}, [instance])
+	}, [instance, audioContext])
 
 	return (
 		<canvas ref={canvas} width="400" height="100" className={styles.main} />
