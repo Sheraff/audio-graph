@@ -21,7 +21,7 @@ export default class Merge extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'merge', {numberOfInputs: 6})
+		this.audioNode = new AudioWorkletNode(audioContext, 'merge', {numberOfInputs: 6, outputChannelCount: [2]})
 	}
 
 	updateSetting(name) {

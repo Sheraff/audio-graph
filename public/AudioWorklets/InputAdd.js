@@ -3,8 +3,8 @@ class InputAdd extends AudioWorkletProcessor {
 		if(!a?.length && !b?.length)
 			return true
 		output.forEach((channel, chIndex) => {
-			const aChannel = a[chIndex]
-			const bChannel = b[chIndex]
+			const aChannel = a[chIndex] || a[chIndex - 1]
+			const bChannel = b[chIndex] || b[chIndex - 1]
 			const channelCount = !!aChannel + !!bChannel
 			for (let i = 0; i < channel.length; i++) {
 				if (channelCount === 0) {

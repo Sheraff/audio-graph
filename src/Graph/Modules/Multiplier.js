@@ -31,7 +31,7 @@ export default class Multiplier extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'multiplier', {numberOfInputs: 2})
+		this.audioNode = new AudioWorkletNode(audioContext, 'multiplier', {numberOfInputs: 2, outputChannelCount: [2]})
 	}
 
 	updateSetting(name) {

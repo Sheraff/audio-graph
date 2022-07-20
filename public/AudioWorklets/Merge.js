@@ -9,9 +9,10 @@ class Merge extends AudioWorkletProcessor {
 				let absSum = 0
 				let sum = 0
 				for (let j = 0; j < inputs.length; j++) {
-					if (channelIndex in inputs[j]) {
-						absSum += Math.abs(inputs[j][channelIndex][i])
-						sum += inputs[j][channelIndex][i]
+					const inputChannel = inputs[j][channelIndex] || inputs[j][channelIndex - 1]
+					if (inputChannel) {
+						absSum += Math.abs(inputChannel[i])
+						sum += inputChannel[i]
 						count++
 					}
 				}

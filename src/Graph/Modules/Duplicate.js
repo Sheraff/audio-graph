@@ -21,7 +21,7 @@ export default class Duplicate extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'duplicate', {numberOfOutputs: 6})
+		this.audioNode = new AudioWorkletNode(audioContext, 'duplicate', {numberOfOutputs: 6, channelCount: 2, outputChannelCount: [2, 2, 2, 2, 2, 2]})
 	}
 
 	updateSetting(name) {

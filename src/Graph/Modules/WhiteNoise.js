@@ -21,7 +21,7 @@ export default class WhiteNoise extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0})
+		this.audioNode = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0, outputChannelCount: [2]})
 	}
 
 	updateSetting(name) {
