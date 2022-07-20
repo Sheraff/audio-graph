@@ -48,7 +48,11 @@ export default class FileSource extends GraphAudioNode {
 	}
 
 	updateSetting(name) {
-		if (name === 'source') {
+		if (name === 'buffer') {
+			const array = new Uint8Array(this.data.settings.buffer)
+			const buffer = array.buffer
+			this.onBuffer(buffer)
+		} else if (name === 'source') {
 			const source = this.data.settings.source?.[0]
 			if (source && source.constructor === File) {
 				const reader = new FileReader()
@@ -64,15 +68,24 @@ export default class FileSource extends GraphAudioNode {
 
 	updateAudioNodeSettings() {
 		if (this.audioContext) {
-			this.updateSetting('source')
+			if (this.data.settings.buffer)
+				this.updateSetting('buffer')
+			else
+				this.updateSetting('source')
 		}
 	}
 
-	async onFile(event) {
+	onFile(event) {
 		if (!event.target?.result) {
 			console.error('could not read file')
 		}
 		const buffer = event.target.result
+		this.data.settings.buffer = [...new Uint8Array(buffer)]
+		this.saveToLocalStorage()
+		this.onBuffer(buffer)
+	}
+
+	async onBuffer(buffer) {
 		const audioData = await this.audioContext.decodeAudioData(buffer)
 		this.buffer = audioData
 		this.connectBuffer()
