@@ -45,7 +45,6 @@ export default class Echo extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.customNodes.input = new AudioWorkletNode(audioContext, 'add-inputs', {numberOfInputs: 2})
 		this.audioNode = new AudioWorkletNode(audioContext, 'duplicate', {numberOfOutputs: 2, channelCount: 2, outputChannelCount: [2, 2]})
-
 		this.customNodes.input.connect(this.audioNode, 0, 0)
 
 		this.customNodes.delay = new DelayNode(audioContext, {delayTime: 0.2})

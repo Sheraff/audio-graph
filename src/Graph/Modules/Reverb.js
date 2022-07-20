@@ -6,10 +6,22 @@ export default class Reverb extends GraphAudioNode {
 
 	static structure = {
 		slots: [
-			{type: 'input', name: 0},
+			{type: 'custom', name: 'input'},
 			{type: 'output', name: 0},
+			{type: 'setting', name: 'wet'},
 		],
 		settings: [
+			{
+				name: 'wet',
+				type: 'range',
+				props: {
+					min: 0,
+					max: 5,
+					step: 0.1,
+				},
+				defaultValue: 4,
+				readFrom: 'value',
+			},
 			{
 				name: 'duration',
 				type: 'range',
@@ -18,7 +30,7 @@ export default class Reverb extends GraphAudioNode {
 					max: 20,
 					step: 0.1,
 				},
-				defaultValue: 0.8,
+				defaultValue: 0.5,
 				readFrom: 'value',
 				event: 'change',
 			},
@@ -30,17 +42,29 @@ export default class Reverb extends GraphAudioNode {
 					max: 0.5,
 					step: 0.01,
 				},
-				defaultValue: 0.1,
+				defaultValue: 0.13,
 				readFrom: 'value',
 				event: 'change',
 			}
 		]
 	}
 
-	static requiredModules = []
+	static requiredModules = [
+		`${process.env.PUBLIC_URL}/AudioWorklets/InputAdd.js`,
+		`${process.env.PUBLIC_URL}/AudioWorklets/Duplicate.js`,
+	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new ConvolverNode(audioContext)
+		this.customNodes.input = new AudioWorkletNode(audioContext, 'duplicate', {numberOfOutputs: 2, channelCount: 2, outputChannelCount: [2, 2]})
+		this.audioNode = new AudioWorkletNode(audioContext, 'add-inputs', {numberOfInputs: 2})
+		this.customNodes.input.connect(this.audioNode, 0, 0)
+		
+		
+		this.customNodes.convolver = new ConvolverNode(audioContext)
+		this.customNodes.gain = new GainNode(audioContext)
+		this.customNodes.input.connect(this.customNodes.convolver, 1, 0)
+		this.customNodes.convolver.connect(this.customNodes.gain, 0, 0)
+		this.customNodes.gain.connect(this.audioNode, 0, 1)
 
 		this.impulseResponseWorkerController = new AbortController()
 		this.impulseResponseWorker = new Worker(`${process.env.PUBLIC_URL}/Workers/impulseResponse.worker.js`)
@@ -49,11 +73,18 @@ export default class Reverb extends GraphAudioNode {
 			this.onWorkerResponse.bind(this),
 			{signal: this.impulseResponseWorkerController.signal}
 		)
+
+		Object.defineProperty(this.audioNode, 'wet', {
+			value: this.customNodes.gain.gain,
+			enumerable: true,
+		})
 	}
 
 	updateSetting(name) {
 		if (name === 'duration' || name === 'decay') {
 			this.updateConvolverBuffer()
+		} else if (name === 'wet') {
+			this.customNodes.gain.gain.value = this.data.settings.wet
 		}
 	}
 
@@ -79,7 +110,7 @@ export default class Reverb extends GraphAudioNode {
 		impulse.copyToChannel(impulseLeft, 0)
 		impulse.copyToChannel(impulseRight, 1)
 
-		this.audioNode.buffer = impulse
+		this.customNodes.convolver.buffer = impulse
 	}
 
 	cleanup() {
