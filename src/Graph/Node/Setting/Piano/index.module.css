@@ -4,6 +4,7 @@
 	z-index: 0;
 	display: flex;
 	--key-width: 30px;
+	overflow: hidden;
 }
 
 .button {
@@ -13,13 +14,14 @@
 	background: #fff;
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
-	box-shadow: inset 0 0 2px #000;
+	box-shadow: inset 0 0 2px #000c;
 }
 
-.button.black {
+.black {
 	position: relative;
 	z-index: 1;
-	background-color: #000;
+	box-shadow: 0 1px 3px #000c;
+	background: #1d0138;
 	height: 50%;
 	width: calc(0.5 * var(--key-width));
 	margin-right: calc(-0.5 * var(--key-width));
@@ -27,13 +29,12 @@
 }
 
 .active {
-	box-shadow: inset 0 0 6px #000;
+	box-shadow: inset 0 4px 4px #000c;
 	background: #ecdefc;
 }
 
 .black.active {
-	box-shadow: 0 0 6px #000;
-	background: #2e005c;
+	background: #511e83;
 }
 
 .input {
