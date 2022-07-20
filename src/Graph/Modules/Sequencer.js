@@ -76,7 +76,11 @@ export default class Sequencer extends GraphAudioNode {
 		this.schedule()
 	}
 
+	scheduleTimeoutId
 	schedule() {
+		if (this.scheduleTimeoutId) {
+			clearTimeout(this.scheduleTimeoutId)
+		}
 		const {currentTime} = this.audioContext
 		const order = ['a', 'b', 'c', 'd']
 		order.forEach((key) => {
@@ -90,7 +94,7 @@ export default class Sequencer extends GraphAudioNode {
 
 		this.data.settings.sequence.forEach((sequence, i) => {
 			const node = this.customNodes[order[i]]
-			for (let repeats = -1; repeats < 300; repeats++) {
+			for (let repeats = -1; repeats < 15; repeats++) {
 				const bars = repeats * barLength
 				sequence.forEach((value, multiplier) => {
 					const offset = multiplier * beatLength
@@ -104,7 +108,7 @@ export default class Sequencer extends GraphAudioNode {
 		const node = this.customNodes.timer.parameters.get('offset')
 		node.cancelAndHoldAtTime(currentTime)
 		const sequence = this.data.settings.sequence[0]
-		for (let repeats = -1; repeats < 300; repeats++) {
+		for (let repeats = -1; repeats < 15; repeats++) {
 			const bars = repeats * barLength
 			sequence.forEach((_, multiplier) => {
 				const offset = multiplier * beatLength
@@ -113,6 +117,17 @@ export default class Sequencer extends GraphAudioNode {
 				if(time > currentTime)
 					node.setValueAtTime(value, time)
 			})
+		}
+
+		this.scheduleTimeoutId = setTimeout(() => {
+			this.schedule()
+		}, barLength * 10)
+	}
+
+	cleanup() {
+		super.cleanup()
+		if (this.scheduleTimeoutId) {
+			clearTimeout(this.scheduleTimeoutId)
 		}
 	}
 }

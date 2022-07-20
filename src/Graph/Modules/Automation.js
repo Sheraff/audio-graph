@@ -37,7 +37,7 @@ function plugAutomationNode(ctx, settings, destination) {
 		offsetNode.setValueAtTime(lerpYValue, startTime)
 	}
 	const interpolation = settings.interpolation === 'linear' ? 'linearRampToValueAtTime' : 'exponentialRampToValueAtTime'
-	for(let i = 0; i < 10_000; i++) {
+	for(let i = 0; i < 60; i++) {
 		points.forEach((point, p) => {
 			const time = startTime + (i * duration) + (point.x * duration)
 			if (time > ctx.currentTime) {
@@ -48,6 +48,7 @@ function plugAutomationNode(ctx, settings, destination) {
 			}
 		})
 	}
+	return duration
 }
 
 export default class Automation extends GraphAudioNode {
@@ -78,13 +79,27 @@ export default class Automation extends GraphAudioNode {
 		this.audioNode = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 1}})
 	}
 
+	scheduleTimeoutId
 	updateAudioNodeSettings() {
 		if (this.audioContext) {
-			plugAutomationNode(this.audioContext, this.data.settings, this.audioNode)
+			const duration = plugAutomationNode(this.audioContext, this.data.settings, this.audioNode)
+			if (this.scheduleTimeoutId) {
+				clearTimeout(this.scheduleTimeoutId)
+			}
+			if (duration) {
+				this.scheduleTimeoutId = setTimeout(() => {
+					this.updateAudioNodeSettings()
+				}, duration * 50)
+			}
 		}
 	}
 
 	updateSetting(name) {
 		this.updateAudioNodeSettings()
+	}
+
+	cleanup() {
+		clearTimeout(this.scheduleTimeoutId)
+		super.cleanup()
 	}
 }
