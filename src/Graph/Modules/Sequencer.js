@@ -41,9 +41,7 @@ export default class Sequencer extends GraphAudioNode {
 		]
 	}
 
-	static requiredModules = [
-		`${process.env.PUBLIC_URL}/AudioWorklets/ConstantCustom.js`
-	]
+	static requiredModules = []
 
 	/** @param {AudioContext} audioContext */
 	initializeAudioNodes(audioContext) {
@@ -52,7 +50,7 @@ export default class Sequencer extends GraphAudioNode {
 		this.customNodes.c = new GainNode(audioContext)
 		this.customNodes.d = new GainNode(audioContext)
 
-		const merger = new ChannelMergerNode(audioContext, {numberOfInputs: 4})
+		const merger = new ChannelMergerNode(audioContext, {numberOfInputs: 5})
 		this.customNodes.a.connect(merger, 0, 0)
 		this.customNodes.a.connect(merger, 0, 1)
 		this.customNodes.b.connect(merger, 0, 0)
@@ -62,12 +60,10 @@ export default class Sequencer extends GraphAudioNode {
 		this.customNodes.d.connect(merger, 0, 0)
 		this.customNodes.d.connect(merger, 0, 1)
 
-		this.audioNode = new GainNode(audioContext)
-		merger.connect(this.audioNode)
+		this.customNodes.timer = new GainNode(audioContext, {gain: 0})
+		this.customNodes.timer.connect(merger, 0, 0)
 
-		this.customNodes.timer = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 0}})
-		this.customNodes.timeAnalyser = new AnalyserNode(audioContext)
-		this.customNodes.timer.connect(this.customNodes.timeAnalyser)
+		this.audioNode = merger
 		
 		this.schedule()
 	}
@@ -105,17 +101,17 @@ export default class Sequencer extends GraphAudioNode {
 			}
 		})
 
-		const node = this.customNodes.timer.parameters.get('offset')
+		// const node = this.customNodes.timer.parameters.get('offset')
+		const node = this.customNodes.timer.gain
 		node.cancelAndHoldAtTime(currentTime)
 		const sequence = this.data.settings.sequence[0]
 		for (let repeats = -1; repeats < 15; repeats++) {
 			const bars = repeats * barLength
 			sequence.forEach((_, multiplier) => {
 				const offset = multiplier * beatLength
-				const value = multiplier / beatCount
 				const time = rootTime + offset + bars
 				if(time > currentTime)
-					node.setValueAtTime(value, time)
+					node.setValueAtTime(multiplier, time)
 			})
 		}
 

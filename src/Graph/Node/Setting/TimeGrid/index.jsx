@@ -54,37 +54,14 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 	useEffect(() => {
 		if(typeof audioContext === 'string') return
 
-		let array
-		let bufferLength
-		function makeBuffer() {
-			bufferLength = instance.current.customNodes.timeAnalyser.frequencyBinCount
-			array = new Float32Array(bufferLength)
-		}
-
-		if (instance.current.customNodes.timeAnalyser) {
-			makeBuffer()
-		} else {
-			instance.current.onAudioNode = () => {
-				makeBuffer()
-			}
-		}
-
 		let rafId
 		let lastValue = -1
 		function loop() {
 			rafId = requestAnimationFrame(() => {
 				loop()
-				if(!array)
-					return
-				if (instance.current.customNodes.timeAnalyser.frequencyBinCount !== bufferLength)
-					makeBuffer()
-
-				instance.current.customNodes.timeAnalyser.getFloatTimeDomainData(array)
-
-				const newValue = array.find((value) => value !== lastValue)
-				if (typeof newValue !== 'undefined') {
-					lastValue = newValue
-					const step = Math.round(newValue * size[1])
+				const step = instance.current.customNodes.timer.gain.value
+				if (typeof step !== 'undefined' && step !== lastValue) {
+					lastValue = step
 					
 					buttons.current.forEach((array, y) => {
 						array.forEach((button, x) => {
