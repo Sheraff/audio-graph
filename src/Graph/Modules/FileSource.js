@@ -45,6 +45,12 @@ export default class FileSource extends GraphAudioNode {
 	/** @param {AudioContext} audioContext */
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new GainNode(audioContext)
+
+		// TODO: this is bad for performance
+		// force keep playing
+		this.customNodes.gain = new GainNode(audioContext, {gain: 0})
+		this.customNodes.gain.connect(audioContext.destination)
+		this.audioNode.connect(this.customNodes.gain)
 	}
 
 	updateSetting(name) {
