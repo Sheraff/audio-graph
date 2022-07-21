@@ -16,7 +16,7 @@ export default class FileSource extends GraphAudioNode {
 					accept: "audio/basic,audio/mpeg,audio/mp4,audio/x-aiff,audio/ogg,audio/vnd.wav",
 				},
 				defaultValue: '',
-				readFrom: 'files.0.name',
+				readFrom: 'files',
 				event: 'change',
 			},
 			{
@@ -55,6 +55,8 @@ export default class FileSource extends GraphAudioNode {
 		} else if (name === 'source') {
 			const source = this.data.settings.source?.[0]
 			if (source && source.constructor === File) {
+				const name = source.name
+				this.data.settings.source = name
 				const reader = new FileReader()
 				reader.onload = this.onFile.bind(this)
 				reader.readAsArrayBuffer(source)
@@ -80,7 +82,14 @@ export default class FileSource extends GraphAudioNode {
 			console.error('could not read file')
 		}
 		const buffer = event.target.result
-		this.data.settings.buffer = [...new Uint8Array(buffer)]
+		// TODO: switch to indexedDB?
+		if (event.lengthComputable && event.total < 3_000_000) {
+			this.data.settings.buffer = [...new Uint8Array(buffer)]
+		} else {
+			delete this.data.settings.buffer
+			delete this.data.settings.source
+			console.warn('file is too large to store in localStorage')
+		}
 		this.saveToLocalStorage()
 		this.onBuffer(buffer)
 	}
