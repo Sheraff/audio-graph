@@ -6,6 +6,10 @@ import Setting from './Setting'
 import Extra from './Extra'
 import styles from './index.module.css'
 
+function getIn(obj, path) {
+	return path.split('.').reduce((o, i) => o[i], obj)
+}
+
 function Node({
 	Class,
 	id,
@@ -95,7 +99,7 @@ function Node({
 			if (!structure)
 				return
 			if (event.type === structure.event || (event.type === 'input' && !structure.event)) {
-				instance.current.data.settings[settingName] = event.target[structure.readFrom]
+				instance.current.data.settings[settingName] = getIn(event.target, structure.readFrom)
 				if(instance.current.audioNode)
 					instance.current.updateSetting(settingName, event.target)
 				instance.current.saveToLocalStorage()

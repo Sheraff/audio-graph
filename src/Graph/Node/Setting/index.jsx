@@ -5,6 +5,7 @@ import Range from "./Range"
 import Sequence from "./Sequence"
 import TimeGrid from "./TimeGrid"
 import Piano from "./Piano"
+import FileInput from "./FileInput"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -62,7 +63,7 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<input type={type} name={name} {...props} id={id}/>
+				<FileInput name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
 			</div>
 		)
 	
