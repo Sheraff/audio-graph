@@ -206,6 +206,7 @@ export default function Connector({boundary, handles, children}) {
 
 		boundary.current.addEventListener('node-removed', ({detail: {id}}) => {
 			const current = nodeMap.current.get(id)
+			if (!current) return // if a node was never connected, it won't be in the map
 			current.parents.forEach(parent => { parent.children.delete(current) })
 			current.children.forEach(child => { child.parents.delete(current) })
 			nodeMap.current.delete(id)

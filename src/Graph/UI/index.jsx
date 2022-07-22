@@ -81,10 +81,6 @@ export default function UI({addNode, modules}) {
 	}, [onTogglePlay])
 
 	const [show, setShow] = useState(false)
-	const onAddNode = (type) => {
-		addNode(type)
-		setShow(false)
-	}
 
 	const ref = useRef(/** @type {HTMLDivElement} */(null))
 	useEffect(() => {
@@ -104,6 +100,32 @@ export default function UI({addNode, modules}) {
 		}
 	}, [show])
 
+	const buttons = useRef(/** @type {HTMLDivElement} */(null))
+	useEffect(() => {
+		const controller = new AbortController()
+		let held
+		buttons.current.addEventListener('mousedown', (e) => {
+			held = true
+		}, {signal: controller.signal})
+		buttons.current.addEventListener('mouseup', (e) => {
+			if(!held) return
+			held = false
+			const type = modules[e.target.dataset.index].type
+			addNode(type)
+			setShow(false)
+		}, {signal: controller.signal})
+		buttons.current.addEventListener('mousemove', (e) => {
+			if(!held) return
+			held = false
+			const type = modules[e.target.dataset.index].type
+			addNode(type, {x: e.clientX, y: e.clientY})
+			setShow(false)
+		}, {signal: controller.signal})
+		return () => {
+			controller.abort()
+		}
+	}, [addNode, modules])
+
 	return (
 		<div
 			ref={ref}
@@ -111,17 +133,19 @@ export default function UI({addNode, modules}) {
 				[styles.show]: show,
 			})}
 		>
-			{modules.map(({type, image}) => (
-				<div key={type} className={styles.item}>
+			<div className={styles.buttons} ref={buttons}>
+				{modules.map(({type, image}, i) => (
 					<button
+						key={type}
+						className={styles.item}
 						type="button"
-						onClick={() => onAddNode(type)}
+						data-index={i}
 					>
 						<img src={image} alt="" width="1" height="1"/>
 						{type}
 					</button>
-				</div>
-			))}
+				))}
+			</div>
 			<div className={styles.bottom}>
 				<button
 					className={styles.toggle}

@@ -14,6 +14,7 @@ function Node({
 	Class,
 	id,
 	initialPosition,
+	startHeld,
 	removeNode,
 	handle,
 	boundary,
@@ -57,6 +58,11 @@ function Node({
 		let initial
 		let start
 		let rafId
+		if (startHeld) {
+			initial = {...position.current}
+			start = true
+			header.current.style.setProperty('cursor', 'grabbing')
+		}
 		header.current.addEventListener('mousedown', e => {
 			if(e.button !== 0)
 				return
@@ -66,6 +72,12 @@ function Node({
 		}, {signal: controller.signal})
 		window.addEventListener('mousemove', e => {
 			if(!start) return
+			if(start === true) {
+				start = {
+					x: e.clientX + 75,
+					y: e.clientY + 20,
+				}
+			}
 			dx = e.clientX - start.x
 			dy = e.clientY - start.y
 			cancelAnimationFrame(rafId)
@@ -96,7 +108,7 @@ function Node({
 			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [])
+	}, [startHeld])
 
 	const form = useRef(/** @type {HTMLFormElement} */(null))
 	useEffect(() => {

@@ -85,14 +85,21 @@ export default function Graph() {
 		}
 	}, [nodes])
 
-	const addNode = useCallback((type) => {
-		const node = {
-			type,
-			id: `${Date.now()}${Math.round(Math.random() * 1000)}`,
-			initialPosition: {
+
+	const addNode = useCallback((type, startHeld) => {
+		const initialPosition = startHeld
+			? {
+				x: startHeld.x + ref.current.scrollLeft,
+				y: startHeld.y + ref.current.scrollTop,
+			} : {
 				x: ref.current.offsetWidth * 0.33 + ref.current.scrollLeft,
 				y: ref.current.offsetHeight * 0.25 + ref.current.scrollTop,
 			}
+		const node = {
+			type,
+			id: `${Date.now()}${Math.round(Math.random() * 1000)}`,
+			initialPosition,
+			startHeld,
 		}
 		setNodes(nodes => [...nodes, node])
 	}, [])
@@ -141,7 +148,7 @@ export default function Graph() {
 				}}
 			>
 				<Connector boundary={ref} handles={canvasNodesHandle}>
-					{nodes.map(({id, type, initialPosition}, i) => 
+					{nodes.map(({id, type, initialPosition, startHeld}, i) => 
 						<Node
 							key={id}
 							id={id}
@@ -150,6 +157,7 @@ export default function Graph() {
 							removeNode={removeNode}
 							handle={handles[i]}
 							boundary={ref}
+							startHeld={startHeld}
 						/>
 					)}
 					<UI addNode={addNode} modules={modules} />
