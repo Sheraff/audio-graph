@@ -25,10 +25,11 @@ function Node({
 		instance.current = new Class(id, audioContext, controls, initialPosition)
 	}
 	useEffect(() => {
-		boundary.current.dispatchEvent(new CustomEvent('node-added', {detail: {id, type: Class.type}}))
+		const {current} = boundary
+		current.dispatchEvent(new CustomEvent('node-added', {detail: {id, type: Class.type}}))
 		return () => {
 			instance.current.cleanup()
-			boundary.current.dispatchEvent(new CustomEvent('node-removed', {detail: {id, type: Class.type}}))
+			current.dispatchEvent(new CustomEvent('node-removed', {detail: {id, type: Class.type}}))
 		}
 	}, [Class, id, boundary])
 

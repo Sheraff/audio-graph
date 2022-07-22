@@ -70,7 +70,7 @@ export default function Connector({boundary, handles, children}) {
 		})
 		const connectedNodes = parseNodeMap(nodeMap.current)
 		nodeMap.current.forEach((node, id) => {
-			handles.current[id].onDestinationChange(connectedNodes.has(node))
+			handles.current[id]?.onDestinationChange(connectedNodes.has(node))
 		})
 	}, [handles])
 
@@ -181,7 +181,7 @@ export default function Connector({boundary, handles, children}) {
 			nodeMap.current.delete(id)
 			const connectedNodes = parseNodeMap(nodeMap.current)
 			nodeMap.current.forEach((node, id) => {
-				handles.current[id].onDestinationChange(connectedNodes.has(node))
+				handles.current[id]?.onDestinationChange(connectedNodes.has(node))
 			})
 		})
 
@@ -206,7 +206,7 @@ export default function Connector({boundary, handles, children}) {
 				nodeMap.current.get(to.nodeUuid).parents.delete(nodeMap.current.get(from.nodeUuid))
 				const connectedNodes = parseNodeMap(nodeMap.current)
 				nodeMap.current.forEach((node, id) => {
-					handles.current[id].onDestinationChange(connectedNodes.has(node))
+					handles.current[id]?.onDestinationChange(connectedNodes.has(node))
 				})
 			} else {
 				const thisKey = detail.left ? 'to' : 'from'
@@ -261,7 +261,7 @@ export default function Connector({boundary, handles, children}) {
 			nodeMap.current.get(to.nodeUuid).parents.add(nodeMap.current.get(from.nodeUuid))
 			const connectedNodes = parseNodeMap(nodeMap.current)
 			nodeMap.current.forEach((node, id) => {
-				handles.current[id].onDestinationChange(connectedNodes.has(node))
+				handles.current[id]?.onDestinationChange(connectedNodes.has(node))
 			})
 		}, {signal: controller.signal})
 

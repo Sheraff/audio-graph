@@ -73,6 +73,8 @@ export default function Graph() {
 		}
 	})
 
+	const canvasNodesHandle = useRef({})
+
 	const ricId = useRef(/** @type {number?} */(null))
 	useEffect(() => {
 		return () => {
@@ -92,8 +94,6 @@ export default function Graph() {
 		})
 	}, [])
 
-	const canvasNodesHandle = useRef({})
-
 	const addNode = useCallback((type) => {
 		const node = {
 			type,
@@ -108,6 +108,7 @@ export default function Graph() {
 	}, [save])
 	const removeNode = useCallback((id) => {
 		delete canvasNodesHandle.current[id]
+
 		setNodes(nodes => nodes.filter(node => node.id !== id))
 		save()
 	}, [save])
