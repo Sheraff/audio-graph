@@ -10,7 +10,7 @@ export default class LFO extends GraphAudioNode {
 			{type: 'setting', name: 'frequency'},
 			{type: 'output', name: 0},
 		],
-		settings:  [
+		settings: [
 			{
 				name: 'frequency',
 				type: 'range',

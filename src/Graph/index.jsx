@@ -30,6 +30,7 @@ import NoteOscillator from './Modules/NoteOscillator'
 import BalanceDisplay from './Modules/BalanceDisplay'
 import Reverb from './Modules/Reverb'
 import Echo from './Modules/Echo'
+import Wobble from './Modules/Wobble'
 
 const modules = [
 	Output,
@@ -58,6 +59,7 @@ const modules = [
 	BalanceDisplay,
 	Reverb,
 	Echo,
+	Wobble,
 ]
 
 export default function Graph() {
