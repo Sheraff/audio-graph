@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Echo extends GraphAudioNode {
 	static type = 'echo'
 	static image = `${process.env.PUBLIC_URL}/icons/echo.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'custom', name: 'input'},

@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class WhiteNoise extends GraphAudioNode {
 	static type = 'white-noise'
 	static image = `${process.env.PUBLIC_URL}/icons/white-noise.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},

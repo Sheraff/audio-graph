@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Multiplier extends GraphAudioNode {
 	static type = 'multiplier'
 	static image = `${process.env.PUBLIC_URL}/icons/multiplier.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

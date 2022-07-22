@@ -42,7 +42,8 @@ function Node({
 		slots: slotsRef.current,
 		connections: instance.current.data.connections,
 		position: position.current,
-		type: Class.type,
+		instance: instance.current,
+		Class: Class,
 		onDestinationChange: (newDestinationState) => {
 			if(newDestinationState !== hasDestination) {
 				setHasDestination(newDestinationState)

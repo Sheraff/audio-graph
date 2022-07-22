@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Visualizer extends GraphAudioNode {
 	static type = 'visualizer'
 	static image = `${process.env.PUBLIC_URL}/icons/visualizer.svg`
-
+	static isSink = true
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Reverb extends GraphAudioNode {
 	static type = 'reverb'
 	static image = `${process.env.PUBLIC_URL}/icons/reverb.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'custom', name: 'input'},

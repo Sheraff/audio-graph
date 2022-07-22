@@ -137,6 +137,14 @@ export default class GraphAudioNode {
 	static get requiredModules() { throw new Error(`undefined requiredModules for ${this.constructor.name}`) }
 	static set requiredModules(value) { Object.defineProperty(this, 'requiredModules', {value, writable: false, configurable: false}) }
 
+	/** @type {boolean} whether this node is an audio destination node */
+	static get isSink() { throw new Error(`undefined isSink for ${this.constructor.name}`) }
+	static set isSink(value) { Object.defineProperty(this, 'isSink', {value, writable: false, configurable: false}) }
+	
+	/** @type {boolean} whether this node can still emit a signal without being connected to a destination node */
+	static get requiresSinkToPlay() { throw new Error(`undefined requiresSinkToPlay for ${this.constructor.name}`) }
+	static set requiresSinkToPlay(value) { Object.defineProperty(this, 'requiresSinkToPlay', {value, writable: false, configurable: false}) }
+
 	/**
 	 * @param {NodeUuid} id 
 	 * @param {AudioContext | string} audioContext
@@ -182,8 +190,7 @@ export default class GraphAudioNode {
 		const save = localStorage.getItem(this.id)
 		if (save) {
 			const data = JSON.parse(save)
-			const isNew = false
-			return [data, isNew]
+			return [data, false]
 		} else {
 			const Class = /** @type {typeof GraphAudioNode} */(this.constructor)
 			const data = {
@@ -196,8 +203,7 @@ export default class GraphAudioNode {
 				connections: [],
 				extra: {}
 			}
-			const isNew = true
-			return [data, isNew]
+			return [data, true]
 		}
 	}
 
@@ -280,13 +286,11 @@ export default class GraphAudioNode {
 		window.addEventListener(this.id, /** @type {EventListener} */(onRequest), {signal: this.controller.signal})
 	}
 
-	saveToLocalStorage(force = false) {
+	saveToLocalStorage() {
 		if(!this.ricId) {
 			this.ricId = requestIdleCallback(() => {
 				this.ricId = null
-				if (force || localStorage.getItem(this.id)) {
-					localStorage.setItem(this.id, JSON.stringify(this.data))
-				}
+				localStorage.setItem(this.id, JSON.stringify(this.data))
 			})
 		}
 	}

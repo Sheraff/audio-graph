@@ -2,7 +2,7 @@ import { useId } from "react"
 import AutomationTrack from "./AutomationTrack"
 import styles from "./index.module.css"
 import Range from "./Range"
-import Sequence from "./Sequence"
+import Splice from "./Splice"
 import TimeGrid from "./TimeGrid"
 import Piano from "./Piano"
 import FileInput from "./FileInput"
@@ -17,11 +17,11 @@ export default function Setting({name, type, defaultValue, options, props, setti
 				<div />
 			</div>
 		)
-	if (type === 'sequence')
+	if (type === 'splice')
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<Sequence {...props} id={id} name={name} defaultValue={defaultValue} instance={instance}/>
+				<Splice {...props} id={id} name={name} defaultValue={defaultValue} instance={instance}/>
 				<div />
 			</div>
 		)

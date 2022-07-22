@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Constant extends GraphAudioNode {
 	static type = 'constant'
 	static image = `${process.env.PUBLIC_URL}/icons/constant.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},

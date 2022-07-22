@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class BiQuadFilter extends GraphAudioNode {
 	static type = 'biquadFilter'
 	static image = `${process.env.PUBLIC_URL}/icons/biquadFilter.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

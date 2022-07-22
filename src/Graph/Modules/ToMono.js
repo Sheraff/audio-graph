@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class ToMono extends GraphAudioNode {
 	static type = 'to-mono'
 	static image = `${process.env.PUBLIC_URL}/icons/to-mono.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react"
 import { GraphAudioContext } from "../../../GraphAudioContext"
 import styles from "./index.module.css"
 
-export default function Sequence({id, name, defaultValue, instance}){
+export default function Splice({id, name, defaultValue, instance}){
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const input = useRef(/** @type {HTMLInputElement} */(null))
 	const [initialValue, setInitialValue] = useState(defaultValue)
@@ -98,7 +98,7 @@ export default function Sequence({id, name, defaultValue, instance}){
 				ctx.fillRect(0, 0, ctx.canvas.width * bounds[0], ctx.canvas.height)
 				ctx.fillRect(ctx.canvas.width * bounds[1], 0, ctx.canvas.width, ctx.canvas.height)
 
-				if (typeof audioContext !== 'string') {
+				if (typeof audioContext !== 'string' && instance.current.startTime !== null) {
 					const [start, end] = instance.current.data.settings.select
 					const delta = end - start
 					const duration = instance.current.buffer.duration / instance.current.data.settings.playbackRate

@@ -4,7 +4,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class BalanceDisplay extends GraphAudioNode {
 	static type = 'balance-display'
 	static image = `${process.env.PUBLIC_URL}/icons/balance-display.svg`
-
+	static isSink = true
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'custom', name: 'input'},

@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Compressor extends GraphAudioNode {
 	static type = 'compressor'
 	static image = `${process.env.PUBLIC_URL}/icons/compressor.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

@@ -4,7 +4,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Waveform extends GraphAudioNode {
 	static type = 'waveform'
 	static image = `${process.env.PUBLIC_URL}/icons/waveform.svg`
-
+	static isSink = true
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

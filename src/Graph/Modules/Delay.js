@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Delay extends GraphAudioNode {
 	static type = 'delay'
 	static image = `${process.env.PUBLIC_URL}/icons/delay.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},
