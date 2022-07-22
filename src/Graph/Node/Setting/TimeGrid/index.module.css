@@ -15,6 +15,7 @@
 
 .time {
 	font: inherit;
+	box-shadow: 0 0 0.5em -0.1em #e2cefac2;
 	background: radial-gradient(#eeebf2de, #ac91cc);
 }
 
@@ -27,7 +28,7 @@
 	border-color: #bca7d6;
 	box-shadow:
 		inset 0 0 0.5em 1px #14062591,
-		0 0 0.5em -0.1em #e2cefac2;
+		0 0 10px #a971ea;
 	background: radial-gradient(#926ac4, #2f1054);
 }
 
