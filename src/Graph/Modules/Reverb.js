@@ -52,18 +52,17 @@ export default class Reverb extends GraphAudioNode {
 
 	static requiredModules = [
 		`${process.env.PUBLIC_URL}/AudioWorklets/InputAdd.js`,
-		`${process.env.PUBLIC_URL}/AudioWorklets/Duplicate.js`,
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.customNodes.input = new AudioWorkletNode(audioContext, 'duplicate', {numberOfOutputs: 2, channelCount: 2, outputChannelCount: [2, 2]})
+		this.customNodes.input = new GainNode(audioContext)
 		this.audioNode = new AudioWorkletNode(audioContext, 'add-inputs', {numberOfInputs: 2})
-		this.customNodes.input.connect(this.audioNode, 0, 0)
+		this.customNodes.input.connect(this.audioNode)
 		
 		
 		this.customNodes.convolver = new ConvolverNode(audioContext)
 		this.customNodes.gain = new GainNode(audioContext)
-		this.customNodes.input.connect(this.customNodes.convolver, 1, 0)
+		this.customNodes.input.connect(this.customNodes.convolver)
 		this.customNodes.convolver.connect(this.customNodes.gain, 0, 0)
 		this.customNodes.gain.connect(this.audioNode, 0, 1)
 
