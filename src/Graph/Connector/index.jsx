@@ -1,22 +1,56 @@
 import { useEffect, useRef } from "react"
 import styles from './index.module.css'
 
+function parseNodeMap(nodeMap) {
+	// find all the leaf nodes
+	const outputLeafs = new Set()
+	const destinations = ['analyser', 'output', 'waveform', 'balance-display']
+	nodeMap.forEach((node) => {
+		if (destinations.includes(node.type) && node.children.size === 0) {
+			outputLeafs.add(node)
+		}
+	})
+	// find all nodes that are ancestors of any output leaf
+	const connectedNodes = new Set([...outputLeafs])
+	let newParents = new Set([...outputLeafs])
+	while(newParents.size > 0) {
+		const futureParents = new Set()
+		newParents.forEach((node) => {
+			node.parents.forEach((parent) => {
+				if (!connectedNodes.has(parent)) {
+					connectedNodes.add(parent)
+					futureParents.add(parent)
+				}
+			})
+		})
+		newParents = futureParents
+	}
+
+	return connectedNodes
+}
+
 export default function Connector({boundary, handles, children}) {
 	const connections = useRef(new Map())
 	const connectedSlots = useRef(new Map())
 	const pendingConnection = useRef(null)
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const mousePos = useRef({x: 0, y: 0})
+	const nodeMap = useRef(new Map())
 
 	// initial state
 	useEffect(() => {
-		Object.entries(handles.current).forEach(([id, node]) => (
+		Object.entries(handles.current).forEach(([id, node]) => {
+			if (!nodeMap.current.has(id)) { nodeMap.current.set(id, { parents: new Set(), children: new Set() }) }
 			node.connections.forEach((connectionId) => {
 				const [fromId, toId] = connectionId.split('-')
 				const [fromNodeId] = fromId.split('.')
 				const [toNodeId] = toId.split('.')
 				const from = handles.current[fromNodeId]?.slots[fromId]
 				const to = handles.current[toNodeId]?.slots[toId]
+				if (!nodeMap.current.has(fromNodeId)) { nodeMap.current.set(fromNodeId, { parents: new Set(), children: new Set() }) }
+				if (!nodeMap.current.has(toNodeId)) { nodeMap.current.set(toNodeId, { parents: new Set(), children: new Set() }) }
+				nodeMap.current.get(fromNodeId).children.add(nodeMap.current.get(toNodeId))
+				nodeMap.current.get(toNodeId).parents.add(nodeMap.current.get(fromNodeId))
 				// TODO: this `return` only happens if we have bad data. find out why we sometimes have bad data.
 				if (!from || !to) {
 					console.warn('Bad initial connection data:', connectionId, fromId, toId, from, to)
@@ -32,7 +66,12 @@ export default function Connector({boundary, handles, children}) {
 				connectedSlots.current.set(fromId, connectionId)
 				connectedSlots.current.set(toId, connectionId)
 			})
-		))
+			nodeMap.current.get(id).type = node.type
+		})
+		const connectedNodes = parseNodeMap(nodeMap.current)
+		nodeMap.current.forEach((node, id) => {
+			handles.current[id].onDestinationChange(connectedNodes.has(node))
+		})
 	}, [handles])
 
 	// draw
@@ -129,6 +168,23 @@ export default function Connector({boundary, handles, children}) {
 		const controller = new AbortController()
 		let dragging = false
 
+		// boundary.current.addEventListener('node-added', ({detail: {id, type}}) => {
+		// 	if (!nodeMap.current.has(id)) {
+		// 		nodeMap.current.set(id, { parents: new Set(), children: new Set(), type })
+		// 	}
+		// })
+
+		boundary.current.addEventListener('node-removed', ({detail: {id}}) => {
+			const current = nodeMap.current.get(id)
+			current.parents.forEach(parent => { parent.children.delete(current) })
+			current.children.forEach(child => { child.parents.delete(current) })
+			nodeMap.current.delete(id)
+			const connectedNodes = parseNodeMap(nodeMap.current)
+			nodeMap.current.forEach((node, id) => {
+				handles.current[id].onDestinationChange(connectedNodes.has(node))
+			})
+		})
+
 		boundary.current.addEventListener('slot-down', ({detail}) => {
 			dragging = true
 			const isConnected = connectedSlots.current.get(detail.id)
@@ -145,6 +201,13 @@ export default function Connector({boundary, handles, children}) {
 				const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
 				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'disconnect', from, to}}))
 				pendingConnection.current = { [otherKey]: otherSlot }
+				
+				nodeMap.current.get(from.nodeUuid).children.delete(nodeMap.current.get(to.nodeUuid))
+				nodeMap.current.get(to.nodeUuid).parents.delete(nodeMap.current.get(from.nodeUuid))
+				const connectedNodes = parseNodeMap(nodeMap.current)
+				nodeMap.current.forEach((node, id) => {
+					handles.current[id].onDestinationChange(connectedNodes.has(node))
+				})
 			} else {
 				const thisKey = detail.left ? 'to' : 'from'
 				const thisSlot = handles.current[detail.nodeId].slots[detail.id]
@@ -177,6 +240,9 @@ export default function Connector({boundary, handles, children}) {
 				const from = {nodeUuid: fromSlot.nodeId, slot: fromSlot}
 				const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
 				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'disconnect', from, to}}))
+				
+				nodeMap.current.get(from.nodeUuid).children.delete(nodeMap.current.get(to.nodeUuid))
+				nodeMap.current.get(to.nodeUuid).parents.delete(nodeMap.current.get(from.nodeUuid))
 			}
 			
 			const fromSlot = thisKey === 'from' ? thisSlot : otherSlot
@@ -188,6 +254,15 @@ export default function Connector({boundary, handles, children}) {
 			const from = {nodeUuid: fromSlot.nodeId, slot: fromSlot}
 			const to = {nodeUuid: toSlot.nodeId, slot: toSlot}
 			window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'connect', from, to}}))
+			
+			if (!nodeMap.current.has(from.nodeUuid)) { nodeMap.current.set(from.nodeUuid, { parents: new Set(), children: new Set(), type: handles.current[from.nodeUuid].type }) }
+			if (!nodeMap.current.has(to.nodeUuid)) { nodeMap.current.set(to.nodeUuid, { parents: new Set(), children: new Set(), type: handles.current[to.nodeUuid].type }) }
+			nodeMap.current.get(from.nodeUuid).children.add(nodeMap.current.get(to.nodeUuid))
+			nodeMap.current.get(to.nodeUuid).parents.add(nodeMap.current.get(from.nodeUuid))
+			const connectedNodes = parseNodeMap(nodeMap.current)
+			nodeMap.current.forEach((node, id) => {
+				handles.current[id].onDestinationChange(connectedNodes.has(node))
+			})
 		}, {signal: controller.signal})
 
 		window.addEventListener('mouseup', () => {

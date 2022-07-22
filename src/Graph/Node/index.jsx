@@ -16,6 +16,7 @@ function Node({
 	initialPosition,
 	removeNode,
 	handle,
+	boundary,
 }) {
 	const audioContext = useContext(GraphAudioContext)
 	const instance = useRef(/** @type {typeof Class?} */(null))
@@ -24,10 +25,12 @@ function Node({
 		instance.current = new Class(id, audioContext, controls, initialPosition)
 	}
 	useEffect(() => {
+		boundary.current.dispatchEvent(new CustomEvent('node-added', {detail: {id, type: Class.type}}))
 		return () => {
 			instance.current.cleanup()
+			boundary.current.dispatchEvent(new CustomEvent('node-removed', {detail: {id, type: Class.type}}))
 		}
-	}, [])
+	}, [Class, id, boundary])
 
 	const ref = useRef(/** @type {HTMLDivElement} */(null))
 	const header = useRef(/** @type {HTMLDivElement} */(null))
@@ -35,10 +38,17 @@ function Node({
 	const position = useRef({...instance.current.data.dom})
 	const slotsRef = useRef({})
 
+	const [hasDestination, setHasDestination] = useState(false)
 	useImperativeHandle(handle, () => ({
 		slots: slotsRef.current,
 		connections: instance.current.data.connections,
 		position: position.current,
+		type: Class.type,
+		onDestinationChange: (newDestinationState) => {
+			if(newDestinationState !== hasDestination) {
+				setHasDestination(newDestinationState)
+			}
+		}
 	}))
 	useEffect(() => {
 		const controller = new AbortController()
@@ -137,6 +147,9 @@ function Node({
 			}}
 		>
 			<div className={styles.header}>
+				<span className={classNames(styles.status, {
+					[styles.hasDestination]: hasDestination
+				})}/>
 				<div
 					className={styles.title}
 					ref={header}

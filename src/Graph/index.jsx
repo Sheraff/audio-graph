@@ -158,6 +158,7 @@ export default function Graph() {
 							initialPosition={initialPosition}
 							removeNode={removeNode}
 							handle={handles[i]}
+							boundary={ref}
 						/>
 					)}
 					<UI addNode={addNode} modules={modules} />

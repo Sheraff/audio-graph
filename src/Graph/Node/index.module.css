@@ -26,6 +26,23 @@
 	border: 1px solid currentColor;
 }
 
+.status {
+	height: 1em;
+	width: 1em;
+	display: inline-block;
+	align-self: center;
+	border-radius: 50%;
+	background: #2f1054;
+	margin: 8px;
+	margin-left: 1em;
+	border: 1px solid currentColor;
+}
+
+.hasDestination {
+	background: radial-gradient(#a481cd, #6717c6);
+	box-shadow: 0 0 2px 1px #9070b5, 0 0 8px 2px #a971ea;
+}
+
 .title {
 	padding: .5rem;
 	user-select: none;
