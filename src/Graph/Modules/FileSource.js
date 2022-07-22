@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class FileSource extends GraphAudioNode {
 	static type = 'file'
 	static image = `${process.env.PUBLIC_URL}/icons/file.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = true
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},
@@ -21,7 +22,7 @@ export default class FileSource extends GraphAudioNode {
 			},
 			{
 				name: 'select',
-				type: 'sequence',
+				type: 'splice',
 				props: {},
 				defaultValue: [0, 1],
 				readFrom: 'bounds',
@@ -45,12 +46,7 @@ export default class FileSource extends GraphAudioNode {
 	/** @param {AudioContext} audioContext */
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new GainNode(audioContext)
-
-		// TODO: this is bad for performance
-		// force keep playing
-		this.customNodes.gain = new GainNode(audioContext, {gain: 0})
-		this.customNodes.gain.connect(audioContext.destination)
-		this.audioNode.connect(this.customNodes.gain)
+		this.startTime = null
 	}
 
 	updateSetting(name) {
@@ -71,6 +67,17 @@ export default class FileSource extends GraphAudioNode {
 			this.connectBuffer()
 		} else if (name === 'playbackRate' && this.bufferNode) {
 			this.connectBuffer()
+		}
+	}
+
+	onConnectionStatusChange(connected) {
+		if (connected && this.buffer) {
+			this.connectBuffer()
+			return
+		}
+		if (!connected && this.bufferNode) {
+			this.bufferNode.stop(this.audioContext.currentTime)
+			this.startTime = null
 		}
 	}
 

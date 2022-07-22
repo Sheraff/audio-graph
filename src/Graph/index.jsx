@@ -73,26 +73,17 @@ export default function Graph() {
 		}
 	})
 
-	const ricId = useRef(/** @type {number?} */(null))
+	const canvasNodesHandle = useRef({})
+
 	useEffect(() => {
-		return () => {
-			if(ricId.current)
-				cancelIdleCallback(ricId.current)
-		}
-	}, [])
-	const nodesRef = useRef(nodes)
-	useEffect(() => { nodesRef.current = nodes }, [nodes])
-	const save = useCallback(() => {
-		if(ricId.current)
-			return
-		ricId.current = requestIdleCallback(() => {
-			ricId.current = null
-			const data = nodesRef.current.map(({id, type}) => ({id, type}))
+		const ricId = requestIdleCallback(() => {
+			const data = nodes.map(({id, type}) => ({id, type}))
 			localStorage.setItem('nodes', JSON.stringify(data))
 		})
-	}, [])
-
-	const canvasNodesHandle = useRef({})
+		return () => {
+			cancelIdleCallback(ricId)
+		}
+	}, [nodes])
 
 	const addNode = useCallback((type) => {
 		const node = {
@@ -104,19 +95,18 @@ export default function Graph() {
 			}
 		}
 		setNodes(nodes => [...nodes, node])
-		save()
-	}, [save])
+	}, [])
+
 	const removeNode = useCallback((id) => {
 		delete canvasNodesHandle.current[id]
 		setNodes(nodes => nodes.filter(node => node.id !== id))
-		save()
-	}, [save])
+	}, [])
 
 	const [offset, setOffset] = useState({x: 0, y: 0})
 	useEffect(() => {
 		const onNodePlacement = () => {
 			const offset = Object.values(canvasNodesHandle.current).reduce(({x, y}, node) => {
-				if(!node?.position)
+				if(!node?.position || !node.position.x || !node.position.y)
 					return {x, y}
 				return {
 					x: Math.max(x, node.position.x),
@@ -128,6 +118,7 @@ export default function Graph() {
 		onNodePlacement()
 		const controller = new AbortController()
 		ref.current.addEventListener('node-moved', onNodePlacement, {signal: controller.signal})
+		ref.current.addEventListener('node-removed', onNodePlacement, {signal: controller.signal})
 		return () => {
 			controller.abort()
 		}

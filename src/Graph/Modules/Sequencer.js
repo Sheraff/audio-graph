@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Sequencer extends GraphAudioNode {
 	static type = 'sequencer'
 	static image = `${process.env.PUBLIC_URL}/icons/sequencer.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},

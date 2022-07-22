@@ -13,7 +13,8 @@ function noteToFrequency(note, octave) {
 export default class NoteOscillator extends GraphAudioNode {
 	static type = 'note'
 	static image = `${process.env.PUBLIC_URL}/icons/note.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'setting', name: 'detune'},

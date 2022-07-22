@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Merge extends GraphAudioNode {
 	static type = 'merge'
 	static image = `${process.env.PUBLIC_URL}/icons/merge.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

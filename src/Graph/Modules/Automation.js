@@ -56,7 +56,8 @@ function plugAutomationNode(ctx, settings, destination) {
 export default class Automation extends GraphAudioNode {
 	static type = 'automation'
 	static image = `${process.env.PUBLIC_URL}/icons/automation.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},

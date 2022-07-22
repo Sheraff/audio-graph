@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Duplicate extends GraphAudioNode {
 	static type = 'duplicate'
 	static image = `${process.env.PUBLIC_URL}/icons/duplicate.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},

@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Oscillator extends GraphAudioNode {
 	static type = 'oscillator'
 	static image = `${process.env.PUBLIC_URL}/icons/oscillator.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'setting', name: 'frequency'},

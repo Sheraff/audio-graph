@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class LFO extends GraphAudioNode {
 	static type = 'lfo'
 	static image = `${process.env.PUBLIC_URL}/icons/lfo.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'setting', name: 'frequency'},
@@ -73,11 +74,5 @@ export default class LFO extends GraphAudioNode {
 		} else if(name === 'gain') {
 			this.audioNode.gain.value = this.data.settings.gain
 		}
-	}
-
-	cleanup() {
-		this.oscillator.stop()
-		this.oscillator.disconnect()
-		super.cleanup()
 	}
 }

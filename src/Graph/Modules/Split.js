@@ -3,7 +3,8 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Split extends GraphAudioNode {
 	static type = 'split'
 	static image = `${process.env.PUBLIC_URL}/icons/split.svg`
-
+	static isSink = false
+	static requiresSinkToPlay = false
 	static structure = {
 		slots: [
 			{type: 'input', name: 0},
