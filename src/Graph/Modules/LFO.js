@@ -74,10 +74,4 @@ export default class LFO extends GraphAudioNode {
 			this.audioNode.gain.value = this.data.settings.gain
 		}
 	}
-
-	cleanup() {
-		this.oscillator.stop()
-		this.oscillator.disconnect()
-		super.cleanup()
-	}
 }

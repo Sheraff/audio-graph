@@ -106,6 +106,15 @@
  * @typedef {RangeSettingDefinition | SelectSettingDefinition | TrackSettingDefinition | SequenceSettingDefinition | FileSettingDefinition} SettingDefinition
  */
 
+/**
+ * @typedef {{
+ * 	dom: {x: number, y: number},
+ * 	settings: {[name: SettingDefinition["name"]]: SettingDefinition["defaultValue"]}[],
+ * 	connections: ConnectionId[],
+ * 	extra: {[name: string]: any},
+ * }} NodeData
+ */
+
 export default class GraphAudioNode {
 	/** @type {string} */
 	static get type() { throw new Error(`undefined type for ${this.constructor.name}`) }
@@ -130,11 +139,10 @@ export default class GraphAudioNode {
 
 	/**
 	 * @param {NodeUuid} id 
-	 * @param {AudioContext | string} audioContext 
-	 * @param {React.MutableRefObject<{}>} controls
+	 * @param {AudioContext | string} audioContext
 	 * @param {{x: number, y: number}?} initialPosition
 	 */
-	constructor(id, audioContext, controls, initialPosition) {
+	constructor(id, audioContext, initialPosition) {
 		this.id = id
 		
 		/** @type {AudioNode | AudioWorkletNode?} */
@@ -152,28 +160,33 @@ export default class GraphAudioNode {
 		/** @type {Set<ConnectionId>} */
 		this.establishedConnections = new Set()
 
-		/** @type {React.MutableRefObject<{}>} */
-		this.controls = controls
-		
-		/** @type {typeof GraphAudioNode} */
-		const Class = this.constructor
-		const save = localStorage.getItem(this.id)
-
+		/** @type {AbortController} */
 		this.controller = new AbortController()
 
-		/**
-		 * @type {{
-		 * 	dom: {x: number, y: number},
-		 * 	settings: {[name: SettingDefinition["name"]]: SettingDefinition["defaultValue"]}[],
-		 * 	connections: ConnectionId[],
-		 * 	extra: {[name: string]: any},
-		 * }}
-		 */
-		this.data = null
+		const [data, isNew] = this.makeInitialData(initialPosition)
+
+		/** @type {NodeData} */
+		this.data = data
+		if(isNew)
+			this.saveToLocalStorage()
+		
+		this.listenToConnections()
+		this.obtainAudioContext(audioContext)
+	}
+
+	/**
+	 * @param {{x: number, y: number}?} initialPosition 
+	 * @returns {[NodeData, boolean]}
+	 */
+	makeInitialData(initialPosition) {
+		const save = localStorage.getItem(this.id)
 		if (save) {
-			this.data = JSON.parse(save)
+			const data = JSON.parse(save)
+			const isNew = false
+			return [data, isNew]
 		} else {
-			this.data = {
+			const Class = /** @type {typeof GraphAudioNode} */(this.constructor)
+			const data = {
 				dom: initialPosition,
 				settings: Class.structure.settings
 					? Object.fromEntries(
@@ -183,11 +196,9 @@ export default class GraphAudioNode {
 				connections: [],
 				extra: {}
 			}
-			this.saveToLocalStorage(true)
+			const isNew = true
+			return [data, isNew]
 		}
-
-		this.listenToConnections()
-		this.obtainAudioContext(audioContext)
 	}
 
 	listenToConnections() {
@@ -200,7 +211,8 @@ export default class GraphAudioNode {
 		 * @param {CustomEvent<ConnectionRequest>} event
 		 */
 		const onRequest = ({detail: {request, from, to, audioNode}}) => {
-			const connectionId = `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
+			/** @type {ConnectionId} */
+			const connectionId = GraphAudioNode.connectionToConnectionId({from, to})
 			if (request === 'ack-connect') {
 				this.establishedConnections.add(connectionId)
 			} else if (request === 'ack-disconnect') {
@@ -238,7 +250,7 @@ export default class GraphAudioNode {
 					console.warn('Connection already disconnected')
 					return
 				}
-				if(this.audioNode) {
+				if (this.audioNode) {
 					if (to.nodeUuid === this.id) {
 						let responseAudioNode = this.getDestinationAudioNode(to)
 						if (responseAudioNode) {
@@ -272,8 +284,9 @@ export default class GraphAudioNode {
 		if(!this.ricId) {
 			this.ricId = requestIdleCallback(() => {
 				this.ricId = null
-				if (force || localStorage.getItem(this.id))
+				if (force || localStorage.getItem(this.id)) {
 					localStorage.setItem(this.id, JSON.stringify(this.data))
+				}
 			})
 		}
 	}
@@ -297,9 +310,10 @@ export default class GraphAudioNode {
 				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
 			}
 		} catch (e) {
-			console.log(from, this.audioNode)
-			console.log(to, audioNode)
-			console.error(`couldn't perform '${action}' on node`, e)
+			console.log('from', from, this.audioNode)
+			console.log('to', to, audioNode)
+			const connectionId = GraphAudioNode.connectionToConnectionId({from, to})
+			console.error(`couldn't perform '${action}' on node ${this.constructor.type} (${connectionId}): ${e.message}`)
 		}
 	}
 
@@ -323,8 +337,10 @@ export default class GraphAudioNode {
 			if (connection.slot.name in this.audioNode) {
 				return this.audioNode[connection.slot.name]
 			}
-			if ('parameters' in this.audioNode && this.audioNode.parameters.has(connection.slot.name)) {
-				return this.audioNode.parameters.get(connection.slot.name)
+			if ('parameters' in this.audioNode) {
+				const audioParam = this.audioNode.parameters.get(connection.slot.name)
+				if (audioParam)
+					return audioParam
 			}
 			return null
 		}
@@ -365,13 +381,11 @@ export default class GraphAudioNode {
 		this.updateAudioNodeSettings()
 
 		// establish connections
-		this.data.connections.forEach((c) => {
-			const [fromId, toId] = c.split('-')
-			const [fromNodeUuid, fromSlotType, fromSlotName] = fromId.split('.')
-			const [toNodeUuid, toSlotType, toSlotName] = toId.split('.')
-			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
-			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
-			window.dispatchEvent(new CustomEvent(toNodeUuid, {detail: {request: 'connect', from, to}}))
+		this.data.connections.forEach((connectionId) => {
+			if (!this.establishedConnections.has(connectionId)) {
+				const {from, to} = GraphAudioNode.connectionIdToObjects(connectionId)
+				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'connect', from, to}}))
+			}
 		})
 	}
 
@@ -390,16 +404,17 @@ export default class GraphAudioNode {
 	}
 
 	disconnectAll() {
-		this.establishedConnections.forEach((c) => {
-			const [fromId, toId] = c.split('-')
-			const [fromNodeUuid, fromSlotType, fromSlotName] = fromId.split('.')
-			const [toNodeUuid, toSlotType, toSlotName] = toId.split('.')
-			const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
-			const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
+		this.establishedConnections.forEach((connectionId) => {
+			const {from, to} = GraphAudioNode.connectionIdToObjects(connectionId)
 			if (from.nodeUuid === this.id) {
-				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to}}))
+				window.dispatchEvent(new CustomEvent(from.nodeUuid, {detail: {request: 'disconnect', from, to}}))
 			} else if (to.nodeUuid === this.id && from.slot.type === 'output') {
-				window.dispatchEvent(new CustomEvent(fromNodeUuid, {detail: {request: 'disconnect', from, to, audioNode: this.audioNode}}))
+				let responseAudioNode = this.getDestinationAudioNode(to)
+				if (responseAudioNode) {
+					window.dispatchEvent(new CustomEvent(from.nodeUuid, {detail: {request: 'disconnect', from, to, audioNode: responseAudioNode}}))
+				} else {
+					console.warn('could not find own already connected audio node for disconnectAll')
+				}
 			} else {
 				console.warn('Unknown connection when disconnecting', from, to)
 			}
@@ -411,11 +426,53 @@ export default class GraphAudioNode {
 			cancelIdleCallback(this.ricId)
 		if (this.audioNode)
 			this.disconnectAll()
-		this.controller.abort()
 	}
 
 	destroy() {
-		this.cleanup()
-		localStorage.removeItem(this.id)
+		const postCleanup = () => {
+			setTimeout(() => {
+				requestIdleCallback(() => {
+					if (this.establishedConnections.size > 0) {
+						postCleanup()
+					} else {
+						this.controller.abort()
+						localStorage.removeItem(this.id)
+					}
+				})
+			}, 100)
+		}
+
+		const scheduleCleanup = () => {
+			if (this.audioContext) {
+				this.cleanup()
+				postCleanup()
+			} else {
+				setTimeout(() => scheduleCleanup(), 100)
+			}
+		}
+
+		scheduleCleanup()
+	}
+
+	/**
+	 * @param {ConnectionId} connectionId 
+	 * @returns {Connection}
+	 */
+	static connectionIdToObjects(connectionId) {
+		const [fromId, toId] = connectionId.split('-')
+		const [fromNodeUuid, fromSlotType, fromSlotName] = fromId.split('.')
+		const [toNodeUuid, toSlotType, toSlotName] = toId.split('.')
+		const from = {nodeUuid: fromNodeUuid, slot: {type: fromSlotType, name: fromSlotName}}
+		const to = {nodeUuid: toNodeUuid, slot: {type: toSlotType, name: toSlotName}}
+
+		return {from, to}
+	}
+
+	/**
+	 * @param {Connection} connection
+	 * @returns {ConnectionId}
+	 */
+	static connectionToConnectionId({from, to}) {
+		return `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
 	}
 }

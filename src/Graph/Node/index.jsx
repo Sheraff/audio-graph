@@ -20,15 +20,13 @@ function Node({
 }) {
 	const audioContext = useContext(GraphAudioContext)
 	const instance = useRef(/** @type {typeof Class?} */(null))
-	const controls = useRef(/** @type {GainControls?} */({}))
 	if (!instance.current) {
-		instance.current = new Class(id, audioContext, controls, initialPosition)
+		instance.current = new Class(id, audioContext, initialPosition)
 	}
 	useEffect(() => {
 		const {current} = boundary
 		current.dispatchEvent(new CustomEvent('node-added', {detail: {id, type: Class.type}}))
 		return () => {
-			instance.current.cleanup()
 			current.dispatchEvent(new CustomEvent('node-removed', {detail: {id, type: Class.type}}))
 		}
 	}, [Class, id, boundary])
@@ -111,7 +109,7 @@ function Node({
 				return
 			if (event.type === structure.event || (event.type === 'input' && !structure.event)) {
 				instance.current.data.settings[settingName] = getIn(event.target, structure.readFrom)
-				if(instance.current.audioNode)
+				if (instance.current.audioNode)
 					instance.current.updateSetting(settingName, event.target)
 				instance.current.saveToLocalStorage()
 			}
