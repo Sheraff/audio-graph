@@ -49,12 +49,12 @@ export default function Splice({id, name, defaultValue, instance}){
 		function updatePath() {
 			previousBuffer = instance.current.buffer
 			const a = instance.current.buffer.getChannelData(0)
-			const b = instance.current.buffer.getChannelData(1)
+			const b = instance.current.buffer.numberOfChannels === 2 && instance.current.buffer.getChannelData(1)
 			const SAMPLE_SIZE = Math.max(1, Math.floor(a.length / Math.max(1, ctx.canvas.width)))
 			let max = 0
 			const [result] = a
 				.reduce(([samples, sum, count], _value, i, array) => {
-					const value = Math.abs(_value) + Math.abs(b[i])
+					const value = Math.abs(_value) + (b ? Math.abs(b[i]) : 0)
 					sum += Math.abs(value)
 					count++
 					if((i + 1) % SAMPLE_SIZE === 0 || i + 1 === array.length) {
