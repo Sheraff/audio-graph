@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import styles from './index.module.css'
 
+let activeKeys = new Set()
+
 export default function KeyBound({
 	name,
 	id,
@@ -37,9 +39,15 @@ export default function KeyBound({
 		let held = false
 		let start
 		window.addEventListener('keydown', (event) => {
-			if (event.key === key) {
+			if (event.key === key && !held) {
 				event.preventDefault()
 				held = true
+				range.current.toggleAttribute('disabled', false)
+				activeKeys.add(key)
+				if (activeKeys.size === 1) {
+					document.body.style.setProperty('cursor', 'ns-resize')
+					document.getElementById('root').style.setProperty('pointer-events', 'none')
+				}
 			}
 		}, {signal: controller.signal})
 		window.addEventListener('keyup', (event) => {
@@ -47,6 +55,12 @@ export default function KeyBound({
 				event.preventDefault()
 				held = false
 				start = null
+				activeKeys.delete(key)
+				range.current.toggleAttribute('disabled', true)
+				if (activeKeys.size === 0) {
+					document.body.style.removeProperty('cursor')
+					document.getElementById('root').style.removeProperty('pointer-events')
+				}
 			}
 		}, {signal: controller.signal})
 		window.addEventListener('mousemove', (event) => {
@@ -74,7 +88,7 @@ export default function KeyBound({
 			<input
 				{...props}
 				ref={range}
-				className={styles.main}
+				className={styles.range}
 				type="range"
 				disabled
 				name={name}
@@ -83,6 +97,7 @@ export default function KeyBound({
 			/>
 			<input
 				ref={text}
+				className={styles.text}
 				type="text"
 				pattern="[a-z]"
 				value={key.toUpperCase()}

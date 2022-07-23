@@ -5,3 +5,25 @@
 	opacity: .7;
 	text-align: center;
 }
+
+.range {
+	cursor: not-allowed !important;
+}
+
+.range:not([disabled])::-webkit-slider-thumb {
+	box-shadow: 0 0 1em -2px #dbccee, inset 0 0 0 1px #811ff9;
+	border-radius: 50%;
+}
+
+.text {
+	color: currentColor;
+	background: transparent;
+	text-align: center;
+	border-radius: 4px;
+	aspect-ratio: 1 / 1;
+	width: fit-content;
+	justify-self: center;
+	border-style: outset;
+	padding: 0.125em;
+	font-family: monospace;
+}
