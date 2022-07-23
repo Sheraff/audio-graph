@@ -7,6 +7,7 @@ import TimeGrid from "./TimeGrid"
 import Piano from "./Piano"
 import FileInput from "./FileInput"
 import KeyBound from "./KeyBound"
+import ToggleRange from "./ToggleRange"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -51,6 +52,12 @@ export default function Setting({name, type, defaultValue, options, props, setti
 			<>
 				<label htmlFor={id}>{name}</label>
 				<Range id={id} name={name} defaultValue={defaultValue} props={props} instance={instance}/>
+			</>
+		)
+	if (type === 'toggle-range')
+		return (
+			<>
+				<ToggleRange id={id} name={name} defaultValue={defaultValue} props={props}/>
 			</>
 		)
 	if (type === 'file')

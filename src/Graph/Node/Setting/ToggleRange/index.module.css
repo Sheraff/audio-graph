@@ -1,0 +1,16 @@
+.range {
+	width: 100%;
+	height: 100%;
+}
+
+.text {
+	background: #fff1;
+	color: inherit;
+	border: none;
+	padding: 0;
+	margin: 0;
+	font-variant: tabular-nums;
+	width: 7ch;
+	text-align: right;
+	font-family: monospace;
+}

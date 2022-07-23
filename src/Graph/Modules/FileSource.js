@@ -38,6 +38,17 @@ export default class FileSource extends GraphAudioNode {
 				defaultValue: 1,
 				readFrom: 'value',
 			},
+			{
+				name: 'tempo',
+				type: 'toggle-range',
+				props: {
+					min: 10,
+					max: 300,
+					step: 1,
+				},
+				defaultValue: {enabled: false, value: 60},
+				readFrom: 'toggle-value',
+			}
 		]
 	}
 
@@ -80,6 +91,8 @@ export default class FileSource extends GraphAudioNode {
 			this.connectBuffer()
 		} else if (name === 'playbackRate' && this.bufferNode) {
 			this.connectBuffer()
+		} else if (name === 'tempo' && this.bufferNode) {
+			this.connectBuffer()
 		}
 	}
 
@@ -118,6 +131,7 @@ export default class FileSource extends GraphAudioNode {
 	connectBuffer(){
 		if (this.bufferNode) {
 			this.bufferNode.disconnect(this.audioNode)
+			this.bufferNode = null
 		}
 		if (!this.buffer || !this.hasAudioDestination) {
 			return
@@ -126,18 +140,65 @@ export default class FileSource extends GraphAudioNode {
 		this.bufferNode.buffer = this.buffer
 		this.bufferNode.connect(this.audioNode)
 
-		const duration = this.buffer.duration
-		const bounds = this.data.settings.select
-		const start = bounds[0] * duration
-		const end = bounds[1] * duration
+		const {loopStart, loopEnd, startTime, loop, stopTime} = this.computePlaybackParameters()
 
-		this.bufferNode.start(this.audioContext.currentTime, start)
-		this.bufferNode.loopStart = start
-		this.bufferNode.loopEnd = end
-		this.bufferNode.loop = true
+		this.bufferNode.start(startTime, loopStart)
+		this.bufferNode.loop = loop
+		if (loop) {
+			this.bufferNode.loopStart = loopStart
+			this.bufferNode.loopEnd = loopEnd
+		} else {
+			this.bufferNode.stop(stopTime)
+		}
 
-		this.startTime = this.audioContext.currentTime
+		this.startTime = startTime
 
 		this.bufferNode.playbackRate.value = this.data.settings.playbackRate
+	}
+
+	computePlaybackParameters() {
+		this.bufferEndedController?.abort()
+		const duration = this.buffer.duration
+		const bounds = this.data.settings.select
+		const loopStart = bounds[0] * duration
+		const loopEnd = bounds[1] * duration
+
+		if (!this.data.settings.tempo.enabled) {
+			return {
+				loopStart,
+				loopEnd,
+				startTime: this.audioContext.currentTime,
+				loop: true
+			}
+		}
+
+		const beatLength = 60 / this.data.settings.tempo.value
+		const boundedDuration = (loopEnd - loopStart) / this.bufferNode.playbackRate.value
+		
+		if (boundedDuration >= beatLength) {
+			const nextStartOnBeat = this.audioContext.currentTime - (this.audioContext.currentTime % beatLength) + beatLength
+			const boundedLoopEnd = loopStart + beatLength / this.bufferNode.playbackRate.value
+			return {
+				loopStart,
+				loopEnd: boundedLoopEnd,
+				startTime: nextStartOnBeat,
+				loop: true,
+			}
+		}
+
+		this.bufferEndedController = new AbortController()
+		this.bufferNode?.addEventListener(
+			'ended',
+			() => this.connectBuffer(),
+			{once: true, signal: this.bufferEndedController.signal}
+		)
+
+		const nextStartOnBeat = this.audioContext.currentTime - (this.audioContext.currentTime % beatLength) + beatLength
+		return {
+			loopStart,
+			startTime: nextStartOnBeat,
+			loop: false,
+			stopTime: nextStartOnBeat + beatLength 
+		}
 	}
 }
