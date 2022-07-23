@@ -21,7 +21,7 @@ export default class FileSource extends GraphAudioNode {
 				name: 'source',
 				type: 'file',
 				props: {
-					accept: "audio/basic,audio/mpeg,audio/mp4,audio/x-aiff,audio/ogg,audio/vnd.wav",
+					accept: "audio/basic,audio/mpeg,audio/mp4,audio/x-aiff,audio/ogg,audio/vnd.wav,audio/wav",
 				},
 				defaultValue: '',
 				readFrom: 'files',
