@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useRef } from "react"
 import styles from "./index.module.css"
 
 const normalizeData = array => {
