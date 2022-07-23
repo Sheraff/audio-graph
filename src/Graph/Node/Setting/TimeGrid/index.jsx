@@ -25,9 +25,7 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 		const sequence = Array(size[1]).fill(0).map((_, y) => ([...initialValue[y]]))
 
 		Object.defineProperty(input.current, 'sequence', {
-			get() {
-				return sequence
-			},
+			get: () => sequence,
 			configurable: true
 		})
 

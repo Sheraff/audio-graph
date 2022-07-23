@@ -58,9 +58,7 @@ export default function AutomationTrack({id, name, defaultValue, settings, insta
 		let path
 
 		Object.defineProperty(input.current, 'points', {
-			get() {
-				return normalizePoints(canvas.current, points)
-			},
+			get: () => normalizePoints(canvas.current, points),
 			configurable: true
 		})
 

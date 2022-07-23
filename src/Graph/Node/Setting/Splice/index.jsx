@@ -33,9 +33,7 @@ export default function Splice({id, name, defaultValue, instance}){
 		let rafId
 
 		Object.defineProperty(input.current, 'bounds', {
-			get() {
-				return [bounds[0], bounds[1]]
-			},
+			get: () => [bounds[0], bounds[1]],
 			configurable: true
 		})
 

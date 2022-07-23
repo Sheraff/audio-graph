@@ -24,9 +24,7 @@ function Piano({id, name, size, defaultValue}){
 		const piano = [...initialValue]
 
 		Object.defineProperty(input.current, 'piano', {
-			get() {
-				return piano
-			},
+			get: () => piano,
 			configurable: true
 		})
 
