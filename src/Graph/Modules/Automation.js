@@ -35,7 +35,7 @@ function plugAutomationNode(ctx, settings, destination) {
 	// 	}
 	// }
 	const interpolation = settings.interpolation === 'linear' ? 'linearRampToValueAtTime' : 'exponentialRampToValueAtTime'
-	for(let i = 0; i < 60; i++) {
+	for(let i = 0; i < 15; i++) {
 		points.forEach((point, p) => {
 			const time = startTime + (i * duration) + (point.x * duration)
 			if (time > ctx.currentTime) {
@@ -87,7 +87,7 @@ export default class Automation extends GraphAudioNode {
 			if (duration) {
 				this.scheduleTimeoutId = setTimeout(() => {
 					this.updateAudioNodeSettings()
-				}, duration * 50)
+				}, duration * 14_000)
 			}
 		}
 	}

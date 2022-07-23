@@ -118,7 +118,7 @@ export default class Sequencer extends GraphAudioNode {
 
 		this.scheduleTimeoutId = setTimeout(() => {
 			this.schedule()
-		}, barLength * 10)
+		}, barLength * 14_000)
 	}
 
 	cleanup() {
