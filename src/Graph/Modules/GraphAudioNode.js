@@ -171,6 +171,9 @@ export default class GraphAudioNode {
 		/** @type {AbortController} */
 		this.controller = new AbortController()
 
+		/** @type {boolean} */
+		this.hasAudioDestination = false
+
 		const [data, isNew] = this.makeInitialData(initialPosition)
 
 		/** @type {NodeData} */
@@ -405,6 +408,53 @@ export default class GraphAudioNode {
 
 	updateSetting(name) {
 		throw new Error(`undefined updateSetting for ${this.constructor.name}`)
+	}
+
+	onConnectionStatusChange(connected) {
+		this.hasAudioDestination = connected
+
+		Object.keys(this.observableNodes).forEach((name) => {
+			if (connected && this.audioNode) {
+				this.observableNodes[name].connect(this.observableNodes[name].offset.observer)
+			} else if (!connected && this.audioNode) {
+				this.observableNodes[name].disconnect(this.observableNodes[name].offset.observer)
+			}
+		})
+	}
+
+	observableNodes = {}
+	makeParamObservable(name) {
+		const audioParam = this.audioNode[name] || this.audioNode.parameters?.get(name)
+		if (!audioParam || audioParam.automationRate !== 'a-rate') return
+
+		this.observableNodes[name] = new ConstantSourceNode(this.audioContext, {offset: 0})
+		this.observableNodes[name].start()
+		this.observableNodes[name].connect(audioParam)
+		Object.defineProperties(this.observableNodes[name].offset, {
+			value: {
+				get: ( ) => audioParam.value,
+				set: (v) => audioParam.value = v,
+			},
+			minValue: { value: audioParam.minValue },
+			maxValue: { value: audioParam.maxValue },
+			observer: { value: new AnalyserNode(this.audioContext) },
+		})
+		this.observableNodes[name].connect(this.observableNodes[name].offset.observer)
+		if (this.audioNode[name]) {
+			Object.defineProperty(this.audioNode, name, {
+				value: this.observableNodes[name].offset,
+				enumerable: true,
+			})
+		} else {
+			const getter = this.audioNode.parameters.get
+			this.audioNode.parameters.get = (arg) => {
+				if (arg === name) {
+					return this.observableNodes[name].offset
+				} else {
+					return getter.call(this.audioNode.parameters, arg)
+				}
+			}
+		}
 	}
 
 	disconnectAll() {

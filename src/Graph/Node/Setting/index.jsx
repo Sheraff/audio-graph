@@ -56,7 +56,7 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<div className={styles.main}>
 				<label htmlFor={id}>{name}</label>
-				<Range id={id} name={name} defaultValue={defaultValue} props={props} />
+				<Range id={id} name={name} defaultValue={defaultValue} props={props} instance={instance}/>
 			</div>
 		)
 	if (type === 'file')

@@ -30,6 +30,11 @@ export default class Delay extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new DelayNode(audioContext)
+		this.makeParamObservable('delayTime')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

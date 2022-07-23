@@ -1,5 +1,32 @@
-.range {
+.cell {
 	width: calc(100% - 7ch);
+}
+
+.main {
+	position: relative;
+	z-index: 0;
+	width: 100%;
+	display: flex;
+	--value: 0;
+}
+
+.main::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0.5em;
+	right: 0.5em;
+	height: 2px;
+	z-index: 1;
+	pointer-events: none;
+	background-color: #811ff9;
+	transform-origin: left;
+	transform: translateY(-50%) translateX(calc(var(--base) * 100%)) scaleX(var(--value));
+}
+
+.range {
+	width: 100%;
+	height: 100%;
 }
 
 .text {

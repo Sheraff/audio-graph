@@ -77,7 +77,13 @@ export default class Reverb extends GraphAudioNode {
 		Object.defineProperty(this.audioNode, 'wet', {
 			value: this.customNodes.gain.gain,
 			enumerable: true,
+			configurable: true,
 		})
+		this.makeParamObservable('wet')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

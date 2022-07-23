@@ -101,9 +101,13 @@ export default class NoteOscillator extends GraphAudioNode {
 		Object.defineProperty(this.audioNode, 'detune', {
 			value: detuneNode.parameters.get('offset'),
 			enumerable: true,
-			configurable: false,
-			writable: false,
+			configurable: true,
 		})
+		this.makeParamObservable('detune')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

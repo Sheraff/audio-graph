@@ -57,7 +57,13 @@ export default class Echo extends GraphAudioNode {
 		Object.defineProperty(this.audioNode, 'gain', {
 			value: this.customNodes.gain.gain,
 			enumerable: true,
+			configurable: true,
 		})
+		this.makeParamObservable('gain')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

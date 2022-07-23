@@ -30,6 +30,11 @@ export default class Gain extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new GainNode(audioContext)
+		this.makeParamObservable('gain')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

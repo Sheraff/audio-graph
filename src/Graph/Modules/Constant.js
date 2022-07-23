@@ -31,6 +31,11 @@ export default class Constant extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0})
+		this.makeParamObservable('offset')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {

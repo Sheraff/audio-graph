@@ -53,9 +53,18 @@ export default class Oscillator extends GraphAudioNode {
 
 	static requiredModules = []
 
+	yoloTest = true
+
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new OscillatorNode(audioContext)
 		this.audioNode.start()
+
+		this.makeParamObservable('frequency')
+		this.makeParamObservable('detune')
+		if (this.onAudioNode) {
+			this.onAudioNode()
+			delete this.onAudioNode
+		}
 	}
 
 	updateSetting(name) {
@@ -63,6 +72,7 @@ export default class Oscillator extends GraphAudioNode {
 			this.audioNode.type = this.data.settings.type
 		} else if(name === 'frequency') {
 			this.audioNode.frequency.value = this.data.settings.frequency
+			// this.customNodes.frequency.offset.value = this.data.settings.frequency
 		} else if(name === 'detune') {
 			this.audioNode.detune.value = parseFloat(this.data.settings.detune)
 		}

@@ -71,6 +71,7 @@ export default class FileSource extends GraphAudioNode {
 	}
 
 	onConnectionStatusChange(connected) {
+		super.onConnectionStatusChange(connected)
 		if (connected && this.buffer) {
 			this.connectBuffer()
 			return
