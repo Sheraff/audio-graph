@@ -26,7 +26,7 @@
 }
 
 .text {
-	background: transparent;
+	background: #fff1;
 	color: inherit;
 	border: none;
 	padding: 0;
@@ -34,4 +34,5 @@
 	font-variant: tabular-nums;
 	width: 7ch;
 	text-align: right;
+	font-family: monospace;
 }

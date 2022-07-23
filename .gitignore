@@ -11,6 +11,9 @@
 # production
 /build
 
+# generated files
+/public/icons
+
 # misc
 .DS_Store
 .env.local
