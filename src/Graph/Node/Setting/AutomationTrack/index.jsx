@@ -54,7 +54,7 @@ export default function AutomationTrack({id, name, defaultValue, settings, insta
 		let lastIndex
 		let hasMoved = false
 		let rafId
-		const DISTANCE_TO_GRAB = 10
+		const DISTANCE_TO_GRAB = 20
 		let path
 
 		Object.defineProperty(input.current, 'points', {
@@ -125,7 +125,7 @@ export default function AutomationTrack({id, name, defaultValue, settings, insta
 				points.forEach((point, i) => {
 					if (lastIndex === i) {
 						ctx.beginPath()
-						ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI)
+						ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI)
 						ctx.stroke()
 					}
 					ctx.beginPath()
