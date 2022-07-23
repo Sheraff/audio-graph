@@ -58,9 +58,7 @@ export default class NoteOscillator extends GraphAudioNode {
 		]
 	}
 
-	static requiredModules = [
-		`${process.env.PUBLIC_URL}/AudioWorklets/ConstantCustom.js`
-	]
+	static requiredModules = []
 
 	createOscillatorChunk(audioContext, offset = 0, detuneNode) {
 		const merger = new ChannelMergerNode(audioContext, {numberOfInputs: 6})
@@ -82,7 +80,8 @@ export default class NoteOscillator extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.allGain = []
 		this.allOscillators = []
-		const detuneNode = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 0}})
+		const detuneNode = new ConstantSourceNode(audioContext, {offset: 0})
+		detuneNode.start()
 		const halfOctave1 = this.createOscillatorChunk(audioContext, 0, detuneNode)
 		const halfOctave2 = this.createOscillatorChunk(audioContext, 6, detuneNode)
 		const halfOctave3 = this.createOscillatorChunk(audioContext, 12, detuneNode)
@@ -99,7 +98,7 @@ export default class NoteOscillator extends GraphAudioNode {
 		halfOctave4.connect(this.audioNode, 0, 1)
 
 		Object.defineProperty(this.audioNode, 'detune', {
-			value: detuneNode.parameters.get('offset'),
+			value: detuneNode.offset,
 			enumerable: true,
 			configurable: true,
 		})

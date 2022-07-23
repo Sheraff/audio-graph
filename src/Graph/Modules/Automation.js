@@ -8,7 +8,7 @@ import GraphAudioNode from "./GraphAudioNode"
  * @returns 
  */
 function plugAutomationNode(ctx, settings, destination) {
-	const offsetNode = destination.parameters.get('offset')
+	const offsetNode = destination.offset
 	if (!offsetNode) {
 		console.warn('Automation node should use a "custom-constant" node')
 		return
@@ -74,12 +74,11 @@ export default class Automation extends GraphAudioNode {
 		],
 	}
 
-	static requiredModules = [
-		`${process.env.PUBLIC_URL}/AudioWorklets/ConstantCustom.js`
-	]
+	static requiredModules = []
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0, parameterData: {offset: 1}})
+		this.audioNode = new ConstantSourceNode(audioContext, {offset: 1})
+		this.audioNode.start()
 	}
 
 	scheduleTimeoutId

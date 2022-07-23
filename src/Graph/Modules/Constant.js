@@ -25,12 +25,11 @@ export default class Constant extends GraphAudioNode {
 		]
 	}
 
-	static requiredModules = [
-		`${process.env.PUBLIC_URL}/AudioWorklets/ConstantCustom.js`
-	]
+	static requiredModules = []
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'constant-custom', {numberOfInputs: 0})
+		this.audioNode = new ConstantSourceNode(audioContext)
+		this.audioNode.start()
 		this.makeParamObservable('offset')
 		if (this.onAudioNode) {
 			this.onAudioNode()
@@ -40,7 +39,7 @@ export default class Constant extends GraphAudioNode {
 
 	updateSetting(name) {
 		if (name === 'offset') {
-			this.audioNode.parameters.get('offset').value = parseFloat(this.data.settings.offset)
+			this.audioNode.offset.value = this.data.settings.offset
 		}
 	}
 }
