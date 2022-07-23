@@ -1,1 +1,5 @@
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect x="19.65" y="105.58" width="100.7" height="2" fill="#fff"/><rect x="19.65" y="88.1" width="100.7" height="2" fill="#fff"/><rect x="19.65" y="70.63" width="100.7" height="2" fill="#fff"/><rect x="19.65" y="53.15" width="100.7" height="2" fill="#fff"/><rect x="19.65" y="35.67" width="100.7" height="2" fill="#fff"/><circle cx="70" cy="80.37" r="8.74" fill="#fff"/><rect x="75.7" y="22.42" width="3" height="57.95" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140">
+	<path fill="#fff" d="M19.6 105.6h100.7v2H19.6zm0-17.5h100.7v2H19.6zm0-17.5h100.7v2H19.6zm0-17.5h100.7v2H19.6zm0-17.4h100.7v2H19.6z"/>
+	<circle cx="70" cy="80.4" r="8.7" fill="#fff"/>
+	<path fill="#fff" d="M75.7 22.4h3v58h-3z"/>
+</svg>

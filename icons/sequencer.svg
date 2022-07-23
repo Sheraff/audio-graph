@@ -1,1 +1,18 @@
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect x="103.72" y="103.72" width="26.58" height="26.58" rx="5.85" transform="translate(234.02 0) rotate(90)" fill="#fff"/><rect x="9.7" y="103.72" width="26.58" height="26.58" rx="5.85" transform="translate(140 94.02) rotate(90)" fill="#fff"/><rect x="41.04" y="103.72" width="26.58" height="26.58" rx="5.85" transform="translate(171.34 62.68) rotate(90)" fill="#fff"/><rect x="72.38" y="103.72" width="26.58" height="26.58" rx="5.85" transform="translate(202.68 31.34) rotate(90)" fill="#fff"/><rect x="9.7" y="9.7" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="103.72" y="9.7" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="72.38" y="9.7" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="41.04" y="9.7" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="9.7" y="72.38" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="103.72" y="72.38" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="72.38" y="72.38" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="41.04" y="72.38" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="9.7" y="41.04" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="103.72" y="41.04" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="72.38" y="41.04" width="26.58" height="26.58" rx="5.85" fill="#fff"/><rect x="41.04" y="41.04" width="26.58" height="26.58" rx="5.85" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140">
+	<rect x="103.7" y="103.7" width="26.6" height="26.6" rx="5.8" transform="translate(234.02 0) rotate(90)" fill="#fff"/>
+	<rect x="9.7" y="103.7" width="26.6" height="26.6" rx="5.8" transform="translate(140 94.02) rotate(90)" fill="#fff"/>
+	<rect x="41" y="103.7" width="26.6" height="26.6" rx="5.8" transform="translate(171.34 62.68) rotate(90)" fill="#fff"/>
+	<rect x="72.4" y="103.7" width="26.6" height="26.6" rx="5.8" transform="translate(202.68 31.34) rotate(90)" fill="#fff"/>
+	<rect x="9.7" y="9.7" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="103.7" y="9.7" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="72.4" y="9.7" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="41" y="9.7" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="9.7" y="72.4" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="103.7" y="72.4" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="72.4" y="72.4" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="41" y="72.4" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="9.7" y="41" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="103.7" y="41" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="72.4" y="41" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+	<rect x="41" y="41" width="26.6" height="26.6" rx="5.8" fill="#fff"/>
+</svg>

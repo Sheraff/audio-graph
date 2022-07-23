@@ -1,1 +1,5 @@
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect x="18.25" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="121.29" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="109.85" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="98.4" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="86.95" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="52.6" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="41.15" y="63.11" width="2" height="15.81" fill="#fff"/><rect x="29.7" y="63.11" width="2" height="15.81" fill="#fff"/><path d="M129.25,75.79h-117a4.78,4.78,0,0,1,0-9.55h117a4.78,4.78,0,1,1,0,9.55Z" fill="#fff"/><path d="M70.77,85.82A4.77,4.77,0,0,1,66,81.05V61a4.78,4.78,0,0,1,9.55,0V81.05A4.77,4.77,0,0,1,70.77,85.82Z" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140">
+	<path fill="#fff" d="M18.3 63.1h2v15.8h-2zm103 0h2v15.8h-2zm-11.5 0h2v15.8h-2zm-11.4 0h2v15.8h-2zm-11.4 0h2v15.8h-2zm-34.4 0h2v15.8h-2zm-11.5 0h2v15.8h-2zm-11.4 0h2v15.8h-2z"/>
+	<path d="M129.3 75.8h-117a4.8 4.8 0 0 1 0-9.6h117a4.8 4.8 0 1 1 0 9.6Z" fill="#fff"/>
+	<path d="M70.8 85.8A4.8 4.8 0 0 1 66 81V61a4.8 4.8 0 0 1 9.6 0v20a4.8 4.8 0 0 1-4.8 4.8Z" fill="#fff"/>
+</svg>
