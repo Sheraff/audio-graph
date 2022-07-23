@@ -33,7 +33,7 @@ export default class FileSource extends GraphAudioNode {
 				props: {
 					min: 0.1,
 					max: 5,
-					step: 0.1,
+					step: 0.01,
 				},
 				defaultValue: 1,
 				readFrom: 'value',
