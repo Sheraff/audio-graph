@@ -21,7 +21,7 @@ export const GraphAudioContextProvider = ({ children, modules }) => {
 			window.dispatchEvent(new CustomEvent(id, {detail: context}))
 			setAudioContext(context)
 		}
-		window.addEventListener('click', onAnyUserEvent, {
+		window.addEventListener('pointerdown', onAnyUserEvent, {
 			once: true,
 			passive: true,
 			signal: controller.signal,
