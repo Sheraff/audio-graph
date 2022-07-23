@@ -1,4 +1,9 @@
 .main {
+	grid-column: 1 / -1;
+	max-width: 200px;
+	justify-self: center;
+	width: 100%;
+
 	display: grid;
 	grid-template-columns: repeat(var(--col), 1fr);
 	grid-auto-rows: 1fr;

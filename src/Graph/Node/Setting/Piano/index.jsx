@@ -55,7 +55,7 @@ function Piano({id, name, size, defaultValue}){
 
 
 	return (
-		<div>
+		<>
 			<div className={styles.main}>
 				{Array(size).fill(0).map((_, note) => (
 					<button
@@ -70,7 +70,7 @@ function Piano({id, name, size, defaultValue}){
 				))}
 			</div>
 			<input ref={input} id={id} name={name} className={styles.input} />
-		</div>
+		</>
 	)
 }
 

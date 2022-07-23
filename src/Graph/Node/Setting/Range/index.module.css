@@ -1,7 +1,3 @@
-.cell {
-	width: calc(100% - 7ch);
-}
-
 .main {
 	position: relative;
 	z-index: 0;

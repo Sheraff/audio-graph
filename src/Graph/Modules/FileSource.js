@@ -11,6 +11,13 @@ export default class FileSource extends GraphAudioNode {
 		],
 		settings: [
 			{
+				name: 'select',
+				type: 'splice',
+				props: {},
+				defaultValue: [0, 1],
+				readFrom: 'bounds',
+			},
+			{
 				name: 'source',
 				type: 'file',
 				props: {
@@ -19,13 +26,6 @@ export default class FileSource extends GraphAudioNode {
 				defaultValue: '',
 				readFrom: 'files',
 				event: 'change',
-			},
-			{
-				name: 'select',
-				type: 'splice',
-				props: {},
-				defaultValue: [0, 1],
-				readFrom: 'bounds',
 			},
 			{
 				name: 'playbackRate',

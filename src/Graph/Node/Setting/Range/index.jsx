@@ -78,22 +78,20 @@ export default function Range({id, name, defaultValue, props, instance}){
 
 	return (
 		<>
-			<div className={styles.cell}>
-				<div ref={ref} className={styles.main} style={{'--base': 0, '--value': 0}}>
-					<input
-						ref={range}
-						onChange={() => {
-							touched.current = true
-							text.current.value = range.current.value
-						}}
-						type="range"
-						name={name}
-						defaultValue={defaultValue}
-						{...props}
-						id={id}
-						className={styles.range}
-					/>
-				</div>
+			<div ref={ref} className={styles.main} style={{'--base': 0, '--value': 0}}>
+				<input
+					ref={range}
+					onChange={() => {
+						touched.current = true
+						text.current.value = range.current.value
+					}}
+					type="range"
+					name={name}
+					defaultValue={defaultValue}
+					{...props}
+					id={id}
+					className={styles.range}
+				/>
 			</div>
 			<input
 				ref={text}

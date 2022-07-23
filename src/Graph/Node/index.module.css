@@ -119,14 +119,11 @@
 }
 
 .settings {
-	display: table;
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-auto-rows: auto;
+	gap: 0.5em;
 	width: 100%;
-}
-.settings > * {
-	display: table-row;
-}
-.settings > * > * {
-	display: table-cell;
 }
 .settings:not(:last-child) {
 	margin-bottom: 0.5em;

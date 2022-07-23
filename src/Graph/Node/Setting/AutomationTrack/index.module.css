@@ -1,9 +1,11 @@
 .main {
-	width: 300px;
+	grid-column: 1 / -1;
+	min-width: 400px;
+	width: 100%;
 	aspect-ratio: 4 / 1;
 	height: auto;
 	background: #2f1054;
-	border: 1px solid #fff;
+	outline: 1px solid #fff;
 	border-radius: 5px;
 	padding: 0 !important;
 }

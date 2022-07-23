@@ -89,7 +89,7 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 	}, [initialValue, audioContext, instance, size])
 
 	return (
-		<div>
+		<>
 			<div className={styles.main} style={{'--col': size[0]}}>
 				{Array(size[1]).fill(0).map((_, y) => (
 					Array(size[0]).fill(0).map((__, x) => (
@@ -111,7 +111,7 @@ function TimeGrid({id, name, size, defaultValue, instance}){
 				))}
 			</div>
 			<input ref={input} id={id} name={name} className={styles.input} />
-		</div>
+		</>
 	)
 }
 

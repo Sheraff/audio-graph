@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import styles from './index.module.css'
 
 export default function FileInput({
 	name,
@@ -20,6 +21,14 @@ export default function FileInput({
 	}, [defaultValue])
 
 	return (
-		<input ref={input} type="file" name={name} accept={accept} id={id} onInput={() => touched.current = true} />
+		<input
+			ref={input}
+			className={styles.main}
+			type="file"
+			name={name}
+			accept={accept}
+			id={id}
+			onInput={() => touched.current = true}
+		/>
 	)
 }

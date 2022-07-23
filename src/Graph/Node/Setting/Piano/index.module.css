@@ -1,4 +1,6 @@
 .main {
+	grid-column: 1 / -1;
+	min-width: 400px;
 	height: 100px;
 	position: relative;
 	z-index: 0;
