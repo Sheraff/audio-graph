@@ -58,6 +58,7 @@ function Node({
 		let initial
 		let start
 		let rafId
+		let hasMoved
 		if (startHeld) {
 			initial = {...position.current}
 			start = true
@@ -68,10 +69,12 @@ function Node({
 				return
 			start = {x: e.clientX, y: e.clientY}
 			initial = {...position.current}
+			hasMoved = false
 			header.current.style.setProperty('cursor', 'grabbing')
 		}, {signal: controller.signal})
 		window.addEventListener('mousemove', e => {
 			if(!start) return
+			hasMoved = true
 			if(start === true) {
 				start = {
 					x: e.clientX + 75,
@@ -91,6 +94,10 @@ function Node({
 		window.addEventListener('mouseup', (e) => {
 			if (!start) return
 			start = null
+			if (!hasMoved) {
+				header.current.style.removeProperty('cursor')
+				return
+			}
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
 				position.current.x = initial.x + dx

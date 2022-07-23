@@ -38,23 +38,34 @@ export default function KeyBound({
 		const controller = new AbortController()
 		let held = false
 		let start
+		let code
 		window.addEventListener('keydown', (event) => {
-			if (event.key === key && !held) {
-				event.preventDefault()
-				held = true
-				range.current.toggleAttribute('disabled', false)
-				activeKeys.add(key)
-				if (activeKeys.size === 1) {
-					document.body.style.setProperty('cursor', 'ns-resize')
-					document.getElementById('root').style.setProperty('pointer-events', 'none')
-				}
+			if (
+				event.key !== key
+				|| event.repeat
+				|| event.ctrlKey
+				|| event.altKey
+				|| event.metaKey
+				|| event.shiftKey
+			) {
+				return
+			}
+			event.preventDefault()
+			held = true
+			code = event.code
+			range.current.toggleAttribute('disabled', false)
+			activeKeys.add(key)
+			if (activeKeys.size === 1) {
+				document.body.style.setProperty('cursor', 'ns-resize')
+				document.getElementById('root').style.setProperty('pointer-events', 'none')
 			}
 		}, {signal: controller.signal})
 		window.addEventListener('keyup', (event) => {
-			if (event.key === key) {
+			if (event.code === code) {
 				event.preventDefault()
 				held = false
 				start = null
+				code = null
 				activeKeys.delete(key)
 				range.current.toggleAttribute('disabled', true)
 				if (activeKeys.size === 0) {
