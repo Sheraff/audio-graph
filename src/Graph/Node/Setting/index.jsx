@@ -6,6 +6,7 @@ import Splice from "./Splice"
 import TimeGrid from "./TimeGrid"
 import Piano from "./Piano"
 import FileInput from "./FileInput"
+import KeyBound from "./KeyBound"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -57,6 +58,12 @@ export default function Setting({name, type, defaultValue, options, props, setti
 			<>
 				<label htmlFor={id}>{name}</label>
 				<FileInput name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
+			</>
+		)
+	if (type === 'key-bound')
+		return (
+			<>
+				<KeyBound name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
 			</>
 		)
 	

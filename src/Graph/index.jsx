@@ -31,6 +31,7 @@ import BalanceDisplay from './Modules/BalanceDisplay'
 import Reverb from './Modules/Reverb'
 import Echo from './Modules/Echo'
 import Wobble from './Modules/Wobble'
+import KeyBoundConstant from './Modules/KeyBoundConstant'
 
 const modules = [
 	Output,
@@ -60,6 +61,7 @@ const modules = [
 	Reverb,
 	Echo,
 	Wobble,
+	KeyBoundConstant,
 ]
 
 export default function Graph() {
