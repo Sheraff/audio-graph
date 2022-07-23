@@ -36,6 +36,7 @@
 
 .item:hover {
 	outline: 1px solid currentColor;
+	background: #fff1;
 }
 
 .item img {
@@ -53,7 +54,7 @@
 	transform: translateX(-50%);
 	background: #2b1b3e;
 	display: flex;
-	gap: .25em;
+	gap: 1em;
 	padding: 0.5em 2em;
 	border-bottom-right-radius: 1em;
 	border-bottom-left-radius: 1em;
@@ -61,31 +62,24 @@
 }
 
 .bottom > * {
-	width: 3rem;
+	font-size: 1rem;
+	width: 2.5rem;
 	text-align: center;
+	border-radius: 4px;
+	cursor: pointer;
+	padding: 0.25em;
 }
 
-.toggle {
-	font-size: 2em;
+.bottom > *:hover {
+	background: #fff1;
 }
 
-.play {
-	font-size: 1.5em;
-}
-
-.github img {
-	width: 1.2em;
+.bottom img {
+	width: 1.4em;
 	height: 100%;
 	object-fit: contain;
 }
 
-.file {
-	font-size: 1em;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	cursor: pointer;
-}
 .file input {
 	display: none;
 }

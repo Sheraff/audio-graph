@@ -148,37 +148,42 @@ export default function UI({addNode, modules}) {
 			</div>
 			<div className={styles.bottom}>
 				<button
-					className={styles.toggle}
 					type="button"
 					title="add node"
 					onClick={() => setShow(a => !a)}
 					aria-label="toggle hud"
 				>
-					{show ? '×' : '+'}
+					{show
+						? <img src={`${process.env.PUBLIC_URL}/icons/ui-close.svg`} width="1" height="1" alt=""/>
+						: <img src={`${process.env.PUBLIC_URL}/icons/ui-open.svg`} width="1" height="1" alt=""/>}
 				</button>
 				<button
-					className={styles.play}
 					type='button'
 					title={`${play ? 'pause' : 'play'} graph`}
 					onClick={onTogglePlay}
 					aria-label={play ? 'pause' : 'play'}
 				>
-					{play ? '▮▮' : '▶'}
+					{play
+						? <img src={`${process.env.PUBLIC_URL}/icons/ui-pause.svg`} width="1" height="1" alt=""/>
+					 	: <img src={`${process.env.PUBLIC_URL}/icons/ui-play.svg`} width="1" height="1" alt=""/>}
 				</button>
 				<a
-					className={styles.github}
 					href="https://github.com/Sheraff/audio-graph"
 					target="_blank"
 					title="see source code on github"
 				>
 					<img src={`${process.env.PUBLIC_URL}/github.png`} width="1" height="1" alt=""/>
 				</a>
-				<button className={styles.file} title="download graph" type="button" onClick={downloadGraph}>DL</button>
+				<button title="download graph" type="button" onClick={downloadGraph}>
+					<img src={`${process.env.PUBLIC_URL}/icons/ui-download.svg`} width="1" height="1" alt=""/>
+				</button>
 				<label className={styles.file} title="upload graph">
-					UP
+					<img src={`${process.env.PUBLIC_URL}/icons/ui-upload.svg`} width="1" height="1" alt=""/>
 					<input type="file" onChange={openGraph} accept=".json,text/json,application/json" hidden/>
 				</label>
-				<button className={styles.file} title="clear graph" type="button" onClick={clear}>🚫</button>
+				<button title="clear graph" type="button" onClick={clear}>
+					<img src={`${process.env.PUBLIC_URL}/icons/ui-clear.svg`} width="1" height="1" alt=""/>
+				</button>
 			</div>
 		</div>
 	)
