@@ -21,6 +21,8 @@ export default function Range({id, name, defaultValue, props, instance}){
 	useEffect(() => {
 		if (typeof audioContext === 'string') return
 
+		const controller = new AbortController()
+
 		let array
 		let bufferLength
 		function makeBuffer() {
@@ -31,13 +33,12 @@ export default function Range({id, name, defaultValue, props, instance}){
 		if (getNode(instance, name)?.observer) {
 			makeBuffer()
 		} else {
-			instance.current.onAudioNode = () => {
-				// TODO: since there can be many ranges, onAudioNode is overridden by the last one
+			instance.current.addEventListener('audio-node-created', () => {
 				if (getNode(instance, name)?.observer)
 					makeBuffer()
-			}
+			}, {once: true, signal: controller.signal})
 		}
-		
+
 		let rafId
 		function loop() {
 			rafId = requestAnimationFrame(() => {
@@ -62,7 +63,6 @@ export default function Range({id, name, defaultValue, props, instance}){
 			})
 		}
 		
-		const controller = new AbortController()
 		audioContext.addEventListener('statechange', (event) => {
 			if(audioContext.state === 'running')
 				loop()

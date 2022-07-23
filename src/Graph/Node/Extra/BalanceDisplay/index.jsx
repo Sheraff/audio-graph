@@ -13,6 +13,8 @@ export default function BalanceDisplay({instance}) {
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
 
+		const controller = new AbortController()
+
 		let array = {}
 		let bufferLength = {}
 		function makeBuffer(key) {
@@ -24,10 +26,10 @@ export default function BalanceDisplay({instance}) {
 			makeBuffer('left')
 			makeBuffer('right')
 		} else {
-			instance.current.onAudioNode = () => {
+			instance.current.addEventListener('audio-node-created', () => {
 				makeBuffer('left')
 				makeBuffer('right')
-			}
+			}, {once: true, signal: controller.signal})
 		}
 
 		const SECTIONS = 30
@@ -95,7 +97,6 @@ export default function BalanceDisplay({instance}) {
 			})
 		}
 
-		const controller = new AbortController()
 		audioContext.addEventListener('statechange', (event) => {
 			if(audioContext.state === 'running')
 				loop()

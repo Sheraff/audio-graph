@@ -53,10 +53,6 @@ export default class Wobble extends GraphAudioNode {
 			configurable: true,
 		})
 		this.makeParamObservable('frequency')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

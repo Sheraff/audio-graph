@@ -75,10 +75,6 @@ export default class BiQuadFilter extends GraphAudioNode {
 		this.makeParamObservable('frequency')
 		this.makeParamObservable('Q')
 		this.makeParamObservable('gain')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

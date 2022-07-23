@@ -13,6 +13,8 @@ export default function Waveform({instance}) {
 		canvas.current.width = canvas.current.offsetWidth
 		canvas.current.height = canvas.current.offsetHeight
 
+		const controller = new AbortController()
+
 		let array
 		let bufferLength
 		function makeBuffer() {
@@ -23,9 +25,9 @@ export default function Waveform({instance}) {
 		if (instance.current.audioNode) {
 			makeBuffer()
 		} else {
-			instance.current.onAudioNode = () => {
+			instance.current.addEventListener('audio-node-created', () => {
 				makeBuffer()
-			}
+			}, {once: true, signal: controller.signal})
 		}
 
 		let rafId
@@ -79,7 +81,6 @@ export default function Waveform({instance}) {
 			})
 		}
 
-		const controller = new AbortController()
 		audioContext.addEventListener('statechange', (event) => {
 			if(audioContext.state === 'running')
 				loop()

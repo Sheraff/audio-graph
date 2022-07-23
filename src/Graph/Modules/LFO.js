@@ -67,10 +67,6 @@ export default class LFO extends GraphAudioNode {
 
 		this.makeParamObservable('gain')
 		this.makeParamObservable('frequency')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

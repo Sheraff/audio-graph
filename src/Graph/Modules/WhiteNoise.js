@@ -25,10 +25,6 @@ export default class WhiteNoise extends GraphAudioNode {
 		this.audioNode = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0, outputChannelCount: [2]})
 		this.makeParamObservable('min')
 		this.makeParamObservable('max')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

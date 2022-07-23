@@ -29,12 +29,14 @@ export default function Visualizer({instance}) {
 			clearTimeout(timeout)
 			timeout = setInterval(resetOnTimeout, 50)
 		}
+
+		const controller = new AbortController()
 		if (instance.current.audioNode) {
 			instance.current.audioNode.port.onmessage = onMessage
 		} else {
-			instance.current.onAudioNode = () => {
+			instance.current.addEventListener('audio-node-created', () => {
 				instance.current.audioNode.port.onmessage = onMessage
-			}
+			}, {once: true, signal: controller.signal})
 		}
 
 		let rafId
@@ -72,6 +74,7 @@ export default function Visualizer({instance}) {
 		return () => {
 			cancelAnimationFrame(rafId)
 			clearTimeout(timeout)
+			controller.abort()
 		}
 	}, [instance])
 

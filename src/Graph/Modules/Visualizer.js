@@ -20,10 +20,6 @@ export default class Visualizer extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new AudioWorkletNode(audioContext, 'visualizer', {numberOfOutputs: 0})
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

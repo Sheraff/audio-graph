@@ -174,6 +174,9 @@ export default class GraphAudioNode {
 		/** @type {boolean} */
 		this.hasAudioDestination = false
 
+		/** @type {EventTarget?} */
+		this.eventTarget = null
+
 		const [data, isNew] = this.makeInitialData(initialPosition)
 
 		/** @type {NodeData} */
@@ -394,6 +397,8 @@ export default class GraphAudioNode {
 				window.dispatchEvent(new CustomEvent(to.nodeUuid, {detail: {request: 'connect', from, to}}))
 			}
 		})
+
+		this.dispatchEvent(new CustomEvent('audio-node-created'))
 	}
 
 	updateAudioNodeSettings() {
@@ -420,12 +425,15 @@ export default class GraphAudioNode {
 				this.observableNodes[name].disconnect(this.observableNodes[name].offset.observer)
 			}
 		})
+
+		this.dispatchEvent(new CustomEvent('connection-status-change'))
 	}
 
+	/** @type {Object<string, ConstantSourceNode>} */
 	observableNodes = {}
 	makeParamObservable(name) {
 		const audioParam = this.audioNode[name] || this.audioNode.parameters?.get(name)
-		if (!audioParam || audioParam.automationRate !== 'a-rate') return
+		if (!audioParam) return
 
 		this.observableNodes[name] = new ConstantSourceNode(this.audioContext, {offset: 0})
 		this.observableNodes[name].start()
@@ -528,5 +536,34 @@ export default class GraphAudioNode {
 	 */
 	static connectionToConnectionId({from, to}) {
 		return `${from.nodeUuid}.${from.slot.type}.${from.slot.name}-${to.nodeUuid}.${to.slot.type}.${to.slot.name}`
+	}
+
+	/**
+	 * @type {EventTarget['addEventListener']}
+	 */
+	get addEventListener() {
+		if (!this.eventTarget) {
+			this.eventTarget = new EventTarget()
+		}
+		return this.eventTarget.addEventListener.bind(this.eventTarget)
+	}
+
+	/**
+	 * @type {EventTarget['removeEventListener']}
+	 */
+	get removeEventListener() {
+		if (!this.eventTarget) {
+			return () => {}
+		}
+		return this.eventTarget.removeEventListener.bind(this.eventTarget)
+	}
+
+	/**
+	 * @param {Event | CustomEvent} event 
+	 */
+	dispatchEvent(event) {
+		if (this.eventTarget) {
+			this.eventTarget.dispatchEvent(event)
+		}
 	}
 }

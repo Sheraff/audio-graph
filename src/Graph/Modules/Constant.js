@@ -31,10 +31,6 @@ export default class Constant extends GraphAudioNode {
 		this.audioNode = new ConstantSourceNode(audioContext)
 		this.audioNode.start()
 		this.makeParamObservable('offset')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

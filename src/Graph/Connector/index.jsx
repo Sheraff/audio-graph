@@ -48,7 +48,7 @@ function parseAndDispatchNodeMap(nodeMap, handles) {
 		const audioNodeInstance = handles.current[id]?.instance
 		if (audioNodeInstance) {
 			if (currentConnectionStatus !== audioNodeInstance[CONNECTED_STATUS]) {
-				audioNodeInstance.onConnectionStatusChange?.(currentConnectionStatus)
+				audioNodeInstance.onConnectionStatusChange(currentConnectionStatus)
 			}
 			audioNodeInstance[CONNECTED_STATUS] = currentConnectionStatus
 		}

@@ -25,9 +25,9 @@ export default function Analyser({instance}) {
 		if (instance.current.audioNode) {
 			makeBuffer()
 		} else {
-			instance.current.onAudioNode = () => {
+			instance.current.addEventListener('audio-node-created', () => {
 				makeBuffer()
-			}
+			}, {once: true, signal: controller.signal})
 		}
 
 		let rafId

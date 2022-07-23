@@ -78,10 +78,6 @@ export default class Analyser extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new AnalyserNode(audioContext)
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

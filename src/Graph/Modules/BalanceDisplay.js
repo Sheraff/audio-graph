@@ -36,11 +36,6 @@ export default class BalanceDisplay extends GraphAudioNode {
 		const mute = new GainNode(audioContext, {gain: 0})
 		merger.connect(mute)
 		mute.connect(audioContext.destination)
-
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

@@ -31,10 +31,6 @@ export default class Pan extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new StereoPannerNode(audioContext)
 		this.makeParamObservable('pan')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

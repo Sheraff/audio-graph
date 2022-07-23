@@ -33,10 +33,6 @@ export default class Waveform extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new AnalyserNode(audioContext)
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

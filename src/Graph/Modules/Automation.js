@@ -75,6 +75,16 @@ export default class Automation extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new ConstantSourceNode(audioContext, {offset: 1})
 		this.audioNode.start()
+
+		this.addEventListener('connection-status-change', () => {
+			if (this.audioNode) {
+				if (this.hasAudioDestination) {
+					this.updateAudioNodeSettings()
+				} else {
+					this.audioNode.offset.cancelAndHoldAtTime(this.audioContext.currentTime)
+				}
+			}
+		}, {signal: this.controller.signal})
 	}
 
 	scheduleTimeoutId
@@ -94,17 +104,6 @@ export default class Automation extends GraphAudioNode {
 
 	updateSetting(name) {
 		this.updateAudioNodeSettings()
-	}
-
-	onConnectionStatusChange(connected) {
-		super.onConnectionStatusChange(connected)
-		if (this.audioNode) {
-			if (connected) {
-				this.updateAudioNodeSettings()
-			} else {
-				this.audioNode.offset.cancelAndHoldAtTime(this.audioContext.currentTime)
-			}
-		}
 	}
 
 	cleanup() {

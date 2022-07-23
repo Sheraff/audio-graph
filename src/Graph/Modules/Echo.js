@@ -60,10 +60,6 @@ export default class Echo extends GraphAudioNode {
 			configurable: true,
 		})
 		this.makeParamObservable('gain')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

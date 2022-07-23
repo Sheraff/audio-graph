@@ -61,10 +61,6 @@ export default class Oscillator extends GraphAudioNode {
 
 		this.makeParamObservable('frequency')
 		this.makeParamObservable('detune')
-		if (this.onAudioNode) {
-			this.onAudioNode()
-			delete this.onAudioNode
-		}
 	}
 
 	updateSetting(name) {

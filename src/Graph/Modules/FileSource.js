@@ -47,6 +47,19 @@ export default class FileSource extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new GainNode(audioContext)
 		this.startTime = null
+
+		this.addEventListener('connection-status-change', () => {
+			if (this.hasAudioDestination && this.buffer) {
+				this.connectBuffer()
+				return
+			}
+			if (!this.hasAudioDestination && this.bufferNode) {
+				this.bufferNode.stop(this.audioContext.currentTime)
+				this.startTime = null
+				this.bufferNode.disconnect(this.audioNode)
+				this.bufferNode = null
+			}
+		}, {signal: this.controller.signal})
 	}
 
 	updateSetting(name) {
@@ -67,18 +80,6 @@ export default class FileSource extends GraphAudioNode {
 			this.connectBuffer()
 		} else if (name === 'playbackRate' && this.bufferNode) {
 			this.connectBuffer()
-		}
-	}
-
-	onConnectionStatusChange(connected) {
-		super.onConnectionStatusChange(connected)
-		if (connected && this.buffer) {
-			this.connectBuffer()
-			return
-		}
-		if (!connected && this.bufferNode) {
-			this.bufferNode.stop(this.audioContext.currentTime)
-			this.startTime = null
 		}
 	}
 
