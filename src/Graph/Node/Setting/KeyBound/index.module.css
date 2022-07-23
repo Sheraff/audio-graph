@@ -11,7 +11,7 @@
 }
 
 .range:not([disabled])::-webkit-slider-thumb {
-	box-shadow: 0 0 1em -2px #dbccee, inset 0 0 0 1px #811ff9;
+	box-shadow: 0 0 0.75em -2px #dbccee, inset 0 0 2px #a45efa;
 	border-radius: 50%;
 }
 
