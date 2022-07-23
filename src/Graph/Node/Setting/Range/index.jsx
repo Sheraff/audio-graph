@@ -32,6 +32,7 @@ export default function Range({id, name, defaultValue, props, instance}){
 			makeBuffer()
 		} else {
 			instance.current.onAudioNode = () => {
+				// TODO: since there can be many ranges, onAudioNode is overridden by the last one
 				if (getNode(instance, name)?.observer)
 					makeBuffer()
 			}
@@ -49,8 +50,9 @@ export default function Range({id, name, defaultValue, props, instance}){
 						makeBuffer()
 					
 					node.observer.getFloatTimeDomainData(array)
-					const avg = array[0]
 					const base = node.value
+					const correction = base + array[0] - Math.min(node.maxValue, Math.max(node.minValue, base + array[0]))
+					const avg = array[0] - correction
 					const normalizedAvg = avg / (props.max - props.min)
 					const normalizedBase = (base - props.min) / (props.max - props.min)
 

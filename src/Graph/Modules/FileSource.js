@@ -118,7 +118,7 @@ export default class FileSource extends GraphAudioNode {
 		if (this.bufferNode) {
 			this.bufferNode.disconnect(this.audioNode)
 		}
-		if (!this.buffer) {
+		if (!this.buffer || !this.hasAudioDestination) {
 			return
 		}
 		this.bufferNode = new AudioBufferSourceNode(this.audioContext)

@@ -9,10 +9,6 @@ import GraphAudioNode from "./GraphAudioNode"
  */
 function plugAutomationNode(ctx, settings, destination) {
 	const offsetNode = destination.offset
-	if (!offsetNode) {
-		console.warn('Automation node should use a "custom-constant" node')
-		return
-	}
 	const duration = 60 / Number(settings.tempo) * 4
 	const progress = ctx.currentTime % duration
 	const startTime = ctx.currentTime - progress
@@ -22,8 +18,8 @@ function plugAutomationNode(ctx, settings, destination) {
 	} else {
 		offsetNode.cancelScheduledValues(ctx.currentTime)
 	}
-	const points = settings.track
-	if(!points?.length) return
+	if(!settings.track?.length) return
+	const points = [...settings.track]
 	if(points[0].x !== 0)
 		points.unshift({x: 0, y: 0})
 	if(points.at(-1).x !== 1)
@@ -83,7 +79,7 @@ export default class Automation extends GraphAudioNode {
 
 	scheduleTimeoutId
 	updateAudioNodeSettings() {
-		if (this.audioContext) {
+		if (this.audioContext && this.hasAudioDestination) {
 			const duration = plugAutomationNode(this.audioContext, this.data.settings, this.audioNode)
 			if (this.scheduleTimeoutId) {
 				clearTimeout(this.scheduleTimeoutId)
@@ -98,6 +94,17 @@ export default class Automation extends GraphAudioNode {
 
 	updateSetting(name) {
 		this.updateAudioNodeSettings()
+	}
+
+	onConnectionStatusChange(connected) {
+		super.onConnectionStatusChange(connected)
+		if (this.audioNode) {
+			if (connected) {
+				this.updateAudioNodeSettings()
+			} else {
+				this.audioNode.offset.cancelAndHoldAtTime(this.audioContext.currentTime)
+			}
+		}
 	}
 
 	cleanup() {

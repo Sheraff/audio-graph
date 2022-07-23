@@ -12,7 +12,7 @@ export default function Setting({name, type, defaultValue, options, props, setti
 	if (type === 'track')
 		return (
 			<>
-				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} settings={settings}/>
+				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} settings={settings} instance={instance}/>
 			</>
 		)
 	if (type === 'splice')

@@ -22,7 +22,7 @@ function localizePoints(canvas, points) {
 	return value
 }
 
-export default function AutomationTrack({id, name, defaultValue, settings}){
+export default function AutomationTrack({id, name, defaultValue, settings, instance}){
 	const canvas = useRef(/** @type {HTMLCanvasElement} */(null))
 	const input = useRef(/** @type {HTMLInputElement} */(null))
 	const [initialValue, setInitialValue] = useState([])
@@ -96,7 +96,7 @@ export default function AutomationTrack({id, name, defaultValue, settings}){
 				ctx.strokeStyle = "#fff2"
 				ctx.stroke(path)
 
-				if (typeof audioContext !== 'string' && settings.tempo) {
+				if (typeof audioContext !== 'string' && settings.tempo && instance.current.hasAudioDestination) {
 					const factor = 60 / Number(settings.tempo) * 4
 					ctx.strokeStyle = "#811ff9"
 					const progress = (audioContext.currentTime % factor) / factor
@@ -214,7 +214,7 @@ export default function AutomationTrack({id, name, defaultValue, settings}){
 			controller.abort()
 			cancelAnimationFrame(rafId)
 		}
-	}, [initialValue, audioContext, settings])
+	}, [initialValue, audioContext, settings, instance])
 
 	return (
 		<>
