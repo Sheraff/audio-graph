@@ -1,3 +1,7 @@
+/**
+ * @typedef {BaseAudioContext['destination']| AudioWorkletNode | AudioBufferSourceNode | AnalyserNode | GainNode | ConstantSourceNode | BiquadFilterNode | OscillatorNode | ChannelMergerNode | StereoPannerNode | ChannelSplitterNode | DelayNode | DynamicsCompressorNode} AudioNodeTypes
+ */
+
 /** 
  * @typedef {import('react')} React
  */
@@ -116,6 +120,8 @@
  * }} NodeData
  */
 
+
+
 export default class GraphAudioNode {
 	/** @type {string} */
 	static get type() { throw new Error(`undefined type for ${this.constructor.name}`) }
@@ -154,10 +160,10 @@ export default class GraphAudioNode {
 	constructor(id, audioContext, initialPosition) {
 		this.id = id
 		
-		/** @type {AudioNode | AudioWorkletNode?} */
+		/** @type {AudioNodeTypes?} */
 		this.audioNode = null
 		
-		/** @type {Object<string, AudioNode | AudioWorkletNode?>} */
+		/** @type {Object<string, AudioNodeTypes?>} */
 		this.customNodes = {}
 		
 		/** @type {AudioContext?} */
@@ -221,7 +227,7 @@ export default class GraphAudioNode {
 		 * @property {'connect' | 'disconnect' | 'ack-connect' | 'ack-disconnect'} request
 		 * @property {ConnectionReference<FromSlotDefinition>} from
 		 * @property {ConnectionReference<ToSlotDefinition>} to
-		 * @property {AudioNode | AudioParam?} audioNode
+		 * @property {AudioNodeTypes | AudioParam?} audioNode
 		 * @param {CustomEvent<ConnectionRequest>} event
 		 */
 		const onRequest = ({detail: {request, from, to, audioNode}}) => {
@@ -307,7 +313,7 @@ export default class GraphAudioNode {
 	 * @param {'connect' | 'disconnect'} action 
 	 * @param {ConnectionReference<FromSlotDefinition>} from 
 	 * @param {ConnectionReference<ToSlotDefinition>} to 
-	 * @param {AudioNode | AudioParam} audioNode 
+	 * @param {AudioNodeTypes | AudioParam} audioNode 
 	 */
 	ownNodeConnection(action, from, to, audioNode) {
 		if (!this.audioNode)
@@ -331,7 +337,7 @@ export default class GraphAudioNode {
 
 	/**
 	 * @param {ConnectionReference<ToSlotDefinition>} connection
-	 * @returns {AudioNode | AudioParam?}
+	 * @returns {AudioNodeTypes | AudioParam?}
 	 */
 	getDestinationAudioNode(connection) {
 		if (connection.slot.type === 'custom') {
