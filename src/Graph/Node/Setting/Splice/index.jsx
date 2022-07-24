@@ -136,17 +136,45 @@ export default function Splice({id, name, defaultValue, instance}){
 		}
 		draw()
 
+		const DISTANCE_TO_RESIZE = 20
+		let type = 0
 		let start = null
+		let boundsAtStart = []
 		canvas.current.addEventListener('mousedown', (e) => {
 			start = e.offsetX
+			boundsAtStart = bounds.map(v => v * ctx.canvas.width)
 		}, {signal: controller.signal})
 		canvas.current.addEventListener('mousemove', (e) => {
-			if(start === null) return
 			const current = e.offsetX
-			const min = Math.min(start, current)
-			const max = Math.max(start, current)
-			bounds[0] = Math.max(0, min / canvas.current.width)
-			bounds[1] = Math.min(1, max / canvas.current.width)
+			if(start === null) {
+				const leftX = bounds[0] * ctx.canvas.width
+				if (current < leftX && current > leftX - DISTANCE_TO_RESIZE) {
+					canvas.current.style.setProperty('cursor', 'e-resize')
+					type = -1
+					return
+				}
+				const rightX = bounds[1] * ctx.canvas.width
+				if (current > rightX && current < rightX + DISTANCE_TO_RESIZE) {
+					canvas.current.style.setProperty('cursor', 'w-resize')
+					type = 1
+					return
+				}
+				canvas.current.style.removeProperty('cursor')
+				type = 0
+				return
+			}
+			if (type === 0) {
+				const min = Math.min(start, current)
+				const max = Math.max(start, current)
+				bounds[0] = Math.max(0, min / canvas.current.width)
+				bounds[1] = Math.min(1, max / canvas.current.width)
+			} else if (type === -1) {
+				const offset = start - boundsAtStart[0]
+				bounds[0] = Math.max(0, Math.min(bounds[1], (current - offset) / canvas.current.width))
+			} else if (type === 1) {
+				const offset = start - boundsAtStart[1]
+				bounds[1] = Math.min(1, Math.max(bounds[0], (current - offset) / canvas.current.width))
+			}
 		}, {signal: controller.signal})
 		window.addEventListener('mouseup', (e) => {
 			if(start === null) return

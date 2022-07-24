@@ -42,7 +42,7 @@ export default class FileSource extends GraphAudioNode {
 				name: 'tempo',
 				type: 'toggle-range',
 				props: {
-					min: 10,
+					min: 1,
 					max: 300,
 					step: 1,
 				},
