@@ -32,7 +32,7 @@ export default function ToggleRange({
 	const toggleId = useId()
 	return (
 		<>
-			<span>
+			<span className={styles.toggle}>
 				<input
 					type="checkbox"
 					ref={toggle}

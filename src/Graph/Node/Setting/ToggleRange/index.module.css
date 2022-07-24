@@ -1,3 +1,11 @@
+.toggle input {
+	cursor: pointer;
+	margin: 0 .5em 0 0;
+}
+.toggle label {
+	cursor: pointer;
+}
+
 .range {
 	width: 100%;
 	height: 100%;
