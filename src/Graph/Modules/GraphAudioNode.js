@@ -97,7 +97,7 @@
  * @typedef {Object} SequenceSettingDefinition
  * @property {string} name
  * @property {'select'} type
- * @property {[0, 1]} defaultValue
+ * @property {[number, number]} defaultValue
  * @property {'bounds'} readFrom
  * @property {'input'?} event
  */
@@ -108,8 +108,9 @@
 
 /**
  * @typedef {{
+ * 	type: string,
  * 	dom: {x: number, y: number},
- * 	settings: {[name: SettingDefinition["name"]]: SettingDefinition["defaultValue"]}[],
+ * 	settings: {[Key in SettingDefinition["name"]]: SettingDefinition["defaultValue"]},
  * 	connections: ConnectionId[],
  * 	extra: {[name: string]: any},
  * }} NodeData
@@ -200,7 +201,8 @@ export default class GraphAudioNode {
 		} else {
 			const Class = /** @type {typeof GraphAudioNode} */(this.constructor)
 			const data = {
-				dom: initialPosition,
+				type: Class.type,
+				dom: initialPosition || {x: 0, y: 0},
 				settings: Class.structure.settings
 					? Object.fromEntries(
 						Class.structure.settings.map(({name, defaultValue}) => [name, defaultValue])
