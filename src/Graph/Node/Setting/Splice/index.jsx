@@ -92,21 +92,44 @@ export default function Splice({id, name, defaultValue, instance}){
 				ctx.fillStyle = "#fff"
 				ctx.fill(path)
 
+				const loopStartX = ctx.canvas.width * bounds[0]
+				const loopEndX = ctx.canvas.width * bounds[1]
 				ctx.fillStyle = "#fff4"
-				ctx.fillRect(0, 0, ctx.canvas.width * bounds[0], ctx.canvas.height)
-				ctx.fillRect(ctx.canvas.width * bounds[1], 0, ctx.canvas.width, ctx.canvas.height)
+				ctx.fillRect(0, 0, loopStartX, ctx.canvas.height)
+				ctx.fillRect(loopEndX, 0, ctx.canvas.width, ctx.canvas.height)
 
 				if (typeof audioContext !== 'string' && instance.current.startTime !== null) {
-					const [start, end] = instance.current.data.settings.select
-					const delta = end - start
-					const duration = instance.current.buffer.duration / instance.current.data.settings.playbackRate
-					const factor = duration * delta
-					const progress = ((audioContext.currentTime - instance.current.startTime) % factor) / factor
-					const x = (start + progress * delta) * canvas.current.width
 					ctx.strokeStyle = "#811ff9"
 					ctx.beginPath()
-					ctx.moveTo(x, 0)
-					ctx.lineTo(x, canvas.current.height)
+					const settings = instance.current.data.settings
+					const loopStartT = bounds[0] * instance.current.buffer.duration
+					const loopEndT = bounds[1] * instance.current.buffer.duration
+					const currentTime = audioContext.currentTime - instance.current.startTime
+					const loopDuration = (loopEndT - loopStartT) / settings.playbackRate
+					if (!settings.tempo.enabled) {
+						const loopProgressT = currentTime % loopDuration * settings.playbackRate
+						const loopProgressX = loopProgressT / instance.current.buffer.duration * ctx.canvas.width
+						const x = loopStartX + loopProgressX
+						ctx.moveTo(x, 0)
+						ctx.lineTo(x, canvas.current.height)
+						
+					} else {
+						const tempoLoopDuration = 60 / settings.tempo.value
+						
+						if (tempoLoopDuration > loopDuration) {
+							const loopProgressT = currentTime % tempoLoopDuration * settings.playbackRate
+							const loopProgressX = loopProgressT / instance.current.buffer.duration * ctx.canvas.width
+							const x = loopStartX + Math.max(0, loopProgressX)
+							ctx.moveTo(x, 0)
+							ctx.lineTo(x, canvas.current.height)
+						} else {
+							const tempoLoopProgressT = currentTime % tempoLoopDuration
+							const tempoLoopProgressX = tempoLoopProgressT / instance.current.buffer.duration * ctx.canvas.width
+							const x = loopStartX + tempoLoopProgressX * settings.playbackRate
+							ctx.moveTo(x, 0)
+							ctx.lineTo(x, canvas.current.height)
+						}
+					}
 					ctx.stroke()
 				}
 			})

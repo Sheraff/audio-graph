@@ -162,6 +162,7 @@ export default class FileSource extends GraphAudioNode {
 		const bounds = this.data.settings.select
 		const loopStart = bounds[0] * duration
 		const loopEnd = bounds[1] * duration
+		const playbackRate = Number(this.data.settings.playbackRate)
 
 		if (!this.data.settings.tempo.enabled) {
 			return {
@@ -173,11 +174,14 @@ export default class FileSource extends GraphAudioNode {
 		}
 
 		const beatLength = 60 / this.data.settings.tempo.value
-		const boundedDuration = (loopEnd - loopStart) / this.bufferNode.playbackRate.value
+		const boundedDuration = (loopEnd - loopStart) / playbackRate
+		const timeInCurrentBeat = this.audioContext.currentTime % beatLength
+		const nextStartOnBeat = timeInCurrentBeat === 0
+			? this.audioContext.currentTime
+			: this.audioContext.currentTime - timeInCurrentBeat + beatLength
 		
 		if (boundedDuration >= beatLength) {
-			const nextStartOnBeat = this.audioContext.currentTime - (this.audioContext.currentTime % beatLength) + beatLength
-			const boundedLoopEnd = loopStart + beatLength / this.bufferNode.playbackRate.value
+			const boundedLoopEnd = loopStart + beatLength * playbackRate
 			return {
 				loopStart,
 				loopEnd: boundedLoopEnd,
@@ -193,12 +197,11 @@ export default class FileSource extends GraphAudioNode {
 			{once: true, signal: this.bufferEndedController.signal}
 		)
 
-		const nextStartOnBeat = this.audioContext.currentTime - (this.audioContext.currentTime % beatLength) + beatLength
 		return {
 			loopStart,
 			startTime: nextStartOnBeat,
 			loop: false,
-			stopTime: nextStartOnBeat + beatLength 
+			stopTime: nextStartOnBeat + boundedDuration
 		}
 	}
 }
