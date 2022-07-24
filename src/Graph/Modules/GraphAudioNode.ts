@@ -42,7 +42,6 @@ type SlotId<
 type ConnectionId = `${SlotId<Connection["from"]>}-${SlotId<Connection["to"]>}`
 
 type RangeSettingDefinition = {
-	name: string
 	type: 'range'
 	props: {
 		min: number
@@ -55,7 +54,6 @@ type RangeSettingDefinition = {
 }
 
 type FileSettingDefinition = {
-	name: string
 	type: 'file'
 	props: {
 		accept: string
@@ -66,7 +64,6 @@ type FileSettingDefinition = {
 }
 
 type SelectSettingDefinition = {
-	name: string
 	type: 'select'
 	options: Array<string>
 	defaultValue: string
@@ -75,7 +72,6 @@ type SelectSettingDefinition = {
 }
 
 type TrackSettingDefinition = {
-	name: string
 	type: 'track'
 	defaultValue: Array<{x: number, y: number}>
 	readFrom: 'points'
@@ -83,14 +79,13 @@ type TrackSettingDefinition = {
 }
 
 type SequenceSettingDefinition = {
-	name: string
 	type: 'select'
 	defaultValue: [number, number]
 	readFrom: 'bounds'
 	event?: 'input'
 }
 
-type SettingDefinition = 
+type SettingDefinition =
 	RangeSettingDefinition
 	| SelectSettingDefinition
 	| TrackSettingDefinition
@@ -100,7 +95,7 @@ type SettingDefinition =
 type NodeData = {
 	type: string,
 	dom: {x: number, y: number},
-	settings: {[Key in SettingDefinition["name"]]: SettingDefinition["defaultValue"]},
+	settings: {[name: string]: SettingDefinition["defaultValue"]},
 	connections: ConnectionId[],
 	extra: {[name: string]: any},
 }
@@ -110,36 +105,45 @@ type IconImage = string
 
 type NodeDefinition = {
 	slots: Array<FromSlotDefinition | ToSlotDefinition>
-	settings?: SettingDefinition[],
+	settings?: {[name: string]: SettingDefinition},
+	extras?: Array<{
+		type: string,
+		name: string | number,
+		[key: string]: any,
+	}>
 }
 
 type RequiresWorklets = Array<`${typeof process.env.PUBLIC_URL}/${string}.js`>
 
-export default class GraphAudioNode {
-	
+type AudioNodeGraphType = 
+	BaseAudioContext['destination']
+	| AudioWorkletNode
+	| AnalyserNode
+
+export default class GraphAudioNode<T, U extends NodeDefinition> {
 	static get type(): string { throw new Error(`undefined type for ${this.constructor.name}`) }
-	// static set type(value: string) { Object.defineProperty(this, 'type', {value, writable: false, configurable: false}) }
+	static set type(value: string) { Object.defineProperty(this, 'type', {value, writable: false, configurable: false}) }
 
 	static get image(): IconImage { throw new Error(`undefined image for ${this.constructor.name}`) }
-	// static set image(value: IconImage) { Object.defineProperty(this, 'image', {value, writable: false, configurable: false}) }
+	static set image(value: IconImage) { Object.defineProperty(this, 'image', {value, writable: false, configurable: false}) }
 
-	static get structure(): NodeDefinition { throw new Error(`undefined structure for ${this.constructor.name}`) }
-	// static set structure(value: NodeDefinition) { Object.defineProperty(this, 'structure', {value, writable: false, configurable: false}) }
+	// static get structure() { throw new Error(`undefined structure for ${this.constructor.name}`) }
+	// static set structure(value) { Object.defineProperty(this, 'structure', {value, writable: false, configurable: false}) }
 
 	static get requiredModules(): RequiresWorklets { throw new Error(`undefined requiredModules for ${this.constructor.name}`) }
-	// static set requiredModules(value: RequiresWorklets) { Object.defineProperty(this, 'requiredModules', {value, writable: false, configurable: false}) }
+	static set requiredModules(value: RequiresWorklets) { Object.defineProperty(this, 'requiredModules', {value, writable: false, configurable: false}) }
 
 	/* whether this node is an audio destination node */
 	static get isSink(): boolean { throw new Error(`undefined isSink for ${this.constructor.name}`) }
-	// static set isSink(value: boolean) { Object.defineProperty(this, 'isSink', {value, writable: false, configurable: false}) }
+	static set isSink(value: boolean) { Object.defineProperty(this, 'isSink', {value, writable: false, configurable: false}) }
 	
 	/* whether this node can still emit a signal without being connected to a destination node */
 	static get requiresSinkToPlay(): boolean { throw new Error(`undefined requiresSinkToPlay for ${this.constructor.name}`) }
-	// static set requiresSinkToPlay(value: boolean) { Object.defineProperty(this, 'requiresSinkToPlay', {value, writable: false, configurable: false}) }
+	static set requiresSinkToPlay(value: boolean) { Object.defineProperty(this, 'requiresSinkToPlay', {value, writable: false, configurable: false}) }
 
 	id: NodeUuid
-	audioNode: AudioNode | AudioWorkletNode | null
-	customNodes?: {[key: string]: AudioNode | AudioWorkletNode}
+	audioNode: T | null
+	customNodes?: {[key: string]: AudioNodeGraphType}
 	observableNodes: {[key: string]: ConstantSourceNode & {offset: AudioParam & {observer: AnalyserNode}}}
 	audioContext: AudioContext | null
 	ricId: number | null
@@ -185,7 +189,8 @@ export default class GraphAudioNode {
 				dom: initialPosition || {x: 0, y: 0},
 				settings: Class.structure.settings
 					? Object.fromEntries(
-						Class.structure.settings.map(({name, defaultValue}) => [name, defaultValue])
+						Object.entries(Class.structure.settings)
+							.map(([name, {defaultValue}]) => [name, defaultValue])
 					)
 					: {},
 				connections: [],
@@ -290,11 +295,11 @@ export default class GraphAudioNode {
 		}
 	}
 
-	ownNodeConnection(
+	ownNodeConnection<U>(
 		action: 'connect' | 'disconnect',
 		from: ConnectionReference<FromSlotDefinition>,
 		to: ConnectionReference<ToSlotDefinition>,
-		audioNode: AudioNode | AudioParam
+		audioNode: U | AudioParam
 	) {
 		if (!this.audioNode)
 			return
@@ -303,9 +308,9 @@ export default class GraphAudioNode {
 			// TODO: handle channel assignment better
 			// though it seems to work pretty well...
 			if (typeof to.slot.name === 'string') {
-				this.audioNode[action](audioNode as AudioParam, from.slot.name)
+				this.audioNode[action](audioNode, from.slot.name)
 			} else {
-				this.audioNode[action](audioNode as AudioNode, from.slot.name, to.slot.name)
+				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
 			}
 		} catch (error) {
 			console.log('from', from, this.audioNode)
@@ -317,7 +322,7 @@ export default class GraphAudioNode {
 		}
 	}
 
-	getDestinationAudioNode(connection: ConnectionReference<ToSlotDefinition>): AudioNode | AudioParam | null {
+	getDestinationAudioNode(connection: ConnectionReference<ToSlotDefinition>): T | AudioParam | null {
 		if (connection.slot.type === 'custom') {
 			if (this.customNodes && (connection.slot.name in this.customNodes)) {
 				return this.customNodes[connection.slot.name]
@@ -334,7 +339,7 @@ export default class GraphAudioNode {
 				return this.audioNode[connection.slot.name]
 			}
 			if ('parameters' in this.audioNode) {
-				const audioParam = this.audioNode.parameters.get(connection.slot.name)
+				const audioParam = (this.audioNode as AudioWorkletNode).parameters.get(connection.slot.name)
 				if (audioParam)
 					return audioParam
 			}
@@ -390,10 +395,10 @@ export default class GraphAudioNode {
 			return
 		}
 		const Class = this.constructor as typeof GraphAudioNode
-		Class.structure.settings.forEach(({name}) => this.updateSetting(name))
+		Object.keys(Class.structure.settings).forEach((name) => this.updateSetting(name))
 	}
 
-	updateSetting(name) {
+	updateSetting(name: keyof (typeof GraphAudioNode<T>['structure']['settings'])) {
 		throw new Error(`undefined updateSetting for ${this.constructor.name}`)
 	}
 
@@ -411,7 +416,7 @@ export default class GraphAudioNode {
 		this.dispatchEvent(new CustomEvent('connection-status-change'))
 	}
 
-	makeParamObservable(name: string) {
+	makeParamObservable(name: keyof U['settings']) {
 		if (!this.audioNode || !this.audioContext) {
 			console.error('call to `makeParamObservable` must come after this.audioNode initialization')
 			return
@@ -420,7 +425,7 @@ export default class GraphAudioNode {
 			return
 		}
 		const audioParam = (
-			(this.audioNode as AudioNode)[name]
+			(this.audioNode as T)[name]
 			|| (this.audioNode as AudioWorkletNode).parameters?.get(name)
 		) as AudioParam
 
