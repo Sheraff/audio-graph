@@ -29,10 +29,10 @@ export default class Compressor extends GraphAudioNode {
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new DynamicsCompressorNode(audioContext)
 		this.makeParamObservable('threshold')
-		// this.makeParamObservable('knee')
-		// this.makeParamObservable('ratio')
-		// this.makeParamObservable('attack')
-		// this.makeParamObservable('release')
+		this.makeParamObservable('knee')
+		this.makeParamObservable('ratio')
+		this.makeParamObservable('attack')
+		this.makeParamObservable('release')
 	}
 
 	updateSetting(name) {
