@@ -18,6 +18,7 @@ class InputAdd extends AudioWorkletProcessor {
 				if (!!bChannel) {
 					channel[i] += bChannel[i]
 				}
+				channel[i] /= channelCount
 			}
 		})
 		return true
