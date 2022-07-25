@@ -29,6 +29,7 @@ import Sequencer from './Modules/Sequencer'
 import NoteOscillator from './Modules/NoteOscillator'
 import BalanceDisplay from './Modules/BalanceDisplay'
 import Reverb from './Modules/Reverb'
+// import ReverbDynamic from './Modules/ReverbDynamic'
 import Echo from './Modules/Echo'
 import Wobble from './Modules/Wobble'
 import KeyBoundConstant from './Modules/KeyBoundConstant'
@@ -59,6 +60,7 @@ const modules = [
 	NoteOscillator,
 	BalanceDisplay,
 	Reverb,
+	// ReverbDynamic,
 	Echo,
 	Wobble,
 	KeyBoundConstant,
