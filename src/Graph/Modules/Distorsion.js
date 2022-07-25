@@ -42,6 +42,7 @@ export default class Distorsion extends GraphAudioNode {
 		}
 	}
 
+	// https://stackoverflow.com/questions/22312841/waveshaper-node-in-webaudio-how-to-emulate-distortion
 	makeDistortionCurve(drive) {
 		const n_samples = 441 //this.audioContext.sampleRate //256
 		const curve = new Float32Array(n_samples)
