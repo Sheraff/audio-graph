@@ -80,7 +80,7 @@ export default class Reverb extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.customNodes.input = new GainNode(audioContext)
-		this.audioNode = new AudioWorkletNode(audioContext, 'add-inputs', {numberOfInputs: 2})
+		this.audioNode = new AudioWorkletNode(audioContext, 'add-inputs', {numberOfInputs: 2, processorOptions: {method: 'average'}})
 		this.customNodes.input.connect(this.audioNode)
 		
 		

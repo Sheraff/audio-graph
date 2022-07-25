@@ -1,4 +1,8 @@
 class InputAdd extends AudioWorkletProcessor {
+	constructor(options) {
+		super()
+		this.method = options.processorOptions?.method || 'addition'
+	}
 	process ([a, b], [output], parameters) {
 		if(!a?.length && !b?.length)
 			return true
@@ -18,7 +22,9 @@ class InputAdd extends AudioWorkletProcessor {
 				if (!!bChannel) {
 					channel[i] += bChannel[i]
 				}
-				channel[i] /= channelCount
+				if (this.method === 'average') {
+					channel[i] /= channelCount
+				}
 			}
 		})
 		return true
