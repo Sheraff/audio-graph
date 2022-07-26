@@ -8,6 +8,7 @@ import Piano from "./Piano"
 import FileInput from "./FileInput"
 import KeyBound from "./KeyBound"
 import ToggleRange from "./ToggleRange"
+import WaveShaper from "./WaveShaper"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -15,6 +16,12 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<>
 				<AutomationTrack {...props} id={id} name={name} defaultValue={defaultValue} settings={settings} instance={instance}/>
+			</>
+		)
+	if (type === 'wave-shaper')
+		return (
+			<>
+				<WaveShaper {...props} id={id} name={name} defaultValue={defaultValue} settings={settings} instance={instance}/>
 			</>
 		)
 	if (type === 'splice')

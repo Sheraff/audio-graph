@@ -34,6 +34,7 @@ import Echo from './Modules/Echo'
 import Wobble from './Modules/Wobble'
 import KeyBoundConstant from './Modules/KeyBoundConstant'
 import Distorsion from './Modules/Distorsion'
+import WaveShaper from './Modules/WaveShaper'
 
 const modules = [
 	Output,
@@ -66,6 +67,7 @@ const modules = [
 	Wobble,
 	KeyBoundConstant,
 	Distorsion,
+	WaveShaper,
 ]
 
 export default function Graph() {
