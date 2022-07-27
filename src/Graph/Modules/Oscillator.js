@@ -108,8 +108,11 @@ export default class Oscillator extends GraphAudioNode {
 	static requiredModules = []
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new OscillatorNode(audioContext)
-		this.audioNode.start()
+		this.audioNode = new GainNode(audioContext, {gain: 0.1})
+
+		this.customNodes.oscillator = new OscillatorNode(audioContext)
+		this.customNodes.oscillator.connect(this.audioNode)
+		this.customNodes.oscillator.start()
 
 		this.makeParamObservable('frequency')
 		this.makeParamObservable('detune')
@@ -119,14 +122,14 @@ export default class Oscillator extends GraphAudioNode {
 		if(name === 'type') {
 			const type = this.data.settings.type
 			if (defaultWaveforms.includes(type)) {
-				this.audioNode.type = type
+				this.customNodes.oscillator.type = type
 			} else {
 				this.onSelect(type)
 			}
 		} else if(name === 'frequency') {
-			this.audioNode.frequency.value = this.data.settings.frequency
+			this.customNodes.oscillator.frequency.value = this.data.settings.frequency
 		} else if(name === 'detune') {
-			this.audioNode.detune.value = parseFloat(this.data.settings.detune)
+			this.customNodes.oscillator.detune.value = parseFloat(this.data.settings.detune)
 		}
 	}
 
@@ -139,7 +142,7 @@ export default class Oscillator extends GraphAudioNode {
 			new Float32Array(imag)
 		)
 		if (type === this.data.settings.type) {
-			this.audioNode.setPeriodicWave(waveform)
+			this.customNodes.oscillator.setPeriodicWave(waveform)
 		}
 	}
 }

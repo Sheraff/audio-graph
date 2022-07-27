@@ -22,16 +22,19 @@ export default class WhiteNoise extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0, outputChannelCount: [2]})
+		this.audioNode = new GainNode(audioContext, {gain: 0.1})
+
+		this.customNodes.oscillator = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0, outputChannelCount: [2]})
+		this.customNodes.oscillator.connect(this.audioNode)
 		this.makeParamObservable('min')
 		this.makeParamObservable('max')
 	}
 
 	updateSetting(name) {
 		if (name === 'min') {
-			this.audioNode.parameters.get('min').value = parseFloat(this.data.settings.min)
+			this.customNodes.oscillator.parameters.get('min').value = parseFloat(this.data.settings.min)
 		} else if (name === 'max') {
-			this.audioNode.parameters.get('max').value = parseFloat(this.data.settings.max)
+			this.customNodes.oscillator.parameters.get('max').value = parseFloat(this.data.settings.max)
 		}
 	}
 }

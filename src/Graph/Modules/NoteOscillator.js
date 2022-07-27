@@ -173,7 +173,7 @@ export default class NoteOscillator extends GraphAudioNode {
 			this.audioNode.detune.value = parseFloat(this.data.settings.detune)
 		} else if(name === 'chord') {
 			this.allGain.forEach((gainNode, i) => {
-				const value = this.data.settings.chord.includes(i) ? 1 : 0
+				const value = this.data.settings.chord.includes(i) ? 0.1 : 0
 				gainNode.gain.value = value
 			})
 		}
