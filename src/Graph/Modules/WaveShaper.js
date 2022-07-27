@@ -63,8 +63,8 @@ export default class WaveShaper extends GraphAudioNode {
 
 	updateSetting(name) {
 		if (name === 'shape') {
-			const {real, imag} = dft(this.data.settings.shape)
-			const waveform = this.audioContext.createPeriodicWave(real, imag)
+			const waveTable = dft(this.data.settings.shape)
+			const waveform = new PeriodicWave(this.audioContext, waveTable)
 			this.customNodes.oscillator.setPeriodicWave(waveform)
 		} else if(name === 'frequency') {
 			this.customNodes.oscillator.frequency.value = this.data.settings.frequency

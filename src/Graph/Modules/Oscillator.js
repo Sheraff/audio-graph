@@ -136,11 +136,11 @@ export default class Oscillator extends GraphAudioNode {
 	async onSelect(type) {
 		const url = `${process.env.PUBLIC_URL}/wave-tables/${type}`
 		const response = await fetch(url)
-		const {real, imag} = await response.json()
-		const waveform = this.audioContext.createPeriodicWave(
-			new Float32Array(real),
-			new Float32Array(imag)
-		)
+		const waveTable = await response.json()
+		const waveform = new PeriodicWave(this.audioContext, {
+			real: new Float32Array(waveTable.real),
+			imag: new Float32Array(waveTable.imag)
+		})
 		if (type === this.data.settings.type) {
 			this.customNodes.oscillator.setPeriodicWave(waveform)
 		}
