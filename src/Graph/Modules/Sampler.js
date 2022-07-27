@@ -24,6 +24,28 @@ export default class Sampler extends GraphAudioNode {
 				defaultValue: [0, 1],
 				readFrom: 'bounds',
 			},
+			{
+				name: 'playbackRate',
+				type: 'range',
+				props: {
+					min: 0.1,
+					max: 5,
+					step: 0.01,
+				},
+				defaultValue: 1,
+				readFrom: 'value',
+			},
+			{
+				name: 'tempo',
+				type: 'toggle-range',
+				props: {
+					min: 1,
+					max: 300,
+					step: 1,
+				},
+				defaultValue: {enabled: false, value: 60},
+				readFrom: 'toggle-value',
+			}
 		]
 	}
 
@@ -38,9 +60,18 @@ export default class Sampler extends GraphAudioNode {
 		this.customNodes.input.connect(this.audioNode)
 
 		this.customNodes.recorder.port.onmessage = ({data}) => {
+			if (this.data.settings.record) {
+				return
+			}
 			const left = new Float32Array(data.left)
 			const right = new Float32Array(data.right)
 			this.onBuffer(left, right)
+			this.data.extra.buffer = [
+				[...new Uint32Array(data.left)],
+				[...new Uint32Array(data.right)],
+			]
+			// TODO: switch to indexedDB for audio buffers
+			this.saveToLocalStorage()
 		}
 
 		composeConnectBuffer(this)
@@ -56,6 +87,7 @@ export default class Sampler extends GraphAudioNode {
 					this.customNodes.source.stop(this.audioContext.currentTime)
 					this.customNodes.source = null
 				}
+				this.data.extra.buffer = null
 				this.buffer = null
 				this.customNodes.recorder.port.postMessage({type: 'start'})
 				this.customNodes.input.connect(this.customNodes.recorder)
@@ -66,21 +98,28 @@ export default class Sampler extends GraphAudioNode {
 			} else {
 				if (this.isCustomNodeInitialConnected) {
 					this.customNodes.input.disconnect(this.customNodes.recorder)
+					this.customNodes.recorder.port.postMessage({type: 'stop'})
+				} else if (this.data.extra.buffer) {
+					const leftInt = new Uint32Array(this.data.extra.buffer[0])
+					const rightInt = new Uint32Array(this.data.extra.buffer[1])
+					const left = new Float32Array(leftInt.buffer)
+					const right = new Float32Array(rightInt.buffer)
+					this.onBuffer(left, right)
 				}
-				this.customNodes.recorder.port.postMessage({type: 'stop'})
 				this.isSink = false
 				this.requiresSinkToPlay = true
 				element?.dispatchEvent(new CustomEvent('node-type-change', {bubbles: true}))
 			}
 		} else if (name === 'select' && this.buffer) {
 			this.connectBuffer()
+		} else if (name === 'playbackRate' && this.customNodes.source) {
+			this.connectBuffer()
+		} else if (name === 'tempo' && this.customNodes.source) {
+			this.connectBuffer()
 		}
 	}
 
 	onBuffer(left, right) {
-		if (this.data.settings.record) {
-			return
-		}
 		this.buffer = new AudioBuffer({
 			length: left.length,
 			numberOfChannels: 2,
