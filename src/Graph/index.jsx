@@ -33,7 +33,7 @@ import Reverb from './Modules/Reverb'
 import Echo from './Modules/Echo'
 import Wobble from './Modules/Wobble'
 import KeyBoundConstant from './Modules/KeyBoundConstant'
-import Distorsion from './Modules/Distorsion'
+import Distortion from './Modules/Distortion'
 import WaveShaper from './Modules/WaveShaper'
 
 const modules = [
@@ -66,7 +66,7 @@ const modules = [
 	Echo,
 	Wobble,
 	KeyBoundConstant,
-	Distorsion,
+	Distortion,
 	WaveShaper,
 ]
 
