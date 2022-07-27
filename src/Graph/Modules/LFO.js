@@ -28,12 +28,12 @@ export default class LFO extends GraphAudioNode {
 				props: {
 				},
 				options: [
-					"sine",
-					"square",
-					"sawtooth",
-					"triangle",
+					'sine',
+					'square',
+					'sawtooth',
+					'triangle',
 				],
-				defaultValue: "sine",
+				defaultValue: 'sine',
 				readFrom: 'value',
 			},
 			{
