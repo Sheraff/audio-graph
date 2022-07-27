@@ -121,6 +121,12 @@ export default class Sampler extends GraphAudioNode {
 		}
 		const left = new Float32Array(data.left)
 		const right = new Float32Array(data.right)
+		if (left.length === 0) {
+			deleteBufferFromIndexedDB(this.id)
+			this.data.extra.buffer = null
+			this.saveToLocalStorage()
+			return
+		}
 		this.onBuffer(left, right)
 		storeBufferInIndexedDB(this.id, [
 			[...new Uint32Array(data.left)],
