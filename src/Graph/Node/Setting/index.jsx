@@ -80,7 +80,6 @@ export default function Setting({name, type, defaultValue, options, props, setti
 				<KeyBound name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
 			</>
 		)
-	
 	console.warn(`unknown Setting type ${type}`)
 	return (
 		<>

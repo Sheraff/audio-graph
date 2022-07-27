@@ -1,4 +1,5 @@
 import GraphAudioNode from "./GraphAudioNode"
+import composeConnectBuffer from "./utils/compose-connect-buffer"
 
 export default class FileSource extends GraphAudioNode {
 	static type = 'file'
@@ -59,16 +60,18 @@ export default class FileSource extends GraphAudioNode {
 		this.audioNode = new GainNode(audioContext)
 		this.startTime = null
 
+		composeConnectBuffer(this)
+
 		this.addEventListener('connection-status-change', () => {
 			if (this.hasAudioDestination && this.buffer) {
 				this.connectBuffer()
 				return
 			}
-			if (!this.hasAudioDestination && this.bufferNode) {
-				this.bufferNode.stop(this.audioContext.currentTime)
+			if (!this.hasAudioDestination && this.customNodes.source) {
+				this.customNodes.source.stop(this.audioContext.currentTime)
 				this.startTime = null
-				this.bufferNode.disconnect(this.audioNode)
-				this.bufferNode = null
+				this.customNodes.source.disconnect(this.audioNode)
+				this.customNodes.source = null
 			}
 		}, {signal: this.controller.signal})
 	}
@@ -89,9 +92,9 @@ export default class FileSource extends GraphAudioNode {
 			}
 		} else if (name === 'select' && this.buffer) {
 			this.connectBuffer()
-		} else if (name === 'playbackRate' && this.bufferNode) {
+		} else if (name === 'playbackRate' && this.customNodes.source) {
 			this.connectBuffer()
-		} else if (name === 'tempo' && this.bufferNode) {
+		} else if (name === 'tempo' && this.customNodes.source) {
 			this.connectBuffer()
 		}
 	}
@@ -126,82 +129,5 @@ export default class FileSource extends GraphAudioNode {
 		const audioData = await this.audioContext.decodeAudioData(buffer)
 		this.buffer = audioData
 		this.connectBuffer()
-	}
-
-	connectBuffer(){
-		if (this.bufferNode) {
-			this.bufferNode.disconnect(this.audioNode)
-			this.bufferNode = null
-		}
-		if (!this.buffer || !this.hasAudioDestination) {
-			return
-		}
-		this.bufferNode = new AudioBufferSourceNode(this.audioContext)
-		this.bufferNode.buffer = this.buffer
-		this.bufferNode.connect(this.audioNode)
-
-		const {loopStart, loopEnd, startTime, loop, stopTime} = this.computePlaybackParameters()
-
-		this.bufferNode.start(startTime, loopStart)
-		this.bufferNode.loop = loop
-		if (loop) {
-			this.bufferNode.loopStart = loopStart
-			this.bufferNode.loopEnd = loopEnd
-		} else {
-			this.bufferNode.stop(stopTime)
-		}
-
-		this.startTime = startTime
-
-		this.bufferNode.playbackRate.value = this.data.settings.playbackRate
-	}
-
-	computePlaybackParameters() {
-		this.bufferEndedController?.abort()
-		const duration = this.buffer.duration
-		const bounds = this.data.settings.select
-		const loopStart = bounds[0] * duration
-		const loopEnd = bounds[1] * duration
-		const playbackRate = Number(this.data.settings.playbackRate)
-
-		if (!this.data.settings.tempo.enabled) {
-			return {
-				loopStart,
-				loopEnd,
-				startTime: this.audioContext.currentTime,
-				loop: true
-			}
-		}
-
-		const beatLength = 60 / this.data.settings.tempo.value
-		const boundedDuration = (loopEnd - loopStart) / playbackRate
-		const timeInCurrentBeat = this.audioContext.currentTime % beatLength
-		const nextStartOnBeat = timeInCurrentBeat === 0
-			? this.audioContext.currentTime
-			: this.audioContext.currentTime - timeInCurrentBeat + beatLength
-		
-		if (boundedDuration >= beatLength) {
-			const boundedLoopEnd = loopStart + beatLength * playbackRate
-			return {
-				loopStart,
-				loopEnd: boundedLoopEnd,
-				startTime: nextStartOnBeat,
-				loop: true,
-			}
-		}
-
-		this.bufferEndedController = new AbortController()
-		this.bufferNode?.addEventListener(
-			'ended',
-			() => this.connectBuffer(),
-			{once: true, signal: this.bufferEndedController.signal}
-		)
-
-		return {
-			loopStart,
-			startTime: nextStartOnBeat,
-			loop: false,
-			stopTime: nextStartOnBeat + boundedDuration
-		}
 	}
 }

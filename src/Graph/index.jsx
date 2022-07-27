@@ -35,6 +35,7 @@ import Wobble from './Modules/Wobble'
 import KeyBoundConstant from './Modules/KeyBoundConstant'
 import Distortion from './Modules/Distortion'
 import WaveShaper from './Modules/WaveShaper'
+import Sampler from './Modules/Sampler'
 
 const modules = [
 	Output,
@@ -68,6 +69,7 @@ const modules = [
 	KeyBoundConstant,
 	Distortion,
 	WaveShaper,
+	Sampler,
 ]
 
 export default function Graph() {
