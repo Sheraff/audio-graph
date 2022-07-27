@@ -5,7 +5,7 @@ function parseNodeMap(nodeMap) {
 	// find all the leaf nodes
 	const outputLeafs = new Set()
 	nodeMap.forEach((node) => {
-		if(node.isSink)
+		if(node.instance.isSink)
 			outputLeafs.add(node)
 	})
 
@@ -31,9 +31,10 @@ function parseNodeMap(nodeMap) {
 function addNodeToNodeMap(id, nodeMap, handles) {
 	if (!nodeMap.current.has(id)) {
 		nodeMap.current.set(id, {
+			id,
 			parents: new Set(),
 			children: new Set(),
-			isSink: handles.current[id].Class.isSink,
+			instance: handles.current[id].instance,
 		})
 	}
 }
@@ -92,7 +93,7 @@ export default function Connector({boundary, handles, children}) {
 				addNodeToNodeMap(fromNodeId, nodeMap, handles)
 				addNodeToNodeMap(toNodeId, nodeMap, handles)
 				const fromNode = handles.current[fromNodeId]
-				if (!fromNode.Class.requiresSinkToPlay || toSlotType !== 'setting') {
+				if (!fromNode.instance.requiresSinkToPlay || toSlotType !== 'setting') {
 					addPair(fromNodeId, toNodeId, nodeMap)
 				}
 				connections.current.set(
@@ -108,6 +109,30 @@ export default function Connector({boundary, handles, children}) {
 		})
 		parseAndDispatchNodeMap(nodeMap, handles)
 	}, [handles])
+
+	// nodes dynamically change their types of connections
+	useEffect(() => {
+		const controller = new AbortController()
+		boundary.current.addEventListener('node-type-change', () => {
+			nodeMap.current.forEach((node, id) => {
+				const fromNode = handles.current[id]
+				fromNode.connections.forEach((connectionId) => {
+					const [, toId] = connectionId.split('-')
+					const [toNodeId, toSlotType] = toId.split('.')
+					if (toNodeId === id) {
+						return
+					}
+					if (!fromNode.instance.requiresSinkToPlay || toSlotType !== 'setting') {
+						addPair(id, toNodeId, nodeMap)
+					} else {
+						deletePair(id, toNodeId, nodeMap)
+					}
+				})
+			})
+			parseAndDispatchNodeMap(nodeMap, handles)
+		}, {signal: controller.signal})
+		return () => controller.abort()
+	}, [handles, boundary])
 
 	// draw
 	useEffect(() => {
@@ -281,7 +306,7 @@ export default function Connector({boundary, handles, children}) {
 			addNodeToNodeMap(from.nodeUuid, nodeMap, handles)
 			addNodeToNodeMap(to.nodeUuid, nodeMap, handles)
 			const fromNode = handles.current[from.nodeUuid]
-			if (!fromNode.Class.requiresSinkToPlay || to.slot.type !== 'setting') {
+			if (!fromNode.instance.requiresSinkToPlay || to.slot.type !== 'setting') {
 				addPair(from.nodeUuid, to.nodeUuid, nodeMap)
 			}
 			parseAndDispatchNodeMap(nodeMap, handles)

@@ -4,7 +4,7 @@ import composeConnectBuffer from "./utils/compose-connect-buffer"
 export default class Sampler extends GraphAudioNode {
 	static type = 'sampler'
 	static image = `${process.env.PUBLIC_URL}/icons/sampler.svg`
-	static isSink = true
+	static isSink = false
 	static requiresSinkToPlay = true
 	static structure = {
 		slots: [
@@ -48,7 +48,7 @@ export default class Sampler extends GraphAudioNode {
 		this.isCustomNodeInitialConnected = false
 	}
 
-	updateSetting(name) {
+	updateSetting(name, element) {
 		if (name === 'record') {
 			const record = this.data.settings.record
 			if (record) {
@@ -60,12 +60,17 @@ export default class Sampler extends GraphAudioNode {
 				this.customNodes.recorder.port.postMessage({type: 'start'})
 				this.customNodes.input.connect(this.customNodes.recorder)
 				this.isCustomNodeInitialConnected = true
+				this.isSink = true
+				this.requiresSinkToPlay = false
+				element?.dispatchEvent(new CustomEvent('node-type-change', {bubbles: true}))
 			} else {
 				if (this.isCustomNodeInitialConnected) {
 					this.customNodes.input.disconnect(this.customNodes.recorder)
 				}
 				this.customNodes.recorder.port.postMessage({type: 'stop'})
-				
+				this.isSink = false
+				this.requiresSinkToPlay = true
+				element?.dispatchEvent(new CustomEvent('node-type-change', {bubbles: true}))
 			}
 		}
 	}

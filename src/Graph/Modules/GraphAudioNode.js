@@ -147,10 +147,14 @@ export default class GraphAudioNode {
 	/** @type {boolean} whether this node is an audio destination node */
 	static get isSink() { throw new Error(`undefined isSink for ${this.constructor.name}`) }
 	static set isSink(value) { Object.defineProperty(this, 'isSink', {value, writable: false, configurable: false}) }
-	
+	get isSink() { return this.constructor.isSink }
+	set isSink(value) { Object.defineProperty(this, 'isSink', {value, writable: true, configurable: true}) }
+
 	/** @type {boolean} whether this node can still emit a signal without being connected to a destination node */
 	static get requiresSinkToPlay() { throw new Error(`undefined requiresSinkToPlay for ${this.constructor.name}`) }
 	static set requiresSinkToPlay(value) { Object.defineProperty(this, 'requiresSinkToPlay', {value, writable: false, configurable: false}) }
+	get requiresSinkToPlay() { return this.constructor.requiresSinkToPlay }
+	set requiresSinkToPlay(value) { Object.defineProperty(this, 'requiresSinkToPlay', {value, writable: true, configurable: true}) }
 
 	/**
 	 * @param {NodeUuid} id 

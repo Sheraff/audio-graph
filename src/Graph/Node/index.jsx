@@ -130,7 +130,7 @@ function Node({
 			if (event.type === structure.event || (event.type === 'input' && !structure.event)) {
 				instance.current.data.settings[settingName] = getIn(event.target, structure.readFrom)
 				if (instance.current.audioNode)
-					instance.current.updateSetting(settingName, event.target)
+					instance.current.updateSetting(settingName, ref.current)
 				instance.current.saveToLocalStorage()
 			}
 		}

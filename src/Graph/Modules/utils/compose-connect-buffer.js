@@ -77,4 +77,17 @@ export default function composeConnectBuffer(node) {
 			stopTime: nextStartOnBeat + boundedDuration
 		}
 	}
+
+	node.addEventListener('connection-status-change', () => {
+		if (node.hasAudioDestination && node.buffer) {
+			node.connectBuffer()
+			return
+		}
+		if (!node.hasAudioDestination && node.customNodes.source) {
+			node.customNodes.source.stop(node.audioContext.currentTime)
+			node.startTime = null
+			node.customNodes.source.disconnect(node.audioNode)
+			node.customNodes.source = null
+		}
+	}, {signal: node.controller.signal})
 }

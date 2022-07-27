@@ -61,19 +61,6 @@ export default class FileSource extends GraphAudioNode {
 		this.startTime = null
 
 		composeConnectBuffer(this)
-
-		this.addEventListener('connection-status-change', () => {
-			if (this.hasAudioDestination && this.buffer) {
-				this.connectBuffer()
-				return
-			}
-			if (!this.hasAudioDestination && this.customNodes.source) {
-				this.customNodes.source.stop(this.audioContext.currentTime)
-				this.startTime = null
-				this.customNodes.source.disconnect(this.audioNode)
-				this.customNodes.source = null
-			}
-		}, {signal: this.controller.signal})
 	}
 
 	updateSetting(name) {
