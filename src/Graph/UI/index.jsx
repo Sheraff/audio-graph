@@ -1,11 +1,19 @@
 import classNames from 'classnames'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import dumpIndexedDB from '../Database/dump'
 import { GraphAudioContext } from '../GraphAudioContext'
 import styles from './index.module.css'
 
-function downloadGraph() {
-	const data = {...localStorage}
+async function downloadGraph() {
+	const dbDump = await dumpIndexedDB()
+	const lsDump = {...localStorage}
+	const data = {
+		indexedDB: dbDump,
+		localStorage: lsDump,
+	}
+
 	console.log(data)
+
 	const blob = new Blob([JSON.stringify(data)], { type: "text/json" })
 	const link = document.createElement("a")
 
