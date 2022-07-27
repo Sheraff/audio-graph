@@ -1,3 +1,4 @@
+import { deleteBufferFromIndexedDB, retrieveBufferFromIndexedDB, storeBufferInIndexedDB } from "../Database/utils"
 import GraphAudioNode from "./GraphAudioNode"
 import composeConnectBuffer from "./utils/compose-connect-buffer"
 
@@ -65,20 +66,7 @@ export default class Sampler extends GraphAudioNode {
 		this.audioNode = new GainNode(audioContext)
 		this.customNodes.input.connect(this.audioNode)
 
-		this.customNodes.recorder.port.onmessage = ({data}) => {
-			if (this.data.settings.record) {
-				return
-			}
-			const left = new Float32Array(data.left)
-			const right = new Float32Array(data.right)
-			this.onBuffer(left, right)
-			this.data.extra.buffer = [
-				[...new Uint32Array(data.left)],
-				[...new Uint32Array(data.right)],
-			]
-			// TODO: switch to indexedDB for audio buffers
-			this.saveToLocalStorage()
-		}
+		this.customNodes.recorder.port.onmessage = this.onWorklet.bind(this)
 
 		composeConnectBuffer(this)
 	}
@@ -92,6 +80,7 @@ export default class Sampler extends GraphAudioNode {
 					this.customNodes.source = null
 				}
 				this.data.extra.buffer = null
+				deleteBufferFromIndexedDB(this.id)
 				this.buffer = null
 				this.customNodes.recorder.port.postMessage({type: 'start'})
 				this.customNodes.input.connect(this.customNodes.recorder)
@@ -104,11 +93,14 @@ export default class Sampler extends GraphAudioNode {
 					this.customNodes.input.disconnect(this.customNodes.recorder)
 					this.customNodes.recorder.port.postMessage({type: 'stop'})
 				} else if (this.data.extra.buffer) {
-					const leftInt = new Uint32Array(this.data.extra.buffer[0])
-					const rightInt = new Uint32Array(this.data.extra.buffer[1])
-					const left = new Float32Array(leftInt.buffer)
-					const right = new Float32Array(rightInt.buffer)
-					this.onBuffer(left, right)
+					retrieveBufferFromIndexedDB(this.data.extra.buffer)
+						.then(buffer => {
+							const leftInt = new Uint32Array(buffer[0])
+							const rightInt = new Uint32Array(buffer[1])
+							const left = new Float32Array(leftInt.buffer)
+							const right = new Float32Array(rightInt.buffer)
+							this.onBuffer(left, right)
+						})
 				}
 				this.isSink = false
 				this.requiresSinkToPlay = true
@@ -123,6 +115,22 @@ export default class Sampler extends GraphAudioNode {
 		}
 	}
 
+	onWorklet({data}) {
+		if (this.data.settings.record) {
+			return
+		}
+		const left = new Float32Array(data.left)
+		const right = new Float32Array(data.right)
+		this.onBuffer(left, right)
+		storeBufferInIndexedDB(this.id, [
+			[...new Uint32Array(data.left)],
+			[...new Uint32Array(data.right)],
+		]).then(() => {
+			this.data.extra.buffer = this.id
+			this.saveToLocalStorage()
+		})
+	}
+
 	onBuffer(left, right) {
 		this.buffer = new AudioBuffer({
 			length: left.length,
@@ -132,5 +140,10 @@ export default class Sampler extends GraphAudioNode {
 		this.buffer.copyToChannel(left, 0)
 		this.buffer.copyToChannel(right, 1)
 		this.connectBuffer()
+	}
+
+	destroy() {
+		super.destroy()
+		deleteBufferFromIndexedDB(this.id)
 	}
 }

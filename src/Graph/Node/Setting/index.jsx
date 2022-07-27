@@ -72,7 +72,7 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<>
 				<label htmlFor={id}>{name}</label>
-				<FileInput name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
+				<FileInput name={name} {...props} id={id} defaultValue={defaultValue} />
 			</>
 		)
 	if (type === 'key-bound')

@@ -6,7 +6,6 @@ export default function FileInput({
 	id,
 	defaultValue,
 	accept,
-	settings,
 }) {
 	const touched = useRef(false)
 	const input = useRef(null)
@@ -14,7 +13,7 @@ export default function FileInput({
 	useEffect(() => {
 		if (touched.current || !defaultValue) return
 
-		const file = new File(settings.buffer, defaultValue, {})
+		const file = new File([], defaultValue, {})
 		const container = new DataTransfer()
 		container.items.add(file)
 		input.current.files = container.files

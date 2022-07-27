@@ -1,3 +1,4 @@
+import { deleteBufferFromIndexedDB, retrieveBufferFromIndexedDB, storeBufferInIndexedDB } from "../Database/utils"
 import GraphAudioNode from "./GraphAudioNode"
 import composeConnectBuffer from "./utils/compose-connect-buffer"
 
@@ -65,9 +66,12 @@ export default class FileSource extends GraphAudioNode {
 
 	updateSetting(name) {
 		if (name === 'buffer') {
-			const array = new Uint8Array(this.data.settings.buffer)
-			const buffer = array.buffer
-			this.onBuffer(buffer)
+			retrieveBufferFromIndexedDB(this.data.settings.buffer)
+				.then(data => {
+					const array = new Uint8Array(data)
+					const buffer = array.buffer
+					this.onBuffer(buffer)
+				})
 		} else if (name === 'source') {
 			const source = this.data.settings.source?.[0]
 			if (source && source.constructor === File) {
@@ -95,19 +99,17 @@ export default class FileSource extends GraphAudioNode {
 		}
 	}
 
+	/** @param {ProgressEvent<FileReader>} event */
 	onFile(event) {
 		if (!event.target?.result) {
 			console.error('could not read file')
 		}
-		const buffer = event.target.result
-		// TODO: switch to indexedDB?
-		if (event.lengthComputable && event.total < 3_000_000) {
-			this.data.settings.buffer = [...new Uint8Array(buffer)]
-		} else {
-			delete this.data.settings.buffer
-			delete this.data.settings.source
-			console.warn('file is too large to store in localStorage')
-		}
+		const buffer = /** @type {ArrayBuffer} */(event.target.result)
+		
+		// store buffer in indexedDB
+		storeBufferInIndexedDB(this.id, [...new Uint8Array(buffer)])
+		this.data.settings.buffer = this.id
+
 		this.saveToLocalStorage()
 		this.onBuffer(buffer)
 	}
@@ -116,5 +118,10 @@ export default class FileSource extends GraphAudioNode {
 		const audioData = await this.audioContext.decodeAudioData(buffer)
 		this.buffer = audioData
 		this.connectBuffer()
+	}
+
+	destroy() {
+		super.destroy()
+		deleteBufferFromIndexedDB(this.id)
 	}
 }
