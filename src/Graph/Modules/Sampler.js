@@ -72,6 +72,8 @@ export default class Sampler extends GraphAudioNode {
 				this.requiresSinkToPlay = true
 				element?.dispatchEvent(new CustomEvent('node-type-change', {bubbles: true}))
 			}
+		} else if (name === 'select' && this.buffer) {
+			this.connectBuffer()
 		}
 	}
 
