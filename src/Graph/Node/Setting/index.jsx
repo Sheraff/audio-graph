@@ -9,6 +9,7 @@ import FileInput from "./FileInput"
 import KeyBound from "./KeyBound"
 import ToggleRange from "./ToggleRange"
 import WaveShaper from "./WaveShaper"
+import Record from "./Record"
 
 export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
 	const id = useId()
@@ -78,6 +79,12 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<>
 				<KeyBound name={name} {...props} id={id} defaultValue={defaultValue} settings={settings}/>
+			</>
+		)
+	if (type === 'record')
+		return (
+			<>
+				<Record name={name} {...props} id={id} />
 			</>
 		)
 	console.warn(`unknown Setting type ${type}`)

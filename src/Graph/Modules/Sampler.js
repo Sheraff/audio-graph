@@ -14,7 +14,7 @@ export default class Sampler extends GraphAudioNode {
 		settings: [
 			{
 				name: 'record',
-				type: 'checkbox',
+				type: 'record',
 				defaultValue: false,
 				readFrom: 'checked'
 			},
@@ -53,6 +53,12 @@ export default class Sampler extends GraphAudioNode {
 		`${process.env.PUBLIC_URL}/AudioWorklets/Recorder.js`
 	]
 
+	constructor(...args) {
+		super(...args)
+		this.isCustomNodeInitialConnected = false
+		this.data.settings.record = false
+	}
+
 	initializeAudioNodes(audioContext) {
 		this.customNodes.input = new GainNode(audioContext)
 		this.customNodes.recorder = new AudioWorkletNode(audioContext, 'recorder', {numberOfInputs: 1, outputChannelCount: [2]})
@@ -75,8 +81,6 @@ export default class Sampler extends GraphAudioNode {
 		}
 
 		composeConnectBuffer(this)
-
-		this.isCustomNodeInitialConnected = false
 	}
 
 	updateSetting(name, element) {
