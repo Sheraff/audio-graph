@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import dumpIndexedDB from '../Database/dump'
+import { clearIndexedDB, dumpIndexedDB, restoreIndexedDB } from '../Database/dump'
 import { GraphAudioContext } from '../GraphAudioContext'
 import styles from './index.module.css'
 
@@ -37,10 +37,15 @@ function openGraph(e) {
 		return
 	}
 	const reader = new FileReader()
-	reader.onload = function(e) {
+	reader.onload = async function(e) {
+		await clearIndexedDB()
 		localStorage.clear()
-		const contents = JSON.parse(e.target.result)
-		Object.entries(contents).forEach(([key, value]) => {
+		const {
+			indexedDB: dbDump,
+			localStorage: lsDump,
+		} = JSON.parse(e.target.result)
+		await restoreIndexedDB(dbDump)
+		Object.entries(lsDump).forEach(([key, value]) => {
 			localStorage.setItem(key, value)
 		})
 		window.location.reload()
@@ -48,7 +53,8 @@ function openGraph(e) {
 	reader.readAsText(file)
 }
 
-function clear() {
+async function clear() {
+	await clearIndexedDB()
 	localStorage.clear()
 	localStorage.setItem('nodes', '[]')
 	window.location.reload()
