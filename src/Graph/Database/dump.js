@@ -1,3 +1,5 @@
+import openDB from "./open"
+
 async function* iterateIndexedDBRequestCursor (store) {
 	const opener = store.openCursor()
 	let resolve
@@ -25,9 +27,7 @@ export async function dumpIndexedDB() {
 	for (const {name, version} of databases) {
 		if(!name) continue
 		dump[name] = { _meta: { version, keys: {} } }
-		const openRequest = await indexedDB.open(name, version)
-		await new Promise(resolve => openRequest.onsuccess = resolve)
-		const db = openRequest.result
+		const db = await openDB(name, version)
 		for (const storeName of db.objectStoreNames) {
 			dump[name][storeName] = []
 			const tx = db.transaction(storeName, 'readonly')
@@ -43,9 +43,7 @@ export async function dumpIndexedDB() {
 
 export async function restoreIndexedDB(dump) {
 	for (const [name, {_meta, ...stores}] of Object.entries(dump)) {
-		const openRequest = await indexedDB.open(name, _meta.version)
-		await new Promise(resolve => openRequest.onsuccess = resolve)
-		const db = openRequest.result
+		const db = await openDB(name, _meta.version)
 		for (const [storeName, entries] of Object.entries(stores)) {
 			const tx = db.transaction(storeName, 'readwrite')
 			const store = tx.objectStore(storeName)
@@ -62,9 +60,7 @@ export async function clearIndexedDB() {
 	const databases = await indexedDB.databases()
 	for (const {name} of databases) {
 		if(!name) continue
-		const openRequest = await indexedDB.open(name)
-		await new Promise(resolve => openRequest.onsuccess = resolve)
-		const db = openRequest.result
+		const db = await openDB(name)
 		for (const storeName of db.objectStoreNames) {
 			const tx = db.transaction(storeName, 'readwrite')
 			const store = tx.objectStore(storeName)

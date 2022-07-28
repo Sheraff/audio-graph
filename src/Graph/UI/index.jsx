@@ -44,6 +44,7 @@ function openGraph(e) {
 			indexedDB: dbDump,
 			localStorage: lsDump,
 		} = JSON.parse(e.target.result)
+		await clearIndexedDB()
 		await restoreIndexedDB(dbDump)
 		Object.entries(lsDump).forEach(([key, value]) => {
 			localStorage.setItem(key, value)

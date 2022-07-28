@@ -252,7 +252,7 @@ export default class GraphAudioNode {
 						if (responseAudioNode) {
 							window.dispatchEvent(new CustomEvent(from.nodeUuid, {detail: {request: 'connect', from, to, audioNode: responseAudioNode}}))
 						} else {
-							console.warn('No audio node found for connection')
+							console.warn('No audio node found for connection', from, to)
 						}
 					} else if (from.nodeUuid === this.id) {
 						if (audioNode) {
