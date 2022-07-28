@@ -1,58 +1,10 @@
 import classNames from 'classnames'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { clearIndexedDB, dumpIndexedDB, restoreIndexedDB } from '../Database/dump'
+import { clearIndexedDB } from '../Database/dump'
+import downloadGraph from '../Files/download'
+import { openGraph } from '../Files/upload'
 import { GraphAudioContext } from '../GraphAudioContext'
 import styles from './index.module.css'
-
-async function downloadGraph() {
-	const dbDump = await dumpIndexedDB()
-	const lsDump = {...localStorage}
-	const data = {
-		indexedDB: dbDump,
-		localStorage: lsDump,
-	}
-
-	console.log(data)
-
-	const blob = new Blob([JSON.stringify(data)], { type: "text/json" })
-	const link = document.createElement("a")
-
-	link.download = "graph.json"
-	link.href = window.URL.createObjectURL(blob)
-	link.dataset.downloadurl = ["text/json", link.download, link.href].join(":")
-
-	const evt = new MouseEvent("click", {
-		view: window,
-		bubbles: true,
-		cancelable: true,
-	})
-
-	link.dispatchEvent(evt)
-	link.remove()
-}
-
-function openGraph(e) {
-	const file = e.target.files[0]
-	if (!file) {
-		return
-	}
-	const reader = new FileReader()
-	reader.onload = async function(e) {
-		await clearIndexedDB()
-		localStorage.clear()
-		const {
-			indexedDB: dbDump,
-			localStorage: lsDump,
-		} = JSON.parse(e.target.result)
-		await clearIndexedDB()
-		await restoreIndexedDB(dbDump)
-		Object.entries(lsDump).forEach(([key, value]) => {
-			localStorage.setItem(key, value)
-		})
-		window.location.reload()
-	}
-	reader.readAsText(file)
-}
 
 async function clear() {
 	await clearIndexedDB()
