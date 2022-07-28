@@ -13,20 +13,16 @@ if (localStorage.length === 0) {
 				indexedDB: dbDump,
 				localStorage: lsDump,
 			} = data
-			console.log('restoring indexedDB')
 			await restoreIndexedDB(dbDump)
-			console.log('restoring localStorage')
 			Object.entries(lsDump).forEach(([key, value]) => {
 				localStorage.setItem(key, value)
 			})
-			console.log('restoring complete')
 		})
 		.then(() => {
 			console.log('Restored from example.json')
 			startApp()
 		})
 } else {
-	console.log('hello')
 	startApp()
 }
 

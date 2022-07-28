@@ -1,7 +1,7 @@
 import openDB from "./open"
 
 export async function storeBufferInIndexedDB(id, buffer) {
-	const db = await openDB()
+	const db = await openDB("graph-audio-node", 1)
 	const tx = db.transaction("buffers", "readwrite")
 	const store = tx.objectStore("buffers")
 	const request = store.put({id, buffer})
@@ -11,7 +11,7 @@ export async function storeBufferInIndexedDB(id, buffer) {
 }
 
 export async function retrieveBufferFromIndexedDB(id) {
-	const db = await openDB()
+	const db = await openDB("graph-audio-node", 1)
 	const tx = db.transaction("buffers")
 	const store = tx.objectStore("buffers")
 	const request = store.get(id)
@@ -27,7 +27,7 @@ export async function retrieveBufferFromIndexedDB(id) {
 }
 
 export async function deleteBufferFromIndexedDB(id) {
-	const db = await openDB()
+	const db = await openDB("graph-audio-node", 1)
 	const tx = db.transaction("buffers", "readwrite")
 	const store = tx.objectStore("buffers")
 	store.delete(id)
