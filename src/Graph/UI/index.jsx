@@ -146,7 +146,7 @@ export default function UI({addNode, modules}) {
 				</button>
 				<label className={styles.file} title="upload graph">
 					<img src={`${process.env.PUBLIC_URL}/icons/ui-upload.svg`} width="1" height="1" alt=""/>
-					<input type="file" onChange={openGraph} accept=".json,text/json,application/json" hidden/>
+					<input type="file" onChange={openGraph} accept=".sheraff,application/octet-stream" hidden/>
 				</label>
 				<button title="clear graph" type="button" onClick={clear}>
 					<img src={`${process.env.PUBLIC_URL}/icons/ui-clear.svg`} width="1" height="1" alt=""/>

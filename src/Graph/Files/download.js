@@ -1,4 +1,5 @@
 import { dumpIndexedDB } from "../Database/dump"
+import { compress } from "./gzip"
 
 export default async function downloadGraph() {
 	const dbDump = await dumpIndexedDB()
@@ -10,12 +11,15 @@ export default async function downloadGraph() {
 
 	console.log(data)
 
-	const blob = new Blob([JSON.stringify(data)], { type: "text/json" })
+	const string = JSON.stringify(data)
+	const compressed = await compress(string, 'gzip')
+
+	const blob = new Blob([compressed], { type: "application/octet-stream" })
 	const link = document.createElement("a")
 
-	link.download = "graph.json"
+	link.download = "graph.sheraff"
 	link.href = window.URL.createObjectURL(blob)
-	link.dataset.downloadurl = ["text/json", link.download, link.href].join(":")
+	link.dataset.downloadurl = ["application/octet-stream", link.download, link.href].join(":")
 
 	const evt = new MouseEvent("click", {
 		view: window,
