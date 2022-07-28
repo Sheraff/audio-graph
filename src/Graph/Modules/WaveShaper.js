@@ -57,6 +57,17 @@ export default class WaveShaper extends GraphAudioNode {
 		this.customNodes.oscillator.connect(this.audioNode)
 		this.customNodes.oscillator.start()
 
+		Object.defineProperty(this.audioNode, 'frequency', {
+			value: this.customNodes.oscillator.frequency,
+			enumerable: true,
+			configurable: true,
+		})
+		Object.defineProperty(this.audioNode, 'detune', {
+			value: this.customNodes.oscillator.detune,
+			enumerable: true,
+			configurable: true,
+		})
+
 		this.makeParamObservable('frequency')
 		this.makeParamObservable('detune')
 	}

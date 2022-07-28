@@ -26,6 +26,13 @@ export default class WhiteNoise extends GraphAudioNode {
 
 		this.customNodes.oscillator = new AudioWorkletNode(audioContext, 'white-noise-processor', {numberOfInputs: 0, outputChannelCount: [2]})
 		this.customNodes.oscillator.connect(this.audioNode)
+
+		Object.defineProperty(this.audioNode, 'parameters', {
+			value: this.customNodes.oscillator.parameters,
+			enumerable: true,
+			configurable: true,
+		})
+
 		this.makeParamObservable('min')
 		this.makeParamObservable('max')
 	}
