@@ -8,14 +8,14 @@ class Random extends AudioWorkletProcessor {
 				defaultValue: 10,
 				minValue: 0,
 				maxValue: 100,
-				automationRate: 'k-rate'
+				automationRate: 'a-rate'
 			},
 			{
 				name: 'rate',
 				defaultValue: 60,
 				minValue: 0,
 				maxValue: 10000,
-				automationRate: 'k-rate'
+				automationRate: 'a-rate'
 			},
 			{
 				name: 'min',
@@ -45,9 +45,9 @@ class Random extends AudioWorkletProcessor {
 		if (!base) {
 			return true
 		}
-		const rate = parameters.rate[0]
-		const variability = parameters.variability[0]
 		base.forEach((_,i) => {
+			const rate = parameters.rate[i] ?? parameters.rate[0]
+			const variability = parameters.variability[i] ?? parameters.variability[0]
 			this.sinceLast += 1 / this.sampleRate
 			if (this.sinceLast >= this.nextChange) {
 				const frameMin = parameters.min[0]
@@ -76,9 +76,10 @@ class Random extends AudioWorkletProcessor {
 	}
 
 	scheduleNextChange(rate, _variability) {
-		const variability = rate * _variability / 100
-		const start = 60 / (rate + variability)
-		const end = 60 / Math.max(1, (rate - variability))
+		const frequency = 60 / rate
+		const variability = frequency * _variability / 100
+		const start = frequency - variability
+		const end = frequency + variability
 		this.nextChange = Math.random() * (end - start) + start
 		this.lastRate = rate
 		this.lastVariability = _variability
