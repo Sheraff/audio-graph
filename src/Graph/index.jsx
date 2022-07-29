@@ -36,6 +36,7 @@ import KeyBoundConstant from './Modules/KeyBoundConstant'
 import Distortion from './Modules/Distortion'
 import WaveShaper from './Modules/WaveShaper'
 import Sampler from './Modules/Sampler'
+import Random from './Modules/Random'
 
 const modules = [
 	Output,
@@ -70,6 +71,7 @@ const modules = [
 	Distortion,
 	WaveShaper,
 	Sampler,
+	Random,
 ]
 
 export default function Graph() {
