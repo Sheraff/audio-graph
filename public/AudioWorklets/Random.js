@@ -14,21 +14,21 @@ class Random extends AudioWorkletProcessor {
 				name: 'rate',
 				defaultValue: 60,
 				minValue: 0,
-				maxValue: 300,
+				maxValue: 10000,
 				automationRate: 'k-rate'
 			},
 			{
 				name: 'min',
 				defaultValue: 0,
-				minValue: -100,
-				maxValue: 100,
+				minValue: -1000,
+				maxValue: 1000,
 				automationRate: 'k-rate'
 			},
 			{
 				name: 'max',
 				defaultValue: 1,
-				minValue: -100,
-				maxValue: 100,
+				minValue: -1000,
+				maxValue: 1000,
 				automationRate: 'k-rate'
 			},
 		]
