@@ -37,6 +37,7 @@ import Distortion from './Modules/Distortion'
 import WaveShaper from './Modules/WaveShaper'
 import Sampler from './Modules/Sampler'
 import Random from './Modules/Random'
+import Quantize from './Modules/Quantize'
 
 const modules = [
 	Output,
@@ -72,6 +73,7 @@ const modules = [
 	WaveShaper,
 	Sampler,
 	Random,
+	Quantize,
 ]
 
 export default function Graph() {
