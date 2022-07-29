@@ -8,8 +8,8 @@ export default class Random extends GraphAudioNode {
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},
-			// {type: 'setting', name: 'variability'},
-			// {type: 'setting', name: 'rate'},
+			{type: 'setting', name: 'variability'},
+			{type: 'setting', name: 'rate'},
 		],
 		settings: [
 			{
@@ -28,7 +28,7 @@ export default class Random extends GraphAudioNode {
 				type: 'range',
 				props: {
 					min: 0,
-					max: 500,
+					max: 4000,
 					step: 0.1
 				},
 				defaultValue: 60,
