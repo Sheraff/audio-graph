@@ -8,8 +8,8 @@ export default class Random extends GraphAudioNode {
 	static structure = {
 		slots: [
 			{type: 'output', name: 0},
-			{type: 'setting', name: 'variability'},
-			{type: 'setting', name: 'rate'},
+			// {type: 'setting', name: 'variability'},
+			// {type: 'setting', name: 'rate'},
 		],
 		settings: [
 			{
@@ -17,21 +17,21 @@ export default class Random extends GraphAudioNode {
 				type: 'range',
 				props: {
 					min: 0,
-					max: 44100,
+					max: 100,
 					step: 1
 				},
-				defaultValue: 50,
+				defaultValue: 10,
 				readFrom: 'value'
 			},
 			{
 				name: 'rate',
 				type: 'range',
 				props: {
-					min: 128,
-					max: 44100,
-					step: 128
+					min: 0,
+					max: 300,
+					step: 0.1
 				},
-				defaultValue: 44100 / 60,
+				defaultValue: 60,
 				readFrom: 'value'
 			},
 			{
@@ -64,7 +64,11 @@ export default class Random extends GraphAudioNode {
 	]
 
 	initializeAudioNodes(audioContext) {
-		this.audioNode = new AudioWorkletNode(audioContext, 'random', {numberOfInputs: 0, outputChannelCount: [1]})
+		this.audioNode = new AudioWorkletNode(audioContext, 'random', {
+			numberOfInputs: 0,
+			outputChannelCount: [1],
+			processorOptions: { sampleRate: audioContext.sampleRate },
+		})
 
 		this.makeParamObservable('variability')
 		this.makeParamObservable('rate')
