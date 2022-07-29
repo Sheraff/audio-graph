@@ -56,6 +56,17 @@ export default class Random extends GraphAudioNode {
 				defaultValue: 1,
 				readFrom: 'value'
 			},
+			{
+				name: 'test',
+				type: 'minmax',
+				props: {
+					min: -100,
+					max: 100,
+					step: 1
+				},
+				defaultValue: [-50, 50],
+				readFrom: 'values'
+			}
 		]
 	}
 
@@ -83,6 +94,8 @@ export default class Random extends GraphAudioNode {
 			this.audioNode.parameters.get('min').value = parseFloat(this.data.settings.min)
 		} else if (name === 'max') {
 			this.audioNode.parameters.get('max').value = parseFloat(this.data.settings.max)
+		} else if (name === 'minmax') {
+			console.log('minmax', this.data.settings.minmax)
 		}
 	}
 }
