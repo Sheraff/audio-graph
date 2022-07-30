@@ -57,6 +57,17 @@ export default class Analyser extends GraphAudioNode {
 				defaultValue: "oscilloscope",
 				readFrom: 'value',
 			},
+			{
+				name: 'focus',
+				type: 'minmax',
+				props: {
+					min: 0,
+					max: 100,
+					step: 1
+				},
+				defaultValue: [0, 100],
+				readFrom: 'values',
+			},
 		],
 		extras: [
 			{type: 'analyser', name: 0}

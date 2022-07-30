@@ -45,13 +45,18 @@ export default function Analyser({instance}) {
 				} else if (type === 'oscilloscope') {
 					instance.current.audioNode.getByteTimeDomainData(array)
 				}
+
+				const [start, end] = instance.current.data.settings.focus || [0, 100]
+				const startIndex = Math.floor(start * bufferLength / 100)
+				const endIndex = Math.ceil(end * bufferLength / 100)
+				const length = endIndex - startIndex
 				
-				const sliceWidth = ctx.canvas.width * 1.0 / bufferLength;
+				const sliceWidth = ctx.canvas.width * 1.0 / length;
 				let x = 0
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 				ctx.strokeStyle = "#fff"
 				ctx.beginPath()
-				for (let i = 0; i < bufferLength; i++) {
+				for (let i = startIndex; i < endIndex; i++) {
 					const v = array[i] / 128.0
 					const y = ctx.canvas.height - v * ctx.canvas.height / 2
 					if (i === 0) {
