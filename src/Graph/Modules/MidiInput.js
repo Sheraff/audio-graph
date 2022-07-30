@@ -148,7 +148,7 @@ export default class MidiInput extends GraphAudioNode {
 				osc.type = 'sine'
 			}
 			const gain = new GainNode(this.audioContext, { gain: 0 })
-			gain.gain.setTargetAtTime(velocity / 127, this.audioContext.currentTime, 0.015);
+			gain.gain.setTargetAtTime(velocity / 127, this.audioContext.currentTime, 0.015)
 
 			osc.connect(gain)
 			gain.connect(this.audioNode)

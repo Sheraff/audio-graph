@@ -96,8 +96,15 @@ export default class Sequencer extends GraphAudioNode {
 				sequence.forEach((value, multiplier) => {
 					const offset = multiplier * beatLength
 					const time = rootTime + offset + bars
-					if(time > currentTime)
-						node.gain.setValueAtTime(value, time)
+					if (time > currentTime) {
+						const valueBefore = sequence.at(multiplier - 1)
+						if (valueBefore !== value) {
+							node.gain.setValueAtTime(valueBefore, time - 0.0075)
+							node.gain.setTargetAtTime(value, time, 0.015)
+						} else {
+							node.gain.setValueAtTime(value, time)
+						}
+					}
 				})
 			}
 		})
