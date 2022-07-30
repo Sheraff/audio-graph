@@ -72,7 +72,6 @@ export default function Setting({
 			<>
 				<label htmlFor={id}>{name}</label>
 				<DynamicSelect id={id} name={name} optionsFrom={optionsFrom} instance={instance} defaultValue={defaultValue}/>
-				<div />
 			</>
 		)
 	if (type === 'range')

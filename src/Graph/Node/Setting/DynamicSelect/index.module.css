@@ -1,0 +1,7 @@
+.main {
+	grid-column: 2 / -1;
+}
+
+.main[disabled] {
+	cursor: not-allowed;
+}

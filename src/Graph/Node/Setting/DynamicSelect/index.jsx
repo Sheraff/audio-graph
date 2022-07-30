@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import styles from '../index.module.css'
+import React, { useEffect, useRef, useState } from 'react'
+import styles from './index.module.css'
 
 export default function DynamicSelect({
 	id,
@@ -9,8 +9,8 @@ export default function DynamicSelect({
 	defaultValue,
 }) {
 	const [options, setOptions] = useState(() => instance.current[optionsFrom])
-
-	console.warn('as long as input is not touched, updating options should change the value to defaultValue if available')
+	const touched = useRef(false)
+	const select = useRef(/** @type {HTMLSelectElement} */(null))
 
 	useEffect(() => {
 		const controller = new AbortController()
@@ -22,15 +22,34 @@ export default function DynamicSelect({
 		return () => controller.abort()
 	}, [instance, optionsFrom])
 
+	useEffect(() => {
+		if (touched.current) return
+		const controller = new AbortController()
+		select.current.addEventListener('change', () => {
+			touched.current = true
+		}, {signal: controller.signal, once: true})
+		return () => controller.abort()
+	}, [])
+
+	useEffect(() => {
+		if (touched.current) return
+		if (options.some(({value}) => value === defaultValue)) {
+			select.current.value = defaultValue
+		}
+	}, [defaultValue, options])
+
 	return (
 		<select
-			className={styles.select}
+			ref={select}
+			className={styles.main}
 			name={name}
 			id={id}
 			disabled={options.length === 0}
 			defaultValue={defaultValue}
 		>
-			<option key={null} value="">---</option>
+			<option key={null} value="">
+				{options.length === 0 ? 'no MIDI device detected' : 'select device'}
+			</option>
 			{options.map(({value, label}) => (
 				<option key={value} value={value}>{label}</option>
 			))}

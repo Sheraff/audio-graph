@@ -1,4 +1,5 @@
 import GraphAudioNode from "./GraphAudioNode"
+import { defaultWaveforms, periodicWaveFromType, waveforms } from "./utils/wave-forms"
 
 export default class MidiInput extends GraphAudioNode {
 	static type = 'midi-input'
@@ -16,6 +17,24 @@ export default class MidiInput extends GraphAudioNode {
 				defaultValue: '',
 				readFrom: 'value',
 				optionsFrom: 'midiDevices'
+			},
+			{
+				name: 'detune',
+				type: 'range',
+				props: {
+					min: -4800,
+					max: 4800,
+					step: 100,
+				},
+				defaultValue: 0,
+				readFrom: 'value',
+			},
+			{
+				name: 'type',
+				type: 'select',
+				options: [...defaultWaveforms, ...waveforms],
+				defaultValue: "sine",
+				readFrom: 'value',
 			}
 		]
 	}
@@ -26,6 +45,7 @@ export default class MidiInput extends GraphAudioNode {
 
 	initializeAudioNodes(audioContext) {
 		this.audioNode = new GainNode(audioContext, {gain: 0.1})
+
 		navigator
 			.requestMIDIAccess()
 			.then(this.onMidiAccess.bind(this))
@@ -34,7 +54,7 @@ export default class MidiInput extends GraphAudioNode {
 	updateSetting(name) {
 		if (name === 'device' && this.midiAccess) {
 			this.onMidiDeviceDisconnected()
-			if (this.data.settings.device) {
+			if (this.midiAccess.inputs.has(this.data.settings.device)) {
 				this.midiInputMessageController = new AbortController()
 				this.midiAccess.inputs.get(this.data.settings.device).addEventListener(
 					'midimessage',
@@ -42,6 +62,37 @@ export default class MidiInput extends GraphAudioNode {
 					{signal: this.midiInputMessageController.signal}
 				)
 			}
+		} else if (name === 'type') {
+			const type = this.data.settings.type
+			if (defaultWaveforms.includes(type)) {
+				this.selectedWaveform = null
+				Object.values(this.customNodes).forEach(node => {
+					if (node && ('type' in node)) {
+						node.type = type
+					}
+				})
+			} else {
+				this.onSelect(type)
+			}
+		} else if (name === 'detune') {
+			const value = parseFloat(this.data.settings.detune)
+			Object.values(this.customNodes).forEach(node => {
+				if (node && ('detune' in node)) {
+					node.detune.value = value
+				}
+			})
+		}
+	}
+
+	async onSelect(type) {
+		const waveform = await periodicWaveFromType(this.audioContext, type)
+		if (type === this.data.settings.type) {
+			this.selectedWaveform = waveform
+			Object.values(this.customNodes).forEach(node => {
+				if (node && ('setPeriodicWave' in node)) {
+					node.setPeriodicWave(waveform)
+				}
+			})
 		}
 	}
 
@@ -52,7 +103,7 @@ export default class MidiInput extends GraphAudioNode {
 			get: () => Array.from(midiAccess.inputs.entries())
 				.map(([key, input]) => ({
 					value: key,
-					label: `${input.name} (${input.manufacturer})`,
+					label: input.name,
 				}))
 		})
 		this.dispatchEvent(new CustomEvent('midiDevices'))
@@ -87,12 +138,17 @@ export default class MidiInput extends GraphAudioNode {
 		if (type === 144 && velocity > 0) {
 			const osc = new OscillatorNode(this.audioContext, {
 				frequency: 440 * Math.pow(2, (note - 69) / 12),
-				detune: 0,
-				type: 'sine',
+				detune: parseFloat(this.data.settings.detune),
 			})
-			const gain = new GainNode(this.audioContext, {
-				gain: velocity / 127,
-			})
+			if (this.selectedWaveform) {
+				osc.setPeriodicWave(this.selectedWaveform)
+			} else if (defaultWaveforms.includes(this.data.settings.type)) {
+				osc.type = this.data.settings.type
+			} else {
+				osc.type = 'sine'
+			}
+			const gain = new GainNode(this.audioContext, { gain: 0 })
+			gain.gain.setTargetAtTime(velocity / 127, this.audioContext.currentTime, 0.015);
 
 			osc.connect(gain)
 			gain.connect(this.audioNode)
@@ -105,14 +161,37 @@ export default class MidiInput extends GraphAudioNode {
 		}
 		
 		if (type === 128 || (type === 144 && velocity === 0)) {
-			if(!this.customNodes[`osc-${note}`]) return
+			if (!this.customNodes[`osc-${note}`]) return
 
-			this.customNodes[`osc-${note}`].stop()
-			this.customNodes[`osc-${note}`].disconnect()
-			this.customNodes[`gain-${note}`].disconnect()
+			const gain = this.customNodes[`gain-${note}`]
+			gain.gain.setValueAtTime(gain.gain.value, this.audioContext.currentTime)
+			gain.gain.exponentialRampToValueAtTime(0.0001, this.audioContext.currentTime + 0.03)
+			this.discardedNodes.add(gain)
+			this.discardedNodes.add(this.customNodes[`osc-${note}`])
 			delete this.customNodes[`osc-${note}`]
 			delete this.customNodes[`gain-${note}`]
 
+		}
+	}
+
+	discardedNodes = new Set()
+	ricDiscardedNodes = null
+	cleanDiscardedNodes() {
+		if (this.ricDiscardedNodes) return
+		this.ricDiscardedNodes = requestIdleCallback(() => {
+			this.ricDiscardedNodes = null
+			this.discardedNodes.forEach(node => {
+				node.disconnect()
+			})
+			this.discardedNodes.clear()
+		})
+	}
+
+	cleanup() {
+		super.cleanup()
+		if(this.ricDiscardedNodes) {
+			cancelIdleCallback(this.ricDiscardedNodes)
+			this.ricDiscardedNodes = null
 		}
 	}
 }
