@@ -100,8 +100,8 @@ function Node({
 			}
 			cancelAnimationFrame(rafId)
 			rafId = requestAnimationFrame(() => {
-				position.current.x = initial.x + dx
-				position.current.y = initial.y + dy
+				position.current.x = Math.round(initial.x + dx)
+				position.current.y = Math.round(initial.y + dy)
 				ref.current.style.setProperty('--x', position.current.x)
 				ref.current.style.setProperty('--y', position.current.y)
 				ref.current.style.removeProperty('transform')

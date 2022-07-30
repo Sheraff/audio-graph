@@ -90,7 +90,7 @@
 	height: 2px;
 	z-index: 2;
 	pointer-events: none;
-	background-color: #811ff9;
+	background-color: #811ff988;
 	transform-origin: left;
 }
 .main::before {

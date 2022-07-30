@@ -15,7 +15,7 @@
 	height: 2px;
 	z-index: 1;
 	pointer-events: none;
-	background-color: #811ff9;
+	background-color: #811ff988;
 	transform-origin: left;
 	transform: translateY(-50%) translateX(calc(var(--base) * 100%)) scaleX(var(--value));
 }
