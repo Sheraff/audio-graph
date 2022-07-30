@@ -38,6 +38,7 @@ import WaveShaper from './Modules/WaveShaper'
 import Sampler from './Modules/Sampler'
 import Random from './Modules/Random'
 import Quantize from './Modules/Quantize'
+import LineIn from './Modules/LineIn'
 
 const modules = [
 	Output,
@@ -74,6 +75,7 @@ const modules = [
 	Sampler,
 	Random,
 	Quantize,
+	LineIn,
 ]
 
 export default function Graph() {

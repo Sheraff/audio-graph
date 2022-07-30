@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import Text from "../../Extra/Text"
 import styles from './index.module.css'
 
 let activeKeys = new Set()
@@ -92,9 +93,7 @@ export default function KeyBound({
 
 	return (
 		<>
-			<p className={styles.explain}>
-				hold the key down while moving the mouse
-			</p>
+			<Text text="hold the key down while moving the mouse" />
 			<label htmlFor={id}>{name}</label>
 			<input
 				{...props}

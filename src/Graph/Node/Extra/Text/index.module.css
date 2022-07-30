@@ -1,0 +1,7 @@
+.main {
+	grid-column: 1 / -1;
+	margin: 0;
+	font-size: .65em;
+	opacity: .7;
+	text-align: center;
+}
