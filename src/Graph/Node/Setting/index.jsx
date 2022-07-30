@@ -12,7 +12,7 @@ import WaveShaper from "./WaveShaper"
 import Record from "./Record"
 import MinMax from "./MinMax"
 
-export default function Setting({name, type, defaultValue, options, props, settings, instance}) {
+export default function Setting({name, type, defaultValue, options, props, settings, instance, controls}) {
 	const id = useId()
 	if (type === 'track')
 		return (
@@ -67,7 +67,7 @@ export default function Setting({name, type, defaultValue, options, props, setti
 		return (
 			<>
 				<label htmlFor={id}>{name}</label>
-				<MinMax id={id} name={name} defaultValue={defaultValue} props={props} instance={instance}/>
+				<MinMax id={id} name={name} defaultValue={defaultValue} props={props} controls={controls} instance={instance} />
 			</>
 		)
 	if (type === 'toggle-range')

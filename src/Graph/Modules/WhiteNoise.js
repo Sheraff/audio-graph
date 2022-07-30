@@ -12,8 +12,21 @@ export default class WhiteNoise extends GraphAudioNode {
 			{type: 'setting', name: 'max'},
 		],
 		settings: [
-			{name: 'min', type: 'range', props: {min: 0, max: 1, step: 0.01}, defaultValue: 0, readFrom: 'value'},
-			{name: 'max', type: 'range', props: {min: 0, max: 1, step: 0.01}, defaultValue: 1, readFrom: 'value'},
+			{
+				name: 'amplitude',
+				type: 'minmax',
+				props: {
+					min: 0,
+					max: 1,
+					step: 0.01
+				},
+				defaultValue: [0, 1],
+				readFrom: 'values',
+				controls: {
+					min: 'min',
+					max: 'max',
+				}
+			}
 		]
 	}
 
@@ -38,10 +51,9 @@ export default class WhiteNoise extends GraphAudioNode {
 	}
 
 	updateSetting(name) {
-		if (name === 'min') {
-			this.customNodes.oscillator.parameters.get('min').value = parseFloat(this.data.settings.min)
-		} else if (name === 'max') {
-			this.customNodes.oscillator.parameters.get('max').value = parseFloat(this.data.settings.max)
+		if (name === 'amplitude') {
+			this.customNodes.oscillator.parameters.get('min').value = this.data.settings.amplitude[0]
+			this.customNodes.oscillator.parameters.get('max').value = this.data.settings.amplitude[1]
 		}
 	}
 }

@@ -24,26 +24,15 @@ export default class Analyser extends GraphAudioNode {
 				readFrom: 'value',
 			},
 			{
-				name: 'maxDecibels',
-				type: 'range',
+				name: 'decibels',
+				type: 'minmax',
 				props: {
 					min: -500,
 					max: 0,
-					step: 1,
+					step: 1
 				},
-				defaultValue: -5,
-				readFrom: 'value',
-			},
-			{
-				name: 'minDecibels',
-				type: 'range',
-				props: {
-					min: -500,
-					max: 0,
-					step: 1,
-				},
-				defaultValue: -200,
-				readFrom: 'value',
+				defaultValue: [-200, -5],
+				readFrom: 'values',
 			},
 			{
 				name: 'smoothingTime',
@@ -83,9 +72,9 @@ export default class Analyser extends GraphAudioNode {
 	updateSetting(name) {
 		if (name === 'fftSize') {
 			this.audioNode.fftSize = 2**Number(this.data.settings.fftSize)
-		} else if (name === 'minDecibels' || name === 'maxDecibels') {
-			this.audioNode.minDecibels = Math.min(this.data.settings.minDecibels, this.data.settings.maxDecibels - 1)
-			this.audioNode.maxDecibels = Math.max(this.data.settings.minDecibels + 1, this.data.settings.maxDecibels)
+		} else if (name === 'decibels') {
+			this.audioNode.minDecibels = this.data.settings.decibels[0]
+			this.audioNode.maxDecibels = this.data.settings.decibels[1]
 		} else if (name === 'smoothingTime') {
 			this.audioNode.smoothingTimeConstant = this.data.settings.smoothingTime
 		}

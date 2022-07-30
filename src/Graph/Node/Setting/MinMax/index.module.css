@@ -1,8 +1,10 @@
 .main {
 	display: grid;
+	position: relative;
 	z-index: 0;
 	width: 100%;
 	align-items: center;
+	min-width: 200px;
 	--full: calc(100% - 1em);
 }
 
@@ -76,6 +78,26 @@
 	border-top-right-radius: .5em;
 	border-bottom-right-radius: .5em;
 	left: calc(var(--full) * var(--max) + 0.5em);
+}
+
+.main::after,
+.main::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0.5em;
+	right: 0.5em;
+	height: 2px;
+	z-index: 2;
+	pointer-events: none;
+	background-color: #811ff9;
+	transform-origin: left;
+}
+.main::before {
+	transform: translateY(-50%) translateX(calc(var(--min-base) * 100%)) scaleX(var(--min-value));
+}
+.main::after {
+	transform: translateY(-50%) translateX(calc(var(--max-base) * 100%)) scaleX(var(--max-value));
 }
 
 

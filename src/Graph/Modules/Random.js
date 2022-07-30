@@ -35,37 +35,15 @@ export default class Random extends GraphAudioNode {
 				readFrom: 'value'
 			},
 			{
-				name: 'min',
-				type: 'range',
-				props: {
-					min: -100,
-					max: 100,
-					step: 0.1
-				},
-				defaultValue: 0,
-				readFrom: 'value'
-			},
-			{
-				name: 'max',
-				type: 'range',
-				props: {
-					min: -100,
-					max: 100,
-					step: 0.1
-				},
-				defaultValue: 1,
-				readFrom: 'value'
-			},
-			{
-				name: 'test',
+				name: 'amplitude',
 				type: 'minmax',
 				props: {
 					min: -100,
 					max: 100,
-					step: 1
+					step: 0.1
 				},
-				defaultValue: [-50, 50],
-				readFrom: 'values'
+				defaultValue: [0, 1],
+				readFrom: 'values',
 			}
 		]
 	}
@@ -90,12 +68,9 @@ export default class Random extends GraphAudioNode {
 			this.audioNode.parameters.get('variability').value = parseFloat(this.data.settings.variability)
 		} else if (name === 'rate') {
 			this.audioNode.parameters.get('rate').value = parseFloat(this.data.settings.rate)
-		} else if (name === 'min') {
-			this.audioNode.parameters.get('min').value = parseFloat(this.data.settings.min)
-		} else if (name === 'max') {
-			this.audioNode.parameters.get('max').value = parseFloat(this.data.settings.max)
-		} else if (name === 'minmax') {
-			console.log('minmax', this.data.settings.minmax)
+		} else if (name === 'amplitude') {
+			this.audioNode.parameters.get('min').value = this.data.settings.amplitude[0]
+			this.audioNode.parameters.get('max').value = this.data.settings.amplitude[1]
 		}
 	}
 }

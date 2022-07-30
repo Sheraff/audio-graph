@@ -1,8 +1,9 @@
 import classNames from 'classnames'
-import React, { useEffect, useRef, memo } from 'react'
+import React, { useEffect, useRef, memo, useCallback } from 'react'
+import useAudioParamViz from '../utils/useAudioParamViz'
 import styles from './index.module.css'
 
-function MinMax({name, defaultValue, props}){
+function MinMax({name, defaultValue, props, controls, instance}){
 	const mainRef = useRef(/** @type {HTMLDivElement} */(null))
 	const inputRef = useRef(/** @type {HTMLInputElement} */(null))
 	const minInputRef = useRef(/** @type {HTMLInputElement} */(null))
@@ -16,6 +17,26 @@ function MinMax({name, defaultValue, props}){
 		const delta = props.max - props.min
 		let values = [defaultValue[0], defaultValue[1]]
 
+		const assignValue = (index, value) => {
+			if (index === 0 && value === values[1]) {
+				if (value < props.min + props.step) {
+					values[0] = props.min
+					values[1] = props.min + props.step
+				} else {
+					values[0] = values[1] - props.step
+				}
+			} else if (index === 1 && value === values[0]) {
+				if (value > props.max - props.step) {
+					values[1] = props.max
+					values[0] = props.max - props.step
+				} else {
+					values[1] = values[0] + props.step
+				}
+			} else {
+				values[index] = value
+			}
+		}
+
 		const updateDisplay = () => {
 			mainRef.current.style.setProperty('--min', (values[0] - props.min) / delta)
 			mainRef.current.style.setProperty('--max', (values[1] - props.min) / delta)
@@ -27,9 +48,11 @@ function MinMax({name, defaultValue, props}){
 		updateDisplay()
 
 		Object.defineProperty(inputRef.current, 'values', {
-			get: () => values,
+			get: () => [...values],
 			configurable: true,
 		})
+
+		const decimals = props.step.toString().split('.')[1]?.length || 0
 
 		const eventToValue = (event) => {
 			const {clientX} = event
@@ -37,7 +60,7 @@ function MinMax({name, defaultValue, props}){
 			const x = clientX - left
 			const value = Math.min(props.max, Math.max(props.min, x / width * delta + props.min))
 			const clampedToStep = Math.round(value / props.step) * props.step
-			return clampedToStep
+			return Number(clampedToStep.toFixed(decimals))
 		}
 
 		/** @type {null | HTMLDivElement} */
@@ -53,7 +76,7 @@ function MinMax({name, defaultValue, props}){
 		const processValue = (value) => {
 			const valueIndex = grabbing === minRef.current ? 0 : 1
 			if (values[valueIndex] !== value) {
-				values[valueIndex] = value
+				assignValue(valueIndex, value)
 				updateDisplay()
 				inputRef.current.dispatchEvent(new Event('input', {bubbles: true}))
 			}
@@ -86,7 +109,7 @@ function MinMax({name, defaultValue, props}){
 
 		const onKeyChange = (index, value) => {
 			if (values[index] !== value) {
-				values[index] = value
+				assignValue(index, value)
 				updateDisplay()
 				inputRef.current.dispatchEvent(new Event('input', {bubbles: true}))
 				inputRef.current.dispatchEvent(new Event('change', {bubbles: true}))
@@ -118,7 +141,7 @@ function MinMax({name, defaultValue, props}){
 
 		function numberInputEvent(element, type, index) {
 			element.addEventListener(type, (event) => {
-				values[index] = event.target.value
+				assignValue(index, event.target.value)
 				updateDisplay()
 				inputRef.current.dispatchEvent(new Event(type, {bubbles: true}))
 			}, {signal: controller.signal})
@@ -137,11 +160,32 @@ function MinMax({name, defaultValue, props}){
 		defaultValue[1],
 	])
 
+	/* eslint-disable react-hooks/rules-of-hooks -- trying to optimize perf */
+	if (controls?.min) {
+		const callback = useCallback((base, value) => {
+			mainRef.current.style.setProperty('--min-base', base)
+			mainRef.current.style.setProperty('--min-value', value)
+		}, [])
+		useAudioParamViz({instance, name: controls.min, props, callback})
+	}
+	if (controls?.max) {
+		const callback = useCallback((base, value) => {
+			mainRef.current.style.setProperty('--max-base', base)
+			mainRef.current.style.setProperty('--max-value', value)
+		}, [])
+		useAudioParamViz({instance, name: controls.max, props, callback})
+	}
+	/* eslint-enable react-hooks/rules-of-hooks -- trying to optimize perf */
+
 	return (
 		<>
 			<span className={styles.main} ref={mainRef} style={{
 				'--min': (defaultValue[0] - props.min) / (props.max - props.min),
 				'--max': (defaultValue[1] - props.min) / (props.max - props.min),
+				'--min-base': 0,
+				'--min-value': 0,
+				'--max-base': 0,
+				'--max-value': 0,
 			}}>
 				<input className={styles.input} ref={inputRef} name={name} />
 				<span ref={minRef} className={classNames(styles.thumb, styles.min)} tabIndex={0} />
