@@ -32,7 +32,7 @@
 	padding: 0;
 	margin: 0;
 	font-variant: tabular-nums;
-	width: 7ch;
+	min-width: 7ch;
 	text-align: right;
 	font-family: monospace;
 }
