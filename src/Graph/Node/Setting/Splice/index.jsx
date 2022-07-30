@@ -147,18 +147,32 @@ export default function Splice({id, name, defaultValue, instance}){
 		}, {signal: controller.signal})
 		canvas.current.addEventListener('mousemove', (e) => {
 			const current = e.offsetX
-			if(start === null) {
+			if (start === null) {
 				const leftX = bounds[0] * ctx.canvas.width
-				if (current < leftX && current > leftX - DISTANCE_TO_RESIZE) {
+				if (current <= leftX && current > leftX - DISTANCE_TO_RESIZE) {
 					canvas.current.style.setProperty('cursor', 'e-resize')
 					type = -1
 					return
 				}
 				const rightX = bounds[1] * ctx.canvas.width
-				if (current > rightX && current < rightX + DISTANCE_TO_RESIZE) {
+				if (current >= rightX && current < rightX + DISTANCE_TO_RESIZE) {
 					canvas.current.style.setProperty('cursor', 'w-resize')
 					type = 1
 					return
+				}
+				if (current > leftX && current < rightX) {
+					const leftD = Math.abs(current - leftX) 
+					const rightD = Math.abs(current - rightX)
+					if (leftD <= rightD && leftD < DISTANCE_TO_RESIZE) {
+						canvas.current.style.setProperty('cursor', 'w-resize')
+						type = -1
+						return
+					}
+					if (rightD < leftD && rightD < DISTANCE_TO_RESIZE) {
+						canvas.current.style.setProperty('cursor', 'e-resize')
+						type = 1
+						return
+					}
 				}
 				canvas.current.style.removeProperty('cursor')
 				type = 0
@@ -178,7 +192,7 @@ export default function Splice({id, name, defaultValue, instance}){
 			}
 		}, {signal: controller.signal})
 		window.addEventListener('mouseup', (e) => {
-			if(start === null) return
+			if (start === null) return
 			start = null
 			dispatch()
 		}, {signal: controller.signal})
