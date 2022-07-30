@@ -39,6 +39,7 @@ import Sampler from './Modules/Sampler'
 import Random from './Modules/Random'
 import Quantize from './Modules/Quantize'
 import LineIn from './Modules/LineIn'
+import MidiInput from './Modules/MidiInput'
 
 const modules = [
 	Output,
@@ -76,6 +77,7 @@ const modules = [
 	Random,
 	Quantize,
 	LineIn,
+	MidiInput,
 ]
 
 export default function Graph() {

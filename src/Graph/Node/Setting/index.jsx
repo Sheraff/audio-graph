@@ -11,8 +11,19 @@ import ToggleRange from "./ToggleRange"
 import WaveShaper from "./WaveShaper"
 import Record from "./Record"
 import MinMax from "./MinMax"
+import DynamicSelect from "./DynamicSelect"
 
-export default function Setting({name, type, defaultValue, options, props, settings, instance, controls}) {
+export default function Setting({
+	name,
+	type,
+	defaultValue,
+	options,
+	props,
+	settings,
+	instance,
+	controls,
+	optionsFrom,
+}) {
 	const id = useId()
 	if (type === 'track')
 		return (
@@ -53,6 +64,14 @@ export default function Setting({name, type, defaultValue, options, props, setti
 						<option key={option} value={option}>{option}</option>
 					))}
 				</select>
+				<div />
+			</>
+		)
+	if (type === 'dynamic-select')
+		return (
+			<>
+				<label htmlFor={id}>{name}</label>
+				<DynamicSelect id={id} name={name} optionsFrom={optionsFrom} instance={instance} defaultValue={defaultValue}/>
 				<div />
 			</>
 		)
