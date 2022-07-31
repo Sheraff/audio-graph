@@ -4,7 +4,7 @@ import GraphAudioNode from "./GraphAudioNode"
 export default class Analyser extends GraphAudioNode {
 	static type = 'analyser'
 	static image = `${process.env.PUBLIC_URL}/icons/analyser.svg`
-	static isSink = true
+	static isSink = false
 	static requiresSinkToPlay = false
 	static structure = {
 		slots: [

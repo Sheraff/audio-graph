@@ -147,12 +147,20 @@ export default class MidiInput extends GraphAudioNode {
 			} else {
 				osc.type = 'sine'
 			}
-			const gain = new GainNode(this.audioContext, { gain: 0 })
-			gain.gain.setTargetAtTime(velocity / 127, this.audioContext.currentTime, 0.015)
-
-			osc.connect(gain)
-			gain.connect(this.audioNode)
 			osc.start()
+
+			const gain = new GainNode(this.audioContext, {gain: velocity / 127})
+			gain.connect(this.audioNode)
+
+			this.smoothConnectionSwitch({
+				action: 'connect',
+				from: {
+					node: osc,
+				},
+				to: {
+					node: gain,
+				},
+			})
 
 			this.customNodes[`osc-${note}`] = osc
 			this.customNodes[`gain-${note}`] = gain
@@ -163,10 +171,17 @@ export default class MidiInput extends GraphAudioNode {
 		if (type === 128 || (type === 144 && velocity === 0)) {
 			if (!this.customNodes[`osc-${note}`]) return
 
-			const gain = this.customNodes[`gain-${note}`]
-			gain.gain.setValueAtTime(gain.gain.value, this.audioContext.currentTime)
-			gain.gain.exponentialRampToValueAtTime(0.0001, this.audioContext.currentTime + 0.03)
-			this.discardedNodes.add(gain)
+			this.smoothConnectionSwitch({
+				action: 'disconnect',
+				from: {
+					node: this.customNodes[`osc-${note}`],
+				},
+				to: {
+					node: this.customNodes[`gain-${note}`],
+				},
+			})
+
+			this.discardedNodes.add(this.customNodes[`gain-${note}`])
 			this.discardedNodes.add(this.customNodes[`osc-${note}`])
 			delete this.customNodes[`osc-${note}`]
 			delete this.customNodes[`gain-${note}`]

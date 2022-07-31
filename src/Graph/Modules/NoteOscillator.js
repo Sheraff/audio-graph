@@ -114,7 +114,7 @@ export default class NoteOscillator extends GraphAudioNode {
 		} else if(name === 'chord') {
 			this.allGain.forEach((gainNode, i) => {
 				const value = this.data.settings.chord.includes(i) ? 0.1 : 0
-				gainNode.gain.value = value
+				gainNode.gain.setTargetAtTime(value, this.audioContext.currentTime, 0.015)
 			})
 		}
 	}

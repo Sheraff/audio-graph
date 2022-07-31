@@ -323,20 +323,77 @@ export default class GraphAudioNode {
 		if (!this.audioNode)
 			return
 		try {
-			// TODO: handle custom nodes
-			// TODO: handle channel assignment better
-			// though it seems to work pretty well...
-			if (typeof to.slot.name === 'string') {
-				this.audioNode[action](audioNode, from.slot.name)
-			} else {
-				this.audioNode[action](audioNode, from.slot.name, to.slot.name)
-			}
+			this.smoothConnectionSwitch({
+				action,
+				from: {
+					node: this.audioNode,
+					name: from.slot.name,
+				},
+				to: {
+					node: audioNode,
+					name: to.slot.name,
+				},
+			})
 		} catch (e) {
 			console.log('from', from, this.audioNode)
 			console.log('to', to, audioNode)
 			const connectionId = GraphAudioNode.connectionToConnectionId({from, to})
 			console.error(`couldn't perform '${action}' on node ${this.constructor.type} (${connectionId}): ${e.message}`)
 		}
+	}
+
+	discarderRicId = null
+	tempConnectionNodes = new Set()
+	/**
+	 * @template {AudioNode} T
+	 * @template {AudioNode | AudioParam} U
+	 * @param {Object} item 
+	 * @param {'connect' | 'disconnect'} item.action
+	 * @param {Object} item.from
+	 * @param {T} item.from.node
+	 * @param {number?} item.from.name
+	 * @param {Object} item.to
+	 * @param {U} item.to.node
+	 * @param {number | string?} item.to.name
+	 */
+	smoothConnectionSwitch({action, from, to}) {
+		// TODO: handle custom nodes
+		// TODO: handle channel assignment better
+		// though it seems to work pretty well...
+		const connector = new GainNode(this.audioContext)
+		if (action === 'connect') {
+			connector.gain.value = 0
+			connector.gain.setValueAtTime(0, this.audioContext.currentTime)
+			from.node.connect(connector, from.name)
+			if (typeof to.name === 'number') {
+				connector.connect(to.node, to.name)
+			} else {
+				connector.connect(to.node)
+			}
+			connector.gain.linearRampToValueAtTime(1, this.audioContext.currentTime + 0.015)
+		} else {
+			connector.gain.value = 1
+			connector.gain.exponentialRampToValueAtTime(0.000001, this.audioContext.currentTime + 0.03)
+			from.node.connect(connector, from.name)
+			if (typeof to.name === 'number') {
+				from.node.disconnect(to.node, from.name, to.name)
+				connector.connect(to.node, to.name)
+			} else {
+				from.node.disconnect(to.node, from.name)
+				connector.connect(to.node)
+			}
+		}
+
+		setTimeout(() => {
+			connector.disconnect()
+			if (action === 'connect') {
+				if (typeof to.name === 'number') {
+					from.node.connect(to.node, from.name, to.name)
+				} else {
+					from.node.connect(to.node, from.name)
+				}
+			}
+		}, action === 'connect' ? 15 : 30)
 	}
 
 	/**
