@@ -87,8 +87,8 @@ export default function Connector({boundary, handles, children}) {
 				const to = handles.current[toNodeId]?.slots[toId]
 				if (!from || !to) {
 					// TODO: this `return` only happens if we have bad data. find out why we sometimes have bad data.
-					console.warn('Bad initial connection data:', connectionId, fromId, toId, from, to)
-					return
+					console.error(`bad data:`, connectionId, fromId, toId, from, to)
+					throw new Error('Bad initial connection data')
 				}
 				addNodeToNodeMap(fromNodeId, nodeMap, handles)
 				addNodeToNodeMap(toNodeId, nodeMap, handles)

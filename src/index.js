@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import Graph from './Graph'
 import request from './Graph/Files/request'
+import ErrorBoundary from './ErrorBoundary'
 
 if (localStorage.length === 0) {
 	request(`${process.env.PUBLIC_URL}/example.sheraff`)
@@ -15,6 +16,8 @@ if (localStorage.length === 0) {
 function startApp() {
 	const root = ReactDOM.createRoot(document.getElementById('root'))
 	root.render(
-		<Graph />
+		<ErrorBoundary>
+			<Graph />
+		</ErrorBoundary>
 	)
 }
