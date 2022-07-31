@@ -6,3 +6,4 @@
 
 - impulse responses for reverb node: https://github.com/GoogleChromeLabs/web-audio-samples/tree/main/src/sounds/impulse-responses
 - wave tables for oscillator nodes: https://github.com/GoogleChromeLabs/web-audio-samples/tree/main/src/demos/wavetable-synth/wave-tables
+- favicon: DALL·E mini
