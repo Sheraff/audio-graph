@@ -129,13 +129,30 @@ export default class MidiInput extends GraphAudioNode {
 		}
 	}
 
+	isSustain = 0
+	sustainedNotes = new Set()
+
 	/** @param {MIDIMessageEvent} event */
 	onMidiMessage(event) {
-		const {data} = event
-		const [type, note, velocity] = data
+		const [type, note, velocity] = event.data
 		if(type >= 240) return
 
 		if (type === 144 && velocity > 0) {
+			// fade existing note
+			if (this.sustainedNotes.has(note)) {
+				const gain = this.customNodes[`gain-${note}`]
+				const osc = this.customNodes[`osc-${note}`]
+				gain.gain.setValueAtTime(gain.gain.value, this.audioContext.currentTime)
+				gain.gain.exponentialRampToValueAtTime(0.0001, this.audioContext.currentTime + 0.1)
+				setTimeout(() => {
+					this.smoothConnectionSwitch({
+						action: 'disconnect',
+						from: { node: osc },
+						to: { node: gain },
+					})
+				}, 100)
+			}
+			// play new note
 			const osc = new OscillatorNode(this.audioContext, {
 				frequency: 440 * Math.pow(2, (note - 69) / 12),
 				detune: parseFloat(this.data.settings.detune),
@@ -170,6 +187,14 @@ export default class MidiInput extends GraphAudioNode {
 		
 		if (type === 128 || (type === 144 && velocity === 0)) {
 			if (!this.customNodes[`osc-${note}`]) return
+			if (this.isSustain) {
+				this.sustainedNotes.add(note)
+				const gain = this.customNodes[`gain-${note}`]
+				const value = gain.gain.value
+				gain.gain.setValueAtTime(value, this.audioContext.currentTime)
+				gain.gain.exponentialRampToValueAtTime(value * this.isSustain / 127, this.audioContext.currentTime + 0.1)
+				return
+			}
 
 			this.smoothConnectionSwitch({
 				action: 'disconnect',
@@ -186,7 +211,31 @@ export default class MidiInput extends GraphAudioNode {
 			delete this.customNodes[`osc-${note}`]
 			delete this.customNodes[`gain-${note}`]
 
+			return
 		}
+
+		if (type === 176 && velocity > 0) {
+			this.isSustain = velocity
+			this.sustainedNotes.forEach(note => {
+				const gain = this.customNodes[`gain-${note}`]
+				const value = gain.gain.value
+				gain.gain.setValueAtTime(value, this.audioContext.currentTime)
+				gain.gain.exponentialRampToValueAtTime(value * this.isSustain / 127, this.audioContext.currentTime + 0.1)
+			})
+			return
+		}
+		if (type === 176 && velocity === 0) {
+			this.isSustain = 0
+			this.sustainedNotes.forEach(note => {
+				this.onMidiMessage({
+					data: [128, note, 0],
+				})
+			})
+			this.sustainedNotes.clear()
+			return
+		}
+
+		console.log('unhandled MIDI message', [type, note, velocity])
 	}
 
 	discardedNodes = new Set()
