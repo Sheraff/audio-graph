@@ -67,9 +67,11 @@ function MinMax({name, defaultValue, props, controls, instance}){
 		let grabbing = null
 
 		minRef.current.addEventListener('mousedown', (event) => {
+			if (event.button !== 0) return
 			grabbing = event.target
 		}, {signal: controller.signal})
 		maxRef.current.addEventListener('mousedown', (event) => {
+			if (event.button !== 0) return
 			grabbing = event.target
 		}, {signal: controller.signal})
 
@@ -103,6 +105,7 @@ function MinMax({name, defaultValue, props, controls, instance}){
 
 		window.addEventListener('mouseup', (e) => {
 			if(!grabbing) return
+
 			grabbing = null
 			inputRef.current.dispatchEvent(new Event('change', {bubbles: true}))
 		}, {signal: controller.signal})
