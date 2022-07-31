@@ -150,6 +150,8 @@ export default class MidiInput extends GraphAudioNode {
 						from: { node: osc },
 						to: { node: gain },
 					})
+					this.discardedNodes.add(gain)
+					this.discardedNodes.add(osc)
 				}, 100)
 			}
 			// play new note
