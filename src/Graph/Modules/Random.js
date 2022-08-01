@@ -44,7 +44,13 @@ export default class Random extends GraphAudioNode {
 				},
 				defaultValue: [0, 1],
 				readFrom: 'values',
-			}
+			},
+			{
+				name: 'smooth',
+				type: 'checkbox',
+				defaultValue: false,
+				readFrom: 'checked',
+			},
 		]
 	}
 
@@ -61,6 +67,7 @@ export default class Random extends GraphAudioNode {
 
 		this.makeParamObservable('variability')
 		this.makeParamObservable('rate')
+		
 	}
 
 	updateSetting(name) {
@@ -71,6 +78,8 @@ export default class Random extends GraphAudioNode {
 		} else if (name === 'amplitude') {
 			this.audioNode.parameters.get('min').value = this.data.settings.amplitude[0]
 			this.audioNode.parameters.get('max').value = this.data.settings.amplitude[1]
+		} else if (name === 'smooth') {
+			this.audioNode.parameters.get('smooth').value = this.data.settings.smooth
 		}
 	}
 }
