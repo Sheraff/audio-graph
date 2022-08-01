@@ -16,7 +16,11 @@ export default class MidiInput extends GraphAudioNode {
 				name: 'device',
 				defaultValue: '',
 				readFrom: 'value',
-				optionsFrom: 'midiDevices'
+				optionsFrom: 'midiDevices',
+				props: {
+					emptyLabel: 'No MIDI devices found',
+					nullLabel: 'Select a MIDI device',
+				}
 			},
 			{
 				name: 'detune',

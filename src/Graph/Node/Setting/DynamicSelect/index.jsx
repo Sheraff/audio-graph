@@ -7,6 +7,8 @@ export default function DynamicSelect({
 	optionsFrom,
 	instance,
 	defaultValue,
+	emptyLabel,
+	nullLabel,
 }) {
 	const [options, setOptions] = useState(() => instance.current[optionsFrom])
 	const touched = useRef(false)
@@ -47,8 +49,8 @@ export default function DynamicSelect({
 			disabled={options.length === 0}
 			defaultValue={defaultValue}
 		>
-			<option key={null} value="">
-				{options.length === 0 ? 'no MIDI device detected' : 'select device'}
+			<option key={null} value="" disabled>
+				{options.length === 0 ? emptyLabel : nullLabel}
 			</option>
 			{options.map(({value, label}) => (
 				<option key={value} value={value}>{label}</option>
