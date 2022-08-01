@@ -31,6 +31,13 @@ class Random extends AudioWorkletProcessor {
 				maxValue: 1000,
 				automationRate: 'k-rate'
 			},
+			{
+				name: 'smooth',
+				defaultValue: 0,
+				minValue: 0,
+				maxValue: 1,
+				automationRate: 'k-rate'
+			},
 		]
 	}
 	constructor(options) {
@@ -39,12 +46,14 @@ class Random extends AudioWorkletProcessor {
 		this.sinceLast = 0
 		this.nextChange = 0
 		this.currentValue = 0
+		this.previousValue = 0
 	}
 	process (inputs, outputs, parameters) {
 		const base = outputs[0][0]
 		if (!base) {
 			return true
 		}
+		const isSmooth = Boolean(parameters.smooth[0])
 		base.forEach((_,i) => {
 			const rate = parameters.rate[i] ?? parameters.rate[0]
 			const variability = parameters.variability[i] ?? parameters.variability[0]
@@ -54,6 +63,7 @@ class Random extends AudioWorkletProcessor {
 				const frameMax = parameters.max[0]
 				const min = Math.min(frameMin, frameMax)
 				const max = Math.max(frameMin, frameMax)
+				this.previousValue = this.currentValue
 				this.currentValue = Math.random() * (max - min) + min
 				this.sinceLast = 0
 
@@ -66,11 +76,22 @@ class Random extends AudioWorkletProcessor {
 				this.nextChange -= this.sinceLast
 			}
 
-			outputs.forEach(output => 
-				output.forEach(channel => 
-					channel[i] = this.currentValue
+			if (isSmooth) {
+				const progress = Math.sin(this.sinceLast / this.nextChange * Math.PI / 2)
+				const delta = this.currentValue - this.previousValue
+				const value = this.previousValue + progress * delta
+				outputs.forEach(output =>
+					output.forEach(channel => {
+						channel[i] = value
+					})
 				)
-			)
+			} else {
+				outputs.forEach(output =>
+					output.forEach(channel => 
+						channel[i] = this.currentValue
+					)
+				)
+			}
 		})
 		return true
 	}
