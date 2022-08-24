@@ -195,7 +195,7 @@ function MinMax({name, defaultValue, props, controls, instance}){
 				<span ref={maxRef} className={classNames(styles.thumb, styles.max)} tabIndex={0} />
 				<span ref={trackRef} className={styles.track}/>
 			</span>
-			<span>
+			<span className={styles.texts}>
 				<input
 					ref={minInputRef}
 					type="number"
